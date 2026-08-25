@@ -1,0 +1,13 @@
+node_modules/
+.next/
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+postgres_data/
+media/
+staticfiles/
+.vscode/
+.idea/
