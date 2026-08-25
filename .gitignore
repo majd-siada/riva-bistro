@@ -1,13 +1,42 @@
+# Dependencies
 node_modules/
+.venv/
+venv/
+
+# Next.js
 .next/
+out/
+apps/web/.turbo/
+*.tsbuildinfo
+
+# Python
 __pycache__/
 *.py[cod]
-.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+staticfiles/
+
+# Environment / secrets
 .env
 .env.*
 !.env.example
+
+# Local data
 postgres_data/
 media/
-staticfiles/
+apps/backend/media/*
+!apps/backend/media/.gitkeep
+!apps/backend/media/.gitignore
+
+# Editors / OS
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Cursor (local)
+.cursor/

@@ -1,0 +1,15 @@
+{
+  "name": "riva-bistro",
+  "private": true,
+  "description": "Riva Bistro monorepo helper scripts",
+  "scripts": {
+    "dev": "docker compose up --build",
+    "down": "docker compose down",
+    "backend:test": "docker compose exec backend pytest",
+    "backend:lint": "docker compose exec backend ruff check .",
+    "web:lint": "docker compose exec web npm run lint",
+    "web:typecheck": "docker compose exec web npm run typecheck",
+    "web:test": "docker compose exec web npm run test",
+    "openapi": "docker compose exec backend python manage.py spectacular --file /tmp/openapi.yaml"
+  }
+}

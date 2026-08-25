@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Riva Bistro design tokens */
+  --riva-black: #0a0a0a;
+  --riva-ivory: #f4f0e6;
+  --riva-gold: #c4a574;
+  --riva-gold-muted: #8f774f;
+  --riva-charcoal: #161616;
+  --riva-mist: #d9d2c3;
+
+  --background: var(--riva-black);
+  --foreground: var(--riva-ivory);
+
+  --radius: 0.25rem;
+}
+
+@layer base {
+  * {
+    border-color: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), ui-serif, Georgia, serif;
+    letter-spacing: 0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--riva-gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -1,0 +1,14 @@
+.git
+.cursor
+.env
+**/node_modules
+**/.next
+**/__pycache__
+**/.venv
+**/.pytest_cache
+**/.ruff_cache
+**/staticfiles
+apps/backend/media
+*.md
+!README.md
+.github
