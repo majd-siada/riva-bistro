@@ -4,8 +4,12 @@ import path from "node:path";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Avoid picking up unrelated lockfiles outside this monorepo.
   outputFileTracingRoot: path.join(__dirname, "../.."),
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
+  },
 };
 
 export default nextConfig;

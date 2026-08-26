@@ -3,23 +3,66 @@
 @tailwind utilities;
 
 :root {
-  /* Riva Bistro design tokens */
+  /* Riva Bistro — primitive tokens (logo-derived) */
   --riva-black: #0a0a0a;
-  --riva-ivory: #f4f0e6;
-  --riva-gold: #c4a574;
-  --riva-gold-muted: #8f774f;
+  --riva-charcoal-deep: #0f1418;
   --riva-charcoal: #161616;
+  --riva-ivory: #f4f0e6;
   --riva-mist: #d9d2c3;
+  --riva-gold: #bfa06a;
+  --riva-gold-muted: #8f774f;
+  --riva-teal: #5e8b8b;
+  --riva-teal-muted: #4a7373;
+  --riva-error: #c45c5c;
+  --riva-success: #5e8b6e;
 
-  --background: var(--riva-black);
-  --foreground: var(--riva-ivory);
+  /* Semantic tokens */
+  --surface-default: var(--riva-black);
+  --surface-elevated: var(--riva-charcoal);
+  --surface-subtle: var(--riva-charcoal-deep);
+  --text-primary: var(--riva-ivory);
+  --text-muted: var(--riva-mist);
+  --text-accent: var(--riva-gold);
+  --border-subtle: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
+  --border-accent: var(--riva-gold);
+  --accent-teal: var(--riva-teal);
+  --accent-gold: var(--riva-gold);
 
-  --radius: 0.25rem;
+  --background: var(--surface-default);
+  --foreground: var(--text-primary);
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius: var(--radius-sm);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows — restrained */
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.32);
 }
 
 @layer base {
   * {
-    border-color: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
+    border-color: var(--border-subtle);
   }
 
   html {
@@ -59,8 +102,105 @@
   }
 }
 
+@layer components {
+  .riva-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-riva-gold;
+  }
+
+  .riva-card {
+    @apply rounded-md border bg-riva-charcoal transition-all;
+    border-color: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .riva-card:hover {
+    border-color: color-mix(in srgb, var(--riva-teal) 30%, transparent);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .riva-card:hover {
+      transform: none;
+    }
+  }
+
+  .riva-price {
+    font-variant-numeric: tabular-nums;
+    @apply text-lg font-semibold text-riva-ivory;
+  }
+
+  .riva-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--riva-charcoal) 0%,
+      color-mix(in srgb, var(--riva-ivory) 6%, var(--riva-charcoal)) 50%,
+      var(--riva-charcoal) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes cart-bounce {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  .cart-badge-bounce {
+    animation: cart-bounce 0.4s var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .riva-shimmer {
+      animation: none;
+    }
+    .cart-badge-bounce {
+      animation: none;
+    }
+  }
+
+  .status-step-active {
+    border-color: var(--riva-teal);
+    background: color-mix(in srgb, var(--riva-teal) 20%, transparent);
+  }
+
+  .status-step-complete {
+    border-color: var(--riva-success);
+    background: color-mix(in srgb, var(--riva-success) 20%, transparent);
+  }
+
+  .status-step-pending {
+    border-color: color-mix(in srgb, var(--riva-ivory) 20%, transparent);
+    background: transparent;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .transition-riva {
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .transition-riva-fast {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-out);
   }
 }

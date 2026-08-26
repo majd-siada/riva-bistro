@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
 
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+import { AppShell } from "@/components/layout/app-shell";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -38,9 +38,8 @@ export default function RootLayout({
   return (
     <html lang="sv">
       <body className={`${display.variable} ${sans.variable} min-h-screen font-sans`}>
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
+        <AppShell>{children}</AppShell>
+        <Toaster />
       </body>
     </html>
   );

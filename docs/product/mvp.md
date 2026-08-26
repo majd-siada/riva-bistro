@@ -30,10 +30,18 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 - Generated OpenAPI TypeScript client
 - Public booking flow wired to real API
 
-### Phase 4 — Admin CMS
+### Phase 4 — Admin CMS & commerce
 
 - Auth / roles
 - Menu, gallery, news, settings management
+- **Online ordering:** cart, checkout, order tracking (implemented)
+- **Restaurant dashboard:** orders, products, inventory, sales KPIs
+
+### Phase 4b — Commerce hardening
+
+- Stripe payment integration (stub payment in place)
+- Real-time order status (WebSocket/polling)
+- Inventory sync on order
 
 ### Phase 5 — Media + Telegram
 

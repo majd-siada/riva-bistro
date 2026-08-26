@@ -1,74 +1,83 @@
 import Link from "next/link";
 
+import { WaveDivider } from "@/components/brand/wave-divider";
+import { ProductCard } from "@/components/commerce/product-card";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/layout/section";
-
-const apiUrl = process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-async function getApiHealth(): Promise<"ok" | "degraded" | "unreachable"> {
-  try {
-    const response = await fetch(`${apiUrl.replace(/\/$/, "")}/api/v1/health/`, {
-      next: { revalidate: 10 },
-    });
-    if (!response.ok) {
-      return "degraded";
-    }
-    const data = (await response.json()) as { status?: string };
-    return data.status === "ok" ? "ok" : "degraded";
-  } catch {
-    return "unreachable";
-  }
-}
+import { fetchProducts } from "@/lib/api";
 
 export default async function HomePage() {
-  const health = await getApiHealth();
+  let featured: Awaited<ReturnType<typeof fetchProducts>> = [];
+  try {
+    const all = await fetchProducts();
+    featured = all.slice(0, 3);
+  } catch {
+    featured = [];
+  }
 
   return (
     <>
-      <section className="relative flex min-h-[100svh] items-center justify-center bg-riva-hero px-6">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="mb-4 text-xs uppercase tracking-[0.35em] text-riva-gold">
-            Stockholm
-          </p>
+      <section className="relative flex min-h-[90svh] items-center justify-center bg-riva-hero px-6 pt-20">
+        <div className="mx-auto max-w-4xl text-center animate-fade-in">
+          <p className="riva-label mb-4">Stockholm · Kust &amp; kök</p>
           <h1 className="font-display text-5xl font-medium text-riva-ivory md:text-7xl">
             Riva Bistro
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-riva-ivory/75 md:text-lg">
-            En stillsam plats för svensk gastronomi — mer av den cinematiska
-            upplevelsen kommer i nästa fas.
+            Premium svensk gastronomi med mediterran själ. Beställ online eller boka bord för en
+            kväll vid vattnet.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" variant="gold">
-              <Link href="/boka">Boka bord</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/meny">Se menyn</Link>
-            </Button>
+            <Link href="/meny">
+              <Button size="lg">Beställ från menyn</Button>
+            </Link>
+            <Link href="/boka">
+              <Button size="lg" variant="outline">
+                Boka bord
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
+      <Section>
+        <div className="text-center">
+          <p className="riva-label">Utvalt</p>
+          <h2 className="mt-2 font-display text-4xl text-riva-ivory">Säsongens favoriter</h2>
+          <WaveDivider className="mx-auto mt-6 max-w-xs" />
+        </div>
+        {featured.length > 0 ? (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-12 text-center text-riva-mist">
+            Menyn laddas snart — starta backend med Docker Compose.
+          </p>
+        )}
+        <div className="mt-12 text-center">
+          <Link href="/meny">
+            <Button variant="outline">Se hela menyn</Button>
+          </Link>
+        </div>
+      </Section>
+
       <Section className="bg-riva-charcoal">
-        <div className="max-w-2xl">
-          <h2 className="text-3xl text-riva-ivory md:text-4xl">Grundplattform</h2>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-3xl text-riva-ivory md:text-4xl">
+            Elegans vid vattnet
+          </h2>
           <p className="mt-4 text-riva-ivory/70">
-            Phase 1 är igång: Docker, PostgreSQL, Django API och den här Next.js
-            grunden med Rivas design tokens.
+            Skandinavisk minimalism möter varm mediterran gästfrihet. Varje rätt tillagad med
+            omsorg, serverad med sjöutsikt.
           </p>
-          <p className="mt-6 text-sm tracking-wide text-riva-mist">
-            API-status:{" "}
-            <span
-              className={
-                health === "ok" ? "text-riva-gold" : "text-riva-ivory/60"
-              }
-            >
-              {health === "ok"
-                ? "ansluten"
-                : health === "degraded"
-                  ? "degraderad"
-                  : "ej nåbar (starta Docker Compose)"}
-            </span>
-          </p>
+          <Link href="/om-oss">
+            <Button variant="link" className="mt-6">
+              Läs mer om oss
+            </Button>
+          </Link>
         </div>
       </Section>
     </>

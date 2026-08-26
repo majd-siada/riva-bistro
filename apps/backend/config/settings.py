@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     # Local
     "core",
+    "catalog",
+    "commerce",
 ]
 
 MIDDLEWARE = [
@@ -149,9 +151,13 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
 }
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Riva Bistro API",
-    "DESCRIPTION": "OpenAPI contract for the Riva Bistro reservation platform.",
+    "DESCRIPTION": "OpenAPI contract for the Riva Bistro platform — menu, ordering, and reservations.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
