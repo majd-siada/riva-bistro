@@ -4,6 +4,8 @@ from django.core.management.base import BaseCommand
 
 from catalog.models import Category, ModifierGroup, ModifierOption, Product
 
+IMG = "https://images.unsplash.com/photo-{id}?w=800"
+
 
 class Command(BaseCommand):
     help = "Seed sample menu data for Riva Bistro"
@@ -17,14 +19,70 @@ class Command(BaseCommand):
         ]
 
         products_data = [
-            ("forratter", "Gravad lax", "gravad-lax", "Hovmästarsås, dill, rostat bröd.", 145, "https://images.unsplash.com/photo-1519708227418-c8fd9a32b9a2?w=800"),
-            ("forratter", "Skagenröra", "skagenrora", "Toast Skagen med löjrom och citron.", 165, "https://images.unsplash.com/photo-1544025162-d76694265947?w=800"),
-            ("huvudratter", "Wallenbergare", "wallenbergare", "Potatispuré, gröna ärtor, lingon.", 245, "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800"),
-            ("huvudratter", "Halstrad röding", "rodling", "Brynt smör, haricots verts, citron.", 285, "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800"),
-            ("huvudratter", "Entrecôte", "entrecote", "Rödvinssås, pommes, bearnaisesås.", 325, "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800"),
-            ("desserter", "Pannacotta", "pannacotta", "Vanilj, bärkompott, mynta.", 115, "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800"),
-            ("desserter", "Chokladfondant", "chokladfondant", "Varm choklad, vaniljglass.", 125, "https://images.unsplash.com/photo-1624353368356-a1ab7033d422?w=800"),
-            ("drycker", "Husets röda", "husets-roda", "Ett glas utvalt rödvin.", 95, "https://images.unsplash.com/photo-1510812431401-41e2bd2722f3?w=800"),
+            (
+                "forratter",
+                "Gravad lax",
+                "gravad-lax",
+                "Hovmästarsås, dill, rostat bröd.",
+                145,
+                IMG.format(id="1519708227418-c8fd9a32b9a2"),
+            ),
+            (
+                "forratter",
+                "Skagenröra",
+                "skagenrora",
+                "Toast Skagen med löjrom och citron.",
+                165,
+                IMG.format(id="1544025162-d76694265947"),
+            ),
+            (
+                "huvudratter",
+                "Wallenbergare",
+                "wallenbergare",
+                "Potatispuré, gröna ärtor, lingon.",
+                245,
+                IMG.format(id="1546833999-b9f581a1996d"),
+            ),
+            (
+                "huvudratter",
+                "Halstrad röding",
+                "rodling",
+                "Brynt smör, haricots verts, citron.",
+                285,
+                IMG.format(id="1467003909585-2f8a72700288"),
+            ),
+            (
+                "huvudratter",
+                "Entrecôte",
+                "entrecote",
+                "Rödvinssås, pommes, bearnaisesås.",
+                325,
+                IMG.format(id="1600891964092-4316c288032e"),
+            ),
+            (
+                "desserter",
+                "Pannacotta",
+                "pannacotta",
+                "Vanilj, bärkompott, mynta.",
+                115,
+                IMG.format(id="1488477181946-6428a0291777"),
+            ),
+            (
+                "desserter",
+                "Chokladfondant",
+                "chokladfondant",
+                "Varm choklad, vaniljglass.",
+                125,
+                IMG.format(id="1624353368356-a1ab7033d422"),
+            ),
+            (
+                "drycker",
+                "Husets röda",
+                "husets-roda",
+                "Ett glas utvalt rödvin.",
+                95,
+                IMG.format(id="1510812431401-41e2bd2722f3"),
+            ),
         ]
 
         for i, (name, slug, desc) in enumerate(categories_data):

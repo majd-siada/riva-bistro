@@ -1,11 +1,10 @@
 from decimal import Decimal
 
-from django.db import transaction
 from rest_framework import serializers
 
 from catalog.models import Category, ModifierOption, Product
 from catalog.pricing import price_from_ex_vat, quantize
-from commerce.models import Cart, CartLine, Customer, Order, OrderLine, Payment
+from commerce.models import Cart, CartLine, Customer, Order, OrderLine
 
 
 class PricingSerializer(serializers.Serializer):

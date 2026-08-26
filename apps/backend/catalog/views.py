@@ -92,7 +92,8 @@ class AdminOrderDetailView(APIView):
 
 class AdminProductListView(APIView):
     def get(self, request: Request) -> Response:
-        return Response(ProductAdminSerializer(Product.objects.select_related("category").all(), many=True).data)
+        products = Product.objects.select_related("category").all()
+        return Response(ProductAdminSerializer(products, many=True).data)
 
     def post(self, request: Request) -> Response:
         serializer = ProductAdminSerializer(data=request.data)
@@ -112,7 +113,8 @@ class AdminProductDetailView(APIView):
 
 class AdminCategoryListView(APIView):
     def get(self, request: Request) -> Response:
-        return Response(CategoryAdminSerializer(Category.objects.annotate(pc=Count("products")).all(), many=True).data)
+        categories = Category.objects.annotate(pc=Count("products")).all()
+        return Response(CategoryAdminSerializer(categories, many=True).data)
 
 
 class AdminInventoryView(APIView):

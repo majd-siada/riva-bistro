@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from commerce.models import Cart, CartLine, Customer, Order, OrderLine, Payment
+from commerce.models import Cart, Customer, Order, OrderLine, Payment
 
 
 class OrderLineInline(admin.TabularInline):

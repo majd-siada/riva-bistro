@@ -16,9 +16,7 @@ from commerce.serializers import (
     CartSerializer,
     CheckoutSerializer,
     OrderSerializer,
-    OrderStatusUpdateSerializer,
 )
-
 
 CART_SESSION_KEY = "riva_cart_id"
 
@@ -152,14 +150,23 @@ class OrderDetailView(APIView):
 class OrderStatusView(APIView):
     def get(self, request: Request, ref: str) -> Response:
         order = get_object_or_404(Order, ref=ref)
-        return Response({"ref": order.ref, "status": order.status, "payment_status": order.payment_status})
+        return Response(
+            {
+                "ref": order.ref,
+                "status": order.status,
+                "payment_status": order.payment_status,
+            }
+        )
 
 
 class AccountOrdersView(APIView):
     def get(self, request: Request) -> Response:
         email = request.query_params.get("email")
         if not email:
-            return Response({"detail": "email query param required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "email query param required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         customer = Customer.objects.filter(email=email).first()
         if not customer:
             return Response([])
