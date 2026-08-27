@@ -1,14 +1,26 @@
 # Reservations Architecture
 
-> Status: **designed in Phase 1**, implemented in **Phase 2**.
+> Status: **implemented** in the `reservations` Django app.
+
+## Model: instant confirmation, backend-enforced
+
+Bookings are confirmed instantly, but availability is decided entirely by the
+backend — the frontend availability UI is advisory only. Implementation:
+`apps/backend/reservations/` (`availability.py`, `booking.py`).
 
 ## Principles
 
-1. The frontend availability UI is **advisory only**.
-2. The backend performs a **final availability check** inside the create-reservation transaction.
-3. Concurrent bookings are protected with database transactions and locking/constraints.
-4. Every reservation receives a **unique booking reference**.
-5. Telegram notification is **out of band** — never part of the commit path.
+1. The frontend availability UI is **advisory only**; the backend re-checks on create.
+2. Concurrency: a Postgres **transaction-scoped advisory lock** keyed on the slot
+   (`pg_advisory_xact_lock`) serialises concurrent bookings for the same date+time,
+   so capacity is enforced at the database layer (no overbooking).
+3. Every reservation receives a **unique booking reference** (`RB-XXXXXX`).
+4. **Production guard**: instant confirmation is only allowed when `settings.DEBUG`
+   (dev placeholder capacity) or `ReservationSettings.production_ready` is true. In
+   production it stays disabled — and returns a clear "not enabled" response rather
+   than a fake confirmation — until staff set a real capacity and enable it.
+5. Confirmation email is **best-effort** and out of band — a mail failure never
+   turns a real, committed booking into an error.
 
 ## Conceptual flow
 
@@ -22,15 +34,16 @@ Customer → Next.js → POST /api/v1/reservations
   → response with booking reference
 ```
 
-## Planned statuses
+## Statuses
 
-| Status      | Meaning                                      |
-|-------------|----------------------------------------------|
-| `pending`   | Created; awaiting staff confirmation (if required) |
-| `confirmed` | Accepted                                     |
-| `cancelled` | Cancelled by guest or restaurant             |
-| `completed` | Guest attended                               |
-| `no_show`   | Guest did not arrive                         |
+| Status      | Meaning                          |
+|-------------|----------------------------------|
+| `confirmed` | Accepted (default on create)     |
+| `seated`    | Guest has arrived                |
+| `cancelled` | Cancelled by guest or restaurant |
+| `no_show`   | Guest did not arrive             |
+
+Staff manage status from the admin (`/admin/bokningar`).
 
 ## Availability inputs
 
@@ -43,14 +56,15 @@ Customer → Next.js → POST /api/v1/reservations
 
 Business logic lives in a **service/domain layer**, not serializers or React components.
 
-## Critical tests (Phase 2)
+## Tests
+
+Covered in `apps/backend/reservations/tests/`:
 
 - Valid booking
 - Invalid party size
-- Closed date
-- Outside opening hours
-- Capacity exceeded
-- Cancellation
-- Duplicate booking-reference protection
-- Concurrent booking protection
-- Telegram failure does not fail reservation creation
+- Invalid / misaligned slot
+- Closed date (special closure) and past dates
+- Capacity exceeded (full slot rejected)
+- Duplicate-submission idempotency
+- Production guard (disabled vs. enabled)
+- Public booking works even with an authenticated session (no CSRF for guests)

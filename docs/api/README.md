@@ -11,24 +11,42 @@ The OpenAPI schema exported by Django (`drf-spectacular`) is the **only** API co
 
 Public HTTP APIs are versioned under `/api/v1/`.
 
-## Phase 1 endpoints
+## Public endpoints
 
-| Method | Path              | Description                |
-|--------|-------------------|----------------------------|
-| GET    | `/api/v1/health/` | API + database health      |
-| GET    | `/api/v1/schema/` | OpenAPI schema (JSON/YAML) |
-| GET    | `/api/v1/docs/`   | Swagger UI                 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/health/` | API + database health |
+| GET | `/api/v1/menu/categories/` | Menu categories |
+| GET | `/api/v1/menu/products/` | Products (`?category=<slug>`, `?featured=true`) |
+| GET | `/api/v1/menu/featured/` | Featured dishes (homepage) |
+| GET | `/api/v1/menu/products/<slug>/` | Product detail |
+| GET | `/api/v1/hours/` | Opening hours |
+| GET | `/api/v1/reservations/availability/?date=YYYY-MM-DD` | Bookable slots + remaining capacity |
+| POST | `/api/v1/reservations/` | Create a confirmed reservation (backend-enforced availability) |
+| POST | `/api/v1/contact/` | Contact message → notification inbox |
+| POST | `/api/v1/events/inquiry/` | Private-event inquiry → notification inbox |
+| GET | `/api/v1/schema/` · `/api/v1/docs/` | OpenAPI schema + Swagger UI |
 
-## Generated TypeScript client
+Public write endpoints (`reservations`, `contact`, `events/inquiry`) do not use
+session auth, so they work for anonymous guests without CSRF tokens.
 
-Workflow (introduced fully in Phase 3):
+## Admin endpoints (staff session, `IsAdminUser`)
 
-1. Export OpenAPI from Django.
-2. Generate client/types into `packages/api-client`.
-3. Consume the generated package from `apps/web`.
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/admin/auth/csrf/` | Set CSRF cookie |
+| POST | `/api/v1/admin/auth/login/` · `logout/` | Session login/logout |
+| GET | `/api/v1/admin/auth/me/` | Current admin session |
+| GET | `/api/v1/admin/overview/` | Dashboard KPIs + today's reservations |
+| GET/PATCH | `/api/v1/admin/reservations/` · `/<id>/` | List/filter + status update |
+| GET/PUT | `/api/v1/admin/hours/` | Opening hours |
+| GET/POST/DELETE | `/api/v1/admin/closures/` · `/<id>/` | Special closures |
+| GET/PATCH | `/api/v1/admin/settings/` | Reservation settings (capacity, `production_ready`) |
+| GET/POST/PATCH/DELETE | `/api/v1/admin/menu/categories/` · `/products/` | Menu CRUD (same catalog data) |
+| POST | `/api/v1/admin/menu/products/<id>/image/` | Upload dish image (multipart) |
 
-Never invent request/response shapes in the frontend.
+Admin write requests use Django session auth + CSRF (`X-CSRFToken`). The
+frontend admin client handles the token automatically.
 
-## Auth (later)
-
-Admin endpoints will require authentication and authorization. Public booking/read endpoints will remain intentionally limited and validated.
+Never invent request/response shapes in the frontend; the OpenAPI schema is the
+contract.
