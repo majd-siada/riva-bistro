@@ -104,6 +104,30 @@ export interface AdminOverview {
   pending_orders: number;
 }
 
+export interface ReservationRequest {
+  date: string;
+  time: string;
+  party_size: number;
+  name: string;
+  email: string;
+  phone: string;
+  notes?: string;
+}
+
+export interface Reservation {
+  ref: string;
+  status: string;
+  date: string;
+  time: string;
+  party_size: number;
+}
+
+export interface ContactMessageRequest {
+  name: string;
+  email: string;
+  message: string;
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}/api/v1${path}`, {
     ...init,
@@ -185,6 +209,24 @@ export async function fetchAccountOrders(email: string): Promise<Order[]> {
 
 export async function fetchAccountOrder(orderId: number, email: string): Promise<Order> {
   return apiFetch(`/account/orders/${orderId}/?email=${encodeURIComponent(email)}`);
+}
+
+// Reservations and contact are Phase 2/4 backend features. These calls are
+// pre-wired to their planned endpoints; until the backend ships them the UI
+// falls back to a graceful "we'll confirm manually" flow.
+export async function createReservation(
+  data: ReservationRequest,
+): Promise<Reservation> {
+  return apiFetch("/reservations/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function sendContactMessage(
+  data: ContactMessageRequest,
+): Promise<{ status: string }> {
+  return apiFetch("/contact/", { method: "POST", body: JSON.stringify(data) });
 }
 
 export async function fetchAdminOverview(): Promise<AdminOverview> {
