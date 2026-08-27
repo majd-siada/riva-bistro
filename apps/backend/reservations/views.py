@@ -45,7 +45,14 @@ class AvailabilityView(APIView):
 
 
 class ReservationCreateView(APIView):
-    """Create a real, confirmed reservation (backend-enforced availability)."""
+    """Create a real, confirmed reservation (backend-enforced availability).
+
+    Public endpoint: no session auth (and therefore no CSRF), so it works for
+    anonymous guests even if a Django session happens to be authenticated.
+    """
+
+    authentication_classes: list = []
+    permission_classes: list = []
 
     def post(self, request: Request) -> Response:
         serializer = ReservationCreateSerializer(data=request.data)

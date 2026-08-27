@@ -65,7 +65,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
-      <body className={`${display.variable} ${sans.variable} min-h-screen font-sans`}>
+      <body
+        className={`${display.variable} ${sans.variable} flex min-h-screen flex-col font-sans`}
+      >
         <AppShell header={<Header />} footer={<Footer />}>
           {children}
         </AppShell>

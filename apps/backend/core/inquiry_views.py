@@ -14,6 +14,9 @@ FAIL_MESSAGE = "Något gick fel. Försök igen eller kontakta oss direkt."
 class ContactView(APIView):
     """Public contact form → emails the restaurant notification inbox."""
 
+    authentication_classes: list = []
+    permission_classes: list = []
+
     def post(self, request: Request) -> Response:
         serializer = ContactSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -27,6 +30,9 @@ class ContactView(APIView):
 
 class EventInquiryView(APIView):
     """Public private-events inquiry → emails the restaurant notification inbox."""
+
+    authentication_classes: list = []
+    permission_classes: list = []
 
     def post(self, request: Request) -> Response:
         serializer = EventInquirySerializer(data=request.data)

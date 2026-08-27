@@ -1,6 +1,7 @@
 from datetime import date, time, timedelta
 
 import pytest
+from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from reservations.models import (
@@ -203,6 +204,31 @@ def test_production_guard_blocks_when_not_ready(api, settings):
     )
     assert resp.status_code == 503
     assert resp.json()["code"] == "not_enabled"
+
+
+@pytest.mark.django_db
+def test_public_booking_ignores_csrf_even_with_authenticated_session():
+    # A staff member (or anyone with an authenticated Django session) browsing
+    # the public site must still be able to book — the public endpoint has no
+    # session auth, so CSRF is never enforced.
+    _open_all_week()
+    user = get_user_model().objects.create_user("staff", password="x", is_staff=True)
+    client = APIClient(enforce_csrf_checks=True)
+    client.force_login(user)
+    target = _target_date()
+    resp = client.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Johan",
+            "phone": "07",
+            "email": "johan@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 201
 
 
 @pytest.mark.django_db

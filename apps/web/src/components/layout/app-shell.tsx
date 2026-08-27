@@ -29,7 +29,9 @@ export function AppShell({
         Hoppa till innehåll
       </a>
       {header}
-      <main id="main-content">{children}</main>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       {footer}
       <RevealObserver />
     </>
