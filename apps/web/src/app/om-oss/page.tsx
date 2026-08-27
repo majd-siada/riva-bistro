@@ -1,7 +1,11 @@
 import { WaveDivider } from "@/components/brand/wave-divider";
 import { Section } from "@/components/layout/section";
 
-export const metadata = { title: "Om oss" };
+export const metadata = {
+  title: "Om oss",
+  description:
+    "Riva Bistros historia — skandinavisk minimalism möter varm mediterran gästfrihet vid Stockholms kust.",
+};
 
 export default function AboutPage() {
   return (

@@ -1,7 +1,11 @@
 import { WaveDivider } from "@/components/brand/wave-divider";
 import { Section } from "@/components/layout/section";
 
-export const metadata = { title: "FAQ" };
+export const metadata = {
+  title: "FAQ",
+  description:
+    "Vanliga frågor om Riva Bistro — moms, bordsbokning, avbokning, allergier och öppettider.",
+};
 
 const faqs = [
   {

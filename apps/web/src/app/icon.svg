@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="#0F1418" />
+  <rect x="1" y="1" width="30" height="30" rx="6" stroke="#BFA06A" stroke-width="1" stroke-opacity="0.5" />
+  <path
+    d="M10.4 24V8h6.3c1.7 0 3 .44 3.96 1.32.95.87 1.42 2.07 1.42 3.6 0 1.1-.28 2.05-.83 2.82-.55.78-1.32 1.32-2.3 1.66L23 24h-2.9l-3.46-6.3H13V24h-2.6Zm2.6-8.55h3.3c.94 0 1.66-.24 2.17-.72.5-.48.76-1.15.76-2 0-.87-.25-1.53-.75-2-.5-.46-1.22-.7-2.16-.7H13v5.42Z"
+    fill="#BFA06A"
+  />
+</svg>
