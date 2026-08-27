@@ -30,11 +30,13 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <Link href="/" className="flex items-center gap-3" aria-label="Riva Bistro — startsida">
             <Image
-              src="/brand/riva-logo.png"
+              src="/brand/riva-logo.svg"
               alt=""
               width={40}
               height={40}
               className="rounded-full"
+              priority
+              unoptimized
             />
             <span className="font-display text-xl tracking-[0.15em] text-riva-ivory md:text-2xl">
               RIVA
