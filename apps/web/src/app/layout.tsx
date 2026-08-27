@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { RestaurantJsonLd } from "@/components/seo/json-ld";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
@@ -39,11 +40,15 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} — Premium svensk gastronomi i Stockholm`,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
+    images: [
+      { url: "/og-image.jpg", width: 1200, height: 630, alt: "Riva Bistro" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — Premium svensk gastronomi i Stockholm`,
     description: SITE_DESCRIPTION,
+    images: ["/og-image.jpg"],
   },
 };
 
@@ -63,6 +68,7 @@ export default function RootLayout({
         <AppShell header={<Header />} footer={<Footer />}>
           {children}
         </AppShell>
+        <RestaurantJsonLd />
         <Toaster />
       </body>
     </html>
