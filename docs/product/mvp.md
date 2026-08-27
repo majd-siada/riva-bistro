@@ -6,6 +6,8 @@ Premium Swedish restaurant website + reservation platform for **Riva Bistro**.
 
 Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinematic luxury.
 
+> **Scope update:** online ordering / commerce (cart, checkout, order tracking, customer accounts) and the commerce admin dashboard have been removed. The product is now a restaurant website (home, menu display, about, contact, FAQ) plus table booking.
+
 ## MVP capabilities (by phase)
 
 ### Phase 1 — Foundation (current)
@@ -30,18 +32,12 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 - Generated OpenAPI TypeScript client
 - Public booking flow wired to real API
 
-### Phase 4 — Admin CMS & commerce
+### Phase 4 — Content management (menu, gallery, news)
 
 - Auth / roles
 - Menu, gallery, news, settings management
-- **Online ordering:** cart, checkout, order tracking (implemented)
-- **Restaurant dashboard:** orders, products, inventory, sales KPIs
 
-### Phase 4b — Commerce hardening
-
-- Stripe payment integration (stub payment in place)
-- Real-time order status (WebSocket/polling)
-- Inventory sync on order
+> Online ordering and the commerce dashboard (cart, checkout, order tracking, inventory, sales) are out of scope and have been removed.
 
 ### Phase 5 — Media + Telegram
 

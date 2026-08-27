@@ -1,6 +1,6 @@
 # RIVA BISTRO Design System
 
-Production-ready visual identity and component library for the Riva Bistro customer storefront and restaurant dashboard.
+Production-ready visual identity and component library for the Riva Bistro restaurant website and table-booking flow.
 
 ## Brand Tokens
 
@@ -30,15 +30,15 @@ All components live in `apps/web/src/components/ui/`:
 |-----------|----------|
 | Button | default (teal), secondary, gold, outline, ghost, link, destructive, loading |
 | Input / Textarea | default, error |
-| Card | product, order, KPI |
-| Badge | available, soldOut, preparing, delivered, vat |
+| Card | product, content |
+| Badge | available, soldOut, vat |
 | Tabs | category navigation |
-| Dialog / Sheet | modals, cart drawer |
-| Toast (Sonner) | cart add, order placed, errors |
+| Dialog / Sheet | modals, mobile navigation |
+| Toast (Sonner) | confirmations, errors |
 | Skeleton | loading states |
 | StateMessage | empty, error, success, loading |
 
-Commerce-specific: `PriceDisplay`, `ProductImage`, `ProductCard`, `OrderStatusTimeline`, `WaveDivider`
+Menu & brand: `PriceDisplay`, `ProductImage`, `ProductCard`, `ProductDetail`, `ReservationForm`, `WaveDivider`
 
 ## Responsive Breakpoints
 
@@ -49,18 +49,18 @@ Commerce-specific: `PriceDisplay`, `ProductImage`, `ProductCard`, `OrderStatusTi
 | Desktop | 1280px+ |
 | Wide | 1440px+ |
 
-Mobile-first layout. Cart drawer on mobile, full cart page on desktop.
+Mobile-first layout. Slide-in sheet for navigation on mobile.
 
 ## Pricing
 
-All customer-facing prices show **inkl. moms** (25% VAT). Checkout displays ex-VAT subtotal, VAT amount, and total.
+All customer-facing prices show **inkl. moms** (25% VAT). The dish detail page also shows the ex-VAT price and VAT amount for reference.
 
 ## Accessibility
 
 - WCAG AA contrast on charcoal/teal/ivory pairings
 - Gold focus rings on all interactive elements
 - `prefers-reduced-motion` disables animations
-- Keyboard navigation for cart drawer, modals, tabs
+- Keyboard navigation for modals, tabs, and mobile navigation
 
 ## Figma Handoff
 
@@ -70,14 +70,12 @@ Import tokens from `packages/design-tokens/tokens.json` when building the Figma 
 
 ## Pages
 
-### Customer
-`/`, `/meny`, `/meny/[slug]`, `/varukorg`, `/kassa`, `/order/[ref]`, `/konto`, `/konto/ordrar/[id]`, `/om-oss`, `/kontakt`, `/faq`
+`/` (hem), `/meny`, `/meny/[slug]`, `/boka`, `/om-oss`, `/kontakt`, `/faq`
 
-### Dashboard
-`/admin`, `/admin/ordrar`, `/admin/produkter`, `/admin/kategorier`, `/admin/lager`, `/admin/kunder`, `/admin/forsaljning`, `/admin/installningar`
+Online ordering (cart, checkout, order tracking, account) and the commerce admin dashboard have been removed from scope — the site is a restaurant website with table booking only.
 
 ## API
 
-Backend commerce domain: `apps/backend/catalog/`, `apps/backend/commerce/`
+Backend menu domain: `apps/backend/catalog/` (public menu endpoints under `/api/v1/menu/`).
 
 Seed menu: `python manage.py seed_menu`
