@@ -135,6 +135,10 @@ CORS_ALLOWED_ORIGINS = env_list(
     "DJANGO_CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 )
+# The frontend calls the API cross-origin with credentials (session cookie for
+# the cart). Without this the browser will not store/send the session cookie,
+# so the cart never persists. Origins remain restricted to the allowlist above.
+CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
