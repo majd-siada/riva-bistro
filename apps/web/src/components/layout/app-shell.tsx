@@ -1,8 +1,25 @@
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+"use client";
+
+import { usePathname } from "next/navigation";
+
 import { RevealObserver } from "@/components/reveal-observer";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  header,
+  footer,
+}: {
+  children: React.ReactNode;
+  header: React.ReactNode;
+  footer: React.ReactNode;
+}) {
+  const pathname = usePathname();
+
+  // The admin area has its own chrome (see app/admin/layout.tsx).
+  if (pathname?.startsWith("/admin")) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <a
@@ -11,9 +28,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         Hoppa till innehåll
       </a>
-      <Header />
+      {header}
       <main id="main-content">{children}</main>
-      <Footer />
+      {footer}
       <RevealObserver />
     </>
   );
