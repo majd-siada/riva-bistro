@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAdminOrder, updateAdminOrderStatus, type Order } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 const STATUSES = ["pending", "confirmed", "preparing", "ready", "delivered", "cancelled"];
 
@@ -83,14 +84,14 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               <span className="text-riva-mist">
                 {line.quantity}× {line.product_name}
               </span>
-              <span className="tabular-nums text-riva-ivory">{line.line_total_inc_vat} kr</span>
+              <span className="tabular-nums text-riva-ivory">{formatPrice(line.line_total_inc_vat)}</span>
             </li>
           ))}
         </ul>
         <Separator className="my-4" />
         <div className="flex justify-between font-semibold text-riva-ivory">
           <span>Totalt inkl. moms</span>
-          <span className="tabular-nums">{order.total_inc_vat} kr</span>
+          <span className="tabular-nums">{formatPrice(order.total_inc_vat)}</span>
         </div>
       </div>
     </div>

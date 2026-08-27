@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAdminOverview } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin — Översikt" };
 
@@ -20,8 +21,8 @@ export default async function AdminOverviewPage() {
 
   const kpis = [
     { label: "Ordrar idag", value: overview.orders_today },
-    { label: "Total intäkt", value: `${overview.revenue_total} kr` },
-    { label: "Snittnota", value: `${overview.avg_ticket} kr` },
+    { label: "Total intäkt", value: formatPrice(overview.revenue_total) },
+    { label: "Snittnota", value: formatPrice(overview.avg_ticket) },
     { label: "Lågt lager", value: overview.low_stock_count },
   ];
 

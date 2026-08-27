@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAccountOrder } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 const STATUS_STEPS = [
   { key: "confirmed", label: "Bekräftad" },
@@ -75,7 +76,7 @@ export default async function AccountOrderPage({ params, searchParams }: Props) 
               <span className="text-riva-mist">
                 {line.quantity}× {line.product_name}
               </span>
-              <span className="tabular-nums text-riva-ivory">{line.line_total_inc_vat} kr</span>
+              <span className="tabular-nums text-riva-ivory">{formatPrice(line.line_total_inc_vat)}</span>
             </li>
           ))}
         </ul>
@@ -83,15 +84,15 @@ export default async function AccountOrderPage({ params, searchParams }: Props) 
         <div className="space-y-1 text-sm">
           <div className="flex justify-between text-riva-mist">
             <span>Exkl. moms</span>
-            <span>{order.subtotal_ex_vat} kr</span>
+            <span>{formatPrice(order.subtotal_ex_vat)}</span>
           </div>
           <div className="flex justify-between text-riva-mist">
             <span>Moms</span>
-            <span>{order.vat_total} kr</span>
+            <span>{formatPrice(order.vat_total)}</span>
           </div>
           <div className="flex justify-between pt-2 text-base font-semibold text-riva-ivory">
             <span>Totalt</span>
-            <span>{order.total_inc_vat} kr</span>
+            <span>{formatPrice(order.total_inc_vat)}</span>
           </div>
         </div>
       </div>

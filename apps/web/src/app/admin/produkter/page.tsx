@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAdminProducts } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin — Produkter" };
 
@@ -32,7 +33,7 @@ export default async function AdminProductsPage() {
               <TableRow key={p.id}>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell>{p.category_name}</TableCell>
-                <TableCell className="tabular-nums">{p.pricing.price_ex_vat} kr</TableCell>
+                <TableCell className="tabular-nums">{formatPrice(p.pricing.price_ex_vat)}</TableCell>
                 <TableCell className="tabular-nums">{p.inventory_count ?? "—"}</TableCell>
                 <TableCell>
                   <Badge variant={p.is_available ? "available" : "soldOut"}>

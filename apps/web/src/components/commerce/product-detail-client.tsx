@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
 import type { ModifierGroup, Product } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -101,7 +102,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       <Label htmlFor={`opt-${opt.id}`} className="flex flex-1 cursor-pointer justify-between">
                         <span>{opt.name}</span>
                         {Number(opt.price_delta) > 0 && (
-                          <span className="text-riva-mist">+{opt.pricing.price_inc_vat} kr</span>
+                          <span className="text-riva-mist">+{formatPrice(opt.pricing.price_inc_vat)}</span>
                         )}
                       </Label>
                     </div>
@@ -119,7 +120,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     <Label htmlFor={`opt-${opt.id}`} className="flex flex-1 cursor-pointer justify-between">
                       <span>{opt.name}</span>
                       {Number(opt.price_delta) > 0 && (
-                        <span className="text-riva-mist">+{opt.pricing.price_inc_vat} kr</span>
+                        <span className="text-riva-mist">+{formatPrice(opt.pricing.price_inc_vat)}</span>
                       )}
                     </Label>
                   </div>

@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StateMessage } from "@/components/ui/state-message";
 import { useCart } from "@/contexts/cart-context";
+import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
   const { cart, loading, updateItem, removeItem } = useCart();
@@ -83,16 +84,16 @@ export default function CartPage() {
               <div className="mt-4 space-y-2 text-sm text-riva-mist">
                 <div className="flex justify-between">
                   <span>Exkl. moms</span>
-                  <span className="tabular-nums">{cart.totals.subtotal_ex_vat} kr</span>
+                  <span className="tabular-nums">{formatPrice(cart.totals.subtotal_ex_vat)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Moms (25%)</span>
-                  <span className="tabular-nums">{cart.totals.vat_total} kr</span>
+                  <span className="tabular-nums">{formatPrice(cart.totals.vat_total)}</span>
                 </div>
                 <Separator className="my-3" />
                 <div className="flex justify-between text-base font-semibold text-riva-ivory">
                   <span>Totalt inkl. moms</span>
-                  <span className="tabular-nums">{cart.totals.total_inc_vat} kr</span>
+                  <span className="tabular-nums">{formatPrice(cart.totals.total_inc_vat)}</span>
                 </div>
               </div>
               <Button asChild className="mt-6 w-full">

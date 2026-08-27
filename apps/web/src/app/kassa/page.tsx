@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { StateMessage } from "@/components/ui/state-message";
 import { useCart } from "@/contexts/cart-context";
 import { checkout } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -101,7 +102,7 @@ export default function CheckoutPage() {
             <StateMessage variant="error" title="Något gick fel" description={error} />
           )}
           <Button type="submit" loading={submitting} className="w-full">
-            Betala {cart?.totals.total_inc_vat ?? ""} kr
+            Betala {cart ? formatPrice(cart.totals.total_inc_vat) : ""}
           </Button>
           <p className="text-xs text-riva-mist">
             Betalning hanteras säkert. Moms redovisas på kvittot.
@@ -117,7 +118,7 @@ export default function CheckoutPage() {
                   {line.quantity}× {line.product_name}
                 </span>
                 <span className="tabular-nums text-riva-ivory">
-                  {line.line_pricing.price_inc_vat} kr
+                  {formatPrice(line.line_pricing.price_inc_vat)}
                 </span>
               </li>
             ))}
@@ -126,15 +127,15 @@ export default function CheckoutPage() {
           <div className="space-y-1 text-sm text-riva-mist">
             <div className="flex justify-between">
               <span>Exkl. moms</span>
-              <span>{cart?.totals.subtotal_ex_vat} kr</span>
+              <span>{formatPrice(cart?.totals.subtotal_ex_vat ?? 0)}</span>
             </div>
             <div className="flex justify-between">
               <span>Moms</span>
-              <span>{cart?.totals.vat_total} kr</span>
+              <span>{formatPrice(cart?.totals.vat_total ?? 0)}</span>
             </div>
             <div className="flex justify-between pt-2 text-base font-semibold text-riva-ivory">
               <span>Totalt</span>
-              <span>{cart?.totals.total_inc_vat} kr</span>
+              <span>{formatPrice(cart?.totals.total_inc_vat ?? 0)}</span>
             </div>
           </div>
         </aside>

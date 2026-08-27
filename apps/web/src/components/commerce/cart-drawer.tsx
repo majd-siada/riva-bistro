@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Skeleton } from "@/components/ui/skeleton";
 import { StateMessage } from "@/components/ui/state-message";
 import { useCart } from "@/contexts/cart-context";
+import { formatPrice } from "@/lib/format";
 
 interface CartDrawerProps {
   open: boolean;
@@ -98,16 +99,16 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <div className="mb-4 space-y-1 text-sm text-riva-mist">
               <div className="flex justify-between">
                 <span>Delsumma exkl. moms</span>
-                <span className="tabular-nums">{cart.totals.subtotal_ex_vat} kr</span>
+                <span className="tabular-nums">{formatPrice(cart.totals.subtotal_ex_vat)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Moms</span>
-                <span className="tabular-nums">{cart.totals.vat_total} kr</span>
+                <span className="tabular-nums">{formatPrice(cart.totals.vat_total)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between text-base font-semibold text-riva-ivory">
                 <span>Totalt</span>
-                <span className="tabular-nums">{cart.totals.total_inc_vat} kr</span>
+                <span className="tabular-nums">{formatPrice(cart.totals.total_inc_vat)}</span>
               </div>
             </div>
             <Link href="/kassa" onClick={() => onOpenChange(false)} className="block">

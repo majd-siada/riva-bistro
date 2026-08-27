@@ -9,6 +9,7 @@ import { Section } from "@/components/layout/section";
 import { Separator } from "@/components/ui/separator";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchOrder } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 const STATUS_STEPS = [
   { key: "confirmed", label: "Bekräftad" },
@@ -76,17 +77,17 @@ export default async function OrderPage({ params }: Props) {
                 <span className="text-riva-mist">
                   {line.quantity}× {line.product_name}
                 </span>
-                <span className="tabular-nums text-riva-ivory">{line.line_total_inc_vat} kr</span>
+                <span className="tabular-nums text-riva-ivory">{formatPrice(line.line_total_inc_vat)}</span>
               </li>
             ))}
           </ul>
           <Separator className="my-4" />
           <div className="flex justify-between font-semibold text-riva-ivory">
             <span>Totalt inkl. moms</span>
-            <span className="tabular-nums">{order.total_inc_vat} kr</span>
+            <span className="tabular-nums">{formatPrice(order.total_inc_vat)}</span>
           </div>
           <p className="mt-1 text-xs text-riva-mist">
-            Varav moms {order.vat_total} kr
+            Varav moms {formatPrice(order.vat_total)}
           </p>
         </div>
 

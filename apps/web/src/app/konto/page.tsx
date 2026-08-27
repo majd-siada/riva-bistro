@@ -11,6 +11,7 @@ import { Section } from "@/components/layout/section";
 import { Badge } from "@/components/ui/badge";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAccountOrders, type Order } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export default function AccountPage() {
   const [email, setEmail] = useState("");
@@ -94,7 +95,7 @@ export default function AccountPage() {
                     </div>
                     <div className="text-right">
                       <p className="tabular-nums font-semibold text-riva-ivory">
-                        {order.total_inc_vat} kr
+                        {formatPrice(order.total_inc_vat)}
                       </p>
                       <Badge variant="preparing" className="mt-1">
                         {order.status}

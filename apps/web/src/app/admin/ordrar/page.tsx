@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAdminOrders } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin — Ordrar" };
 
@@ -55,7 +56,7 @@ export default async function AdminOrdersPage() {
                       {order.payment_status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{order.total_inc_vat} kr</TableCell>
+                  <TableCell className="text-right tabular-nums">{formatPrice(order.total_inc_vat)}</TableCell>
                 </TableRow>
               ))
             )}

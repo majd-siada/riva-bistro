@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StateMessage } from "@/components/ui/state-message";
 import { fetchAdminSales } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Admin — Försäljning" };
 
@@ -33,7 +34,7 @@ export default async function AdminSalesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-display text-3xl tabular-nums">{sales.total_revenue} kr</p>
+            <p className="font-display text-3xl tabular-nums">{formatPrice(sales.total_revenue)}</p>
           </CardContent>
         </Card>
         <Card className="hover:translate-y-0 hover:shadow-none">
@@ -43,7 +44,7 @@ export default async function AdminSalesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-display text-3xl tabular-nums">{sales.total_vat} kr</p>
+            <p className="font-display text-3xl tabular-nums">{formatPrice(sales.total_vat)}</p>
           </CardContent>
         </Card>
       </div>
