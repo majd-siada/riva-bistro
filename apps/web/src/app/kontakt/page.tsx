@@ -1,11 +1,12 @@
 import { WaveDivider } from "@/components/brand/wave-divider";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { ContactForm } from "@/components/contact-form";
 import { Section } from "@/components/layout/section";
 
-export const metadata = { title: "Kontakt" };
+export const metadata = {
+  title: "Kontakt",
+  description:
+    "Kontakta Riva Bistro — adress, öppettider och meddelandeformulär. Strandvägen 12, Stockholm.",
+};
 
 export default function ContactPage() {
   return (
@@ -30,23 +31,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <form className="space-y-5 rounded-md border border-riva-ivory/10 bg-riva-charcoal p-6">
-          <div>
-            <Label htmlFor="contact-name">Namn</Label>
-            <Input id="contact-name" className="mt-1.5" />
-          </div>
-          <div>
-            <Label htmlFor="contact-email">E-post</Label>
-            <Input id="contact-email" type="email" className="mt-1.5" />
-          </div>
-          <div>
-            <Label htmlFor="contact-message">Meddelande</Label>
-            <Textarea id="contact-message" className="mt-1.5" />
-          </div>
-          <Button type="submit" className="w-full">
-            Skicka meddelande
-          </Button>
-        </form>
+        <ContactForm />
       </div>
     </Section>
   );
