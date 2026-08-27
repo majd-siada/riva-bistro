@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     # Local
     "core",
     "catalog",
-    "commerce",
 ]
 
 MIDDLEWARE = [
@@ -161,7 +160,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Riva Bistro API",
-    "DESCRIPTION": "OpenAPI contract for Riva Bistro — menu, ordering, and reservations.",
+    "DESCRIPTION": "OpenAPI contract for Riva Bistro — menu and reservations.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
