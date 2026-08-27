@@ -6,30 +6,29 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-medium tracking-wide transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold focus-visible:ring-offset-2 focus-visible:ring-offset-riva-black disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium tracking-wide transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold focus-visible:ring-offset-2 focus-visible:ring-offset-riva-cream disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-riva-teal text-riva-ivory hover:bg-riva-teal-muted",
-        secondary: "bg-riva-ivory text-riva-black hover:bg-riva-ivory/90",
-        gold: "bg-riva-gold text-riva-black hover:bg-riva-gold/90",
+        default: "bg-riva-ink text-riva-ivory hover:bg-riva-ink-soft",
+        gold: "bg-riva-gold text-riva-ink hover:bg-[color-mix(in_srgb,var(--riva-gold)_88%,black)]",
+        teal: "bg-riva-teal text-on-dark hover:bg-[color-mix(in_srgb,var(--riva-teal)_88%,black)]",
         outline:
-          "border border-riva-ivory/40 bg-transparent text-riva-ivory hover:border-riva-teal hover:text-riva-teal",
-        ghost: "text-riva-ivory hover:bg-riva-ivory/10",
+          "border border-riva-ink/25 bg-transparent text-riva-ink hover:border-riva-ink/60 hover:bg-riva-ink/[0.03]",
+        ghost: "text-riva-ink hover:bg-riva-ink/[0.06]",
         link: "text-riva-teal underline-offset-4 hover:underline",
-        destructive: "bg-riva-error text-riva-ivory hover:bg-riva-error/90",
+        destructive: "bg-riva-error text-white hover:bg-[color-mix(in_srgb,var(--riva-error)_88%,black)]",
+        "outline-light":
+          "border border-on-dark/40 bg-transparent text-on-dark hover:bg-on-dark/10",
       },
       size: {
         default: "h-11 px-6 py-2",
         sm: "h-9 px-4 text-xs",
-        lg: "h-12 px-8 text-base",
+        lg: "h-12 px-8 text-[0.95rem]",
         icon: "h-10 w-10",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    defaultVariants: { variant: "default", size: "default" },
   },
 );
 

@@ -57,11 +57,14 @@ class ProductListSerializer(serializers.ModelSerializer):
         return price_from_ex_vat(Decimal(str(obj.base_price)), Decimal(str(obj.vat_rate)))
 
     def get_image_url(self, obj: Product) -> str:
-        """Prefer an uploaded image (absolute URL) over an external URL."""
+        """Prefer an uploaded image over an external URL.
+
+        Uploaded images are returned as a root-relative media path (e.g.
+        /media/menu/x.webp). The frontend resolves it against the public API
+        origin, which works for both SSR and browser (unlike an absolute URL
+        built from the internal container host)."""
         if obj.image:
-            request = self.context.get("request")
-            url = obj.image.url
-            return request.build_absolute_uri(url) if request else url
+            return obj.image.url
         return obj.image_url or ""
 
 

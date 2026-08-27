@@ -3,20 +3,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MenuLoading() {
   return (
-    <Section className="pt-24">
-      <div className="mb-10">
-        <Skeleton className="h-5 w-28" />
-        <Skeleton className="mt-4 h-12 w-64" />
-        <Skeleton className="mt-6 h-4 w-full max-w-xl" />
+    <Section className="pt-16">
+      <div className="mx-auto max-w-2xl text-center">
+        <Skeleton className="mx-auto h-5 w-28" />
+        <Skeleton className="mx-auto mt-4 h-12 w-48" />
       </div>
-      <div className="mb-8 flex gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-10 w-28" />
-        ))}
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-16 space-y-10">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-80 w-full" />
+          <div key={i} className="grid gap-x-14 gap-y-4 md:grid-cols-2">
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+          </div>
         ))}
       </div>
     </Section>

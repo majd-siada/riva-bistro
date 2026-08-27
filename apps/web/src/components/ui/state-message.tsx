@@ -12,10 +12,10 @@ interface StateMessageProps {
 }
 
 const variantStyles: Record<StateVariant, string> = {
-  empty: "border-riva-ivory/10 bg-riva-charcoal",
-  error: "border-riva-error/30 bg-riva-error/5",
-  success: "border-riva-success/30 bg-riva-success/5",
-  loading: "border-riva-ivory/10 bg-riva-charcoal",
+  empty: "border-riva-ink/10 bg-riva-cream-2",
+  error: "border-riva-error/30 bg-riva-error/[0.06]",
+  success: "border-riva-success/30 bg-riva-success/[0.06]",
+  loading: "border-riva-ink/10 bg-riva-cream-2",
 };
 
 export function StateMessage({
@@ -29,15 +29,15 @@ export function StateMessage({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-md border px-6 py-12 text-center",
+        "flex flex-col items-center justify-center rounded-lg border px-6 py-12 text-center",
         variantStyles[variant],
         className,
       )}
       role={variant === "error" ? "alert" : "status"}
     >
       {icon && <div className="mb-4 text-riva-teal">{icon}</div>}
-      <h3 className="font-display text-xl text-riva-ivory">{title}</h3>
-      {description && <p className="mt-2 max-w-md text-sm text-riva-mist">{description}</p>}
+      <h3 className="font-display text-xl text-riva-ink">{title}</h3>
+      {description && <p className="mt-2 max-w-md text-sm text-riva-taupe">{description}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

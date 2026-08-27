@@ -3,75 +3,80 @@
 @tailwind utilities;
 
 :root {
-  /* Riva Bistro — primitive tokens (logo-derived) */
-  --riva-black: #0a0a0a;
-  --riva-charcoal-deep: #0f1418;
-  --riva-charcoal: #161616;
-  --riva-ivory: #f4f0e6;
-  --riva-mist: #d9d2c3;
-  --riva-gold: #bfa06a;
-  --riva-gold-muted: #8f774f;
-  --riva-teal: #5e8b8b;
-  --riva-teal-muted: #4a7373;
-  --riva-error: #c45c5c;
-  --riva-success: #5e8b6e;
+  /* Riva Bistro — warm editorial palette (light, premium but relaxed) */
+  --riva-cream: #f7f2e9; /* page background */
+  --riva-cream-2: #fcf8f1; /* elevated surface */
+  --riva-ivory: #fffdf8; /* brightest surface */
+  --riva-ink: #262019; /* primary text (warm near-black) */
+  --riva-ink-soft: #4a4239;
+  --riva-taupe: #7a7063; /* muted text */
+  --riva-gold: #b08a46; /* accent for text/labels (AA on cream) */
+  --riva-gold-soft: #c6a56a; /* decorative gold (from logo) */
+  --riva-teal: #3e6e6a; /* secondary accent / links */
+  --riva-teal-soft: #5e8b8b; /* decorative teal (from logo) */
+  --riva-charcoal: #211d18; /* dark sections (hero/footer) */
+  --riva-charcoal-2: #2b261f;
+  --riva-error: #b4453c;
+  --riva-success: #4e7a57;
 
-  /* Semantic tokens */
-  --surface-default: var(--riva-black);
-  --surface-elevated: var(--riva-charcoal);
-  --surface-subtle: var(--riva-charcoal-deep);
-  --text-primary: var(--riva-ivory);
-  --text-muted: var(--riva-mist);
-  --text-accent: var(--riva-gold);
-  --border-subtle: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
-  --border-accent: var(--riva-gold);
-  --accent-teal: var(--riva-teal);
-  --accent-gold: var(--riva-gold);
+  /* Semantic */
+  --surface: var(--riva-cream);
+  --surface-elevated: var(--riva-cream-2);
+  --surface-dark: var(--riva-charcoal);
+  --text: var(--riva-ink);
+  --text-muted: var(--riva-taupe);
+  --text-on-dark: #f3ecdd;
+  --text-on-dark-muted: #cdc3b1;
+  --border: color-mix(in srgb, var(--riva-ink) 12%, transparent);
+  --border-on-dark: color-mix(in srgb, #f3ecdd 16%, transparent);
 
-  --background: var(--surface-default);
-  --foreground: var(--text-primary);
+  --background: var(--surface);
+  --foreground: var(--text);
 
   /* Spacing (4px base) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
-  --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
+  --space-24: 96px;
 
-  /* Radius */
+  /* Radius — intentional, softly rounded */
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius: var(--radius-sm);
+  --radius-lg: 14px;
+  --radius-full: 999px;
+  --radius: var(--radius-md);
 
   /* Motion */
   --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 260ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Shadows — restrained */
-  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.24);
-  --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.32);
+  /* Shadows — soft and warm, restrained */
+  --shadow-subtle: 0 1px 2px rgba(38, 32, 25, 0.06), 0 1px 3px rgba(38, 32, 25, 0.08);
+  --shadow-card: 0 8px 24px -12px rgba(38, 32, 25, 0.18);
+  --shadow-elevated: 0 18px 48px -20px rgba(38, 32, 25, 0.28);
 }
 
 @layer base {
   * {
-    border-color: var(--border-subtle);
+    border-color: var(--border);
   }
 
   html {
     @apply scroll-smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "kern", "liga";
   }
 
   h1,
@@ -79,19 +84,26 @@
   h3,
   h4 {
     font-family: var(--font-display), ui-serif, Georgia, serif;
-    letter-spacing: 0.02em;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    text-wrap: balance;
   }
 
   :focus-visible {
     outline: 2px solid var(--riva-gold);
     outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--riva-gold-soft) 45%, transparent);
+    color: var(--riva-ink);
   }
 
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
-
     *,
     *::before,
     *::after {
@@ -104,18 +116,19 @@
 
 @layer components {
   .riva-label {
-    @apply text-xs font-semibold uppercase tracking-[0.2em] text-riva-gold;
+    @apply text-xs font-semibold uppercase tracking-[0.22em] text-riva-gold;
   }
 
   .riva-card {
-    @apply rounded-md border bg-riva-charcoal transition-all;
-    border-color: color-mix(in srgb, var(--riva-ivory) 10%, transparent);
+    @apply rounded-lg border bg-riva-cream-2 transition-all;
+    border-color: var(--border);
+    box-shadow: var(--shadow-subtle);
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-out);
   }
 
   .riva-card:hover {
-    border-color: color-mix(in srgb, var(--riva-teal) 30%, transparent);
+    box-shadow: var(--shadow-card);
     transform: translateY(-2px);
   }
 
@@ -127,15 +140,27 @@
 
   .riva-price {
     font-variant-numeric: tabular-nums;
-    @apply text-lg font-semibold text-riva-ivory;
+    @apply font-semibold text-riva-ink;
+  }
+
+  /* Dark editorial section (hero, footer, cinematic blocks) */
+  .riva-dark {
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+  }
+  .riva-dark h1,
+  .riva-dark h2,
+  .riva-dark h3,
+  .riva-dark h4 {
+    color: var(--text-on-dark);
   }
 
   .riva-shimmer {
     background: linear-gradient(
       90deg,
-      var(--riva-charcoal) 0%,
-      color-mix(in srgb, var(--riva-ivory) 6%, var(--riva-charcoal)) 50%,
-      var(--riva-charcoal) 100%
+      var(--riva-cream-2) 0%,
+      color-mix(in srgb, var(--riva-ink) 6%, var(--riva-cream-2)) 50%,
+      var(--riva-cream-2) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
@@ -150,42 +175,10 @@
     }
   }
 
-  @keyframes cart-bounce {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.15);
-    }
-  }
-
-  .cart-badge-bounce {
-    animation: cart-bounce 0.4s var(--ease-out);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .riva-shimmer {
       animation: none;
     }
-    .cart-badge-bounce {
-      animation: none;
-    }
-  }
-
-  .status-step-active {
-    border-color: var(--riva-teal);
-    background: color-mix(in srgb, var(--riva-teal) 20%, transparent);
-  }
-
-  .status-step-complete {
-    border-color: var(--riva-success);
-    background: color-mix(in srgb, var(--riva-success) 20%, transparent);
-  }
-
-  .status-step-pending {
-    border-color: color-mix(in srgb, var(--riva-ivory) 20%, transparent);
-    background: transparent;
   }
 }
 
@@ -193,14 +186,37 @@
   .text-balance {
     text-wrap: balance;
   }
+  .text-pretty {
+    text-wrap: pretty;
+  }
 
   .transition-riva {
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-out);
   }
-
   .transition-riva-fast {
     transition-duration: var(--duration-fast);
     transition-timing-function: var(--ease-out);
+  }
+
+  /* Scroll reveal — progressive enhancement; visible by default (no-JS safe) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--duration-slow) var(--ease-out),
+      transform var(--duration-slow) var(--ease-out);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 }

@@ -1,111 +1,134 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { CalendarCheck, Clock, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CalendarCheck, Check, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StateMessage } from "@/components/ui/state-message";
 import { Textarea } from "@/components/ui/textarea";
-import { createReservation } from "@/lib/api";
+import { business } from "@/config/business";
 import {
-  toDateString,
-  validateReservation,
-  type ReservationErrors,
-  type ReservationFormValues,
-} from "@/lib/validation";
+  ApiError,
+  createReservation,
+  fetchAvailability,
+  type Availability,
+  type Reservation,
+} from "@/lib/api";
+import { isValidEmail, toDateString } from "@/lib/validation";
 
-const TIME_SLOTS = [
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-  "20:00",
-  "20:30",
-  "21:00",
-];
-
-const PARTY_SIZES = ["1", "2", "3", "4", "5", "6", "7", "8", "9+"];
-
-const EMPTY: ReservationFormValues = {
-  date: "",
-  time: "",
-  partySize: "2",
-  name: "",
-  email: "",
-  phone: "",
-  notes: "",
-};
-
-type Result = { kind: "confirmed"; ref: string } | { kind: "pending" };
-
-function FieldError({ id, message }: { id: string; message?: string }) {
-  if (!message) return null;
-  return (
-    <p id={id} className="mt-1.5 text-xs text-riva-error">
-      {message}
-    </p>
-  );
-}
+type ContactErrors = Partial<Record<"name" | "phone" | "email", string>>;
 
 export function ReservationForm() {
   const today = useMemo(() => toDateString(new Date()), []);
-  const [values, setValues] = useState<ReservationFormValues>(EMPTY);
-  const [errors, setErrors] = useState<ReservationErrors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<Result | null>(null);
+  const maxDate = useMemo(
+    () => toDateString(new Date(Date.now() + 90 * 864e5)),
+    [],
+  );
 
-  const update = <K extends keyof ReservationFormValues>(
-    key: K,
-    value: ReservationFormValues[K],
-  ) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
+  const [date, setDate] = useState("");
+  const [availability, setAvailability] = useState<Availability | null>(null);
+  const [loadingAvail, setLoadingAvail] = useState(false);
+  const [availError, setAvailError] = useState<string | null>(null);
+
+  const [guests, setGuests] = useState(2);
+  const [time, setTime] = useState("");
+  const [contact, setContact] = useState({ name: "", phone: "", email: "", special: "" });
+  const [errors, setErrors] = useState<ContactErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [result, setResult] = useState<(Reservation & { email_sent?: boolean }) | null>(null);
+
+  const maxParty = availability?.max_party_size ?? 12;
+
+  useEffect(() => {
+    if (!date) {
+      setAvailability(null);
+      return;
+    }
+    let active = true;
+    setLoadingAvail(true);
+    setAvailError(null);
+    setTime("");
+    fetchAvailability(date)
+      .then((data) => {
+        if (!active) return;
+        setAvailability(data);
+      })
+      .catch(() => {
+        if (!active) return;
+        setAvailError("Kunde inte hämta lediga tider. Försök igen.");
+        setAvailability(null);
+      })
+      .finally(() => active && setLoadingAvail(false));
+    return () => {
+      active = false;
+    };
+  }, [date]);
+
+  useEffect(() => {
+    if (guests > maxParty) setGuests(maxParty);
+  }, [guests, maxParty]);
+
+  // Slots that can still seat this party (capacity per slot vs. guests).
+  const slots = useMemo(() => {
+    if (!availability) return [];
+    return availability.slots.map((s) => ({
+      time: s.time,
+      available: s.available && s.remaining >= guests,
+    }));
+  }, [availability, guests]);
+
+  useEffect(() => {
+    if (time && !slots.find((s) => s.time === time && s.available)) setTime("");
+  }, [slots, time]);
+
+  const validateContact = (): boolean => {
+    const next: ContactErrors = {};
+    if (!contact.name.trim()) next.name = "Ange ditt namn";
+    if (!contact.phone.trim()) next.phone = "Ange ett telefonnummer";
+    if (!contact.email.trim()) next.email = "Ange din e-post";
+    else if (!isValidEmail(contact.email)) next.email = "Ogiltig e-postadress";
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const nextErrors = validateReservation(values);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    setServerError(null);
+    if (!date || !time) {
+      setServerError("Välj datum och tid.");
+      return;
+    }
+    if (!validateContact()) return;
 
     setSubmitting(true);
-    const partySize =
-      values.partySize === "9+" ? 9 : Number.parseInt(values.partySize, 10);
     try {
       const reservation = await createReservation({
-        date: values.date,
-        time: values.time,
-        party_size: partySize,
-        name: values.name.trim(),
-        email: values.email.trim(),
-        phone: values.phone.trim(),
-        notes: values.notes.trim() || undefined,
+        name: contact.name.trim(),
+        phone: contact.phone.trim(),
+        email: contact.email.trim(),
+        party_size: guests,
+        date,
+        time,
+        special_request: contact.special.trim() || undefined,
       });
-      setResult({ kind: "confirmed", ref: reservation.ref });
-    } catch {
-      // Reservations backend is not live yet — record the request gracefully
-      // rather than showing a false failure.
-      setResult({ kind: "pending" });
+      setResult(reservation);
+      toast.success("Bokningen är bekräftad.");
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : "Något gick fel. Försök igen.";
+      setServerError(message);
+      // The slot may have filled up — refresh availability so the UI is honest.
+      if (err instanceof ApiError && (err.code === "full" || err.code === "closed")) {
+        fetchAvailability(date).then(setAvailability).catch(() => {});
+        setTime("");
+      }
     } finally {
       setSubmitting(false);
-      toast.success("Tack! Vi har tagit emot din bordsförfrågan.");
     }
   };
 
@@ -113,22 +136,24 @@ export function ReservationForm() {
     return (
       <StateMessage
         variant="success"
-        title={
-          result.kind === "confirmed"
-            ? "Bordet är bokat"
-            : "Tack för din bordsförfrågan"
-        }
-        description={
-          result.kind === "confirmed"
-            ? `Din bokning ${result.ref} den ${values.date} kl. ${values.time} för ${values.partySize} gäster är bekräftad. En bekräftelse skickas till ${values.email}.`
-            : `Vi har tagit emot din förfrågan för ${values.date} kl. ${values.time} (${values.partySize} gäster) och bekräftar den via e-post eller telefon inom kort.`
-        }
+        icon={<Check className="h-8 w-8" />}
+        title="Bokningen är bekräftad"
+        description={`Bokningsnummer ${result.ref} · ${result.date} kl. ${result.time.slice(
+          0,
+          5,
+        )} för ${result.party_size} gäster.${
+          result.email_sent
+            ? ` En bekräftelse har skickats till ${result.email}.`
+            : ""
+        }`}
         action={
           <Button
             variant="outline"
             onClick={() => {
-              setValues(EMPTY);
               setResult(null);
+              setDate("");
+              setTime("");
+              setContact({ name: "", phone: "", email: "", special: "" });
             }}
           >
             Gör en ny bokning
@@ -142,148 +167,192 @@ export function ReservationForm() {
     <form
       onSubmit={(e) => void handleSubmit(e)}
       noValidate
-      className="space-y-5 rounded-md border border-riva-ivory/10 bg-riva-charcoal p-6 md:p-8"
+      className="rounded-lg border border-riva-ink/10 bg-riva-ivory p-6 shadow-subtle md:p-8"
     >
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="res-date" className="flex items-center gap-1.5">
-            <CalendarCheck className="h-4 w-4 text-riva-gold" aria-hidden="true" />
-            Datum
-          </Label>
-          <Input
-            id="res-date"
-            type="date"
-            min={today}
-            value={values.date}
-            error={Boolean(errors.date)}
-            aria-invalid={Boolean(errors.date)}
-            aria-describedby={errors.date ? "res-date-error" : undefined}
-            onChange={(e) => update("date", e.target.value)}
-            className="mt-1.5"
-          />
-          <FieldError id="res-date-error" message={errors.date} />
-        </div>
-
-        <div>
-          <Label htmlFor="res-time" className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-riva-gold" aria-hidden="true" />
-            Tid
-          </Label>
-          <Select value={values.time} onValueChange={(v) => update("time", v)}>
-            <SelectTrigger
-              id="res-time"
-              aria-invalid={Boolean(errors.time)}
-              aria-describedby={errors.time ? "res-time-error" : undefined}
-              className={`mt-1.5 ${errors.time ? "border-riva-error" : ""}`}
-            >
-              <SelectValue placeholder="Välj tid" />
-            </SelectTrigger>
-            <SelectContent>
-              {TIME_SLOTS.map((slot) => (
-                <SelectItem key={slot} value={slot}>
-                  {slot}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FieldError id="res-time-error" message={errors.time} />
-        </div>
-      </div>
-
+      {/* Step 1 — Datum */}
       <div>
-        <Label htmlFor="res-party" className="flex items-center gap-1.5">
-          <Users className="h-4 w-4 text-riva-gold" aria-hidden="true" />
-          Antal gäster
+        <Label htmlFor="res-date" className="flex items-center gap-2">
+          <CalendarCheck className="h-4 w-4 text-riva-gold" aria-hidden="true" />
+          Datum
         </Label>
-        <Select
-          value={values.partySize}
-          onValueChange={(v) => update("partySize", v)}
-        >
-          <SelectTrigger
-            id="res-party"
-            aria-describedby={errors.partySize ? "res-party-error" : undefined}
-            className="mt-1.5"
-          >
-            <SelectValue placeholder="Välj antal" />
-          </SelectTrigger>
-          <SelectContent>
-            {PARTY_SIZES.map((size) => (
-              <SelectItem key={size} value={size}>
-                {size === "1" ? "1 gäst" : `${size} gäster`}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FieldError id="res-party-error" message={errors.partySize} />
-        {values.partySize === "9+" && (
-          <p className="mt-1.5 text-xs text-riva-mist">
-            För sällskap på 9 eller fler kontaktar vi dig för att planera kvällen.
-          </p>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="res-name">Namn</Label>
         <Input
-          id="res-name"
-          value={values.name}
-          error={Boolean(errors.name)}
-          aria-invalid={Boolean(errors.name)}
-          aria-describedby={errors.name ? "res-name-error" : undefined}
-          onChange={(e) => update("name", e.target.value)}
-          className="mt-1.5"
-        />
-        <FieldError id="res-name-error" message={errors.name} />
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="res-email">E-post</Label>
-          <Input
-            id="res-email"
-            type="email"
-            value={values.email}
-            error={Boolean(errors.email)}
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? "res-email-error" : undefined}
-            onChange={(e) => update("email", e.target.value)}
-            className="mt-1.5"
-          />
-          <FieldError id="res-email-error" message={errors.email} />
-        </div>
-        <div>
-          <Label htmlFor="res-phone">Telefon</Label>
-          <Input
-            id="res-phone"
-            type="tel"
-            value={values.phone}
-            error={Boolean(errors.phone)}
-            aria-invalid={Boolean(errors.phone)}
-            aria-describedby={errors.phone ? "res-phone-error" : undefined}
-            onChange={(e) => update("phone", e.target.value)}
-            className="mt-1.5"
-          />
-          <FieldError id="res-phone-error" message={errors.phone} />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="res-notes">Önskemål (valfritt)</Label>
-        <Textarea
-          id="res-notes"
-          value={values.notes}
-          onChange={(e) => update("notes", e.target.value)}
-          placeholder="Allergier, fönsterbord, firande…"
+          id="res-date"
+          type="date"
+          min={today}
+          max={maxDate}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
           className="mt-1.5"
         />
       </div>
 
-      <Button type="submit" loading={submitting} className="w-full">
-        Boka bord
-      </Button>
-      <p className="text-center text-xs text-riva-mist">
-        Vi bekräftar din bokning via e-post eller telefon.
-      </p>
+      {/* Step 2 — Tid + gäster */}
+      {date && (
+        <div className="mt-6 border-t border-riva-ink/10 pt-6">
+          {loadingAvail ? (
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-24" />
+              <div className="grid grid-cols-4 gap-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            </div>
+          ) : availError ? (
+            <p className="text-sm text-riva-error">{availError}</p>
+          ) : availability && !availability.enabled ? (
+            <StateMessage
+              variant="empty"
+              title="Onlinebokning är inte aktiverad"
+              description={`Ring oss gärna på ${business.phone} så hjälper vi dig med din bokning.`}
+            />
+          ) : availability && availability.closed ? (
+            <StateMessage
+              variant="empty"
+              title="Vi har stängt den valda dagen"
+              description="Välj en annan dag för din bokning."
+            />
+          ) : (
+            <>
+              <div>
+                <span className="text-sm font-medium text-riva-ink">Antal gäster</span>
+                <div className="mt-2 flex items-center gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label="Färre gäster"
+                    disabled={guests <= 1}
+                    onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="w-10 text-center text-lg font-semibold tabular-nums text-riva-ink">
+                    {guests}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label="Fler gäster"
+                    disabled={guests >= maxParty}
+                    onClick={() => setGuests((g) => Math.min(maxParty, g + 1))}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-riva-taupe">
+                    Upp till {maxParty} gäster online
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <span className="text-sm font-medium text-riva-ink">Välj tid</span>
+                {slots.length === 0 ? (
+                  <p className="mt-2 text-sm text-riva-taupe">
+                    Inga lediga tider den här dagen. Prova en annan dag.
+                  </p>
+                ) : (
+                  <div
+                    className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-5"
+                    role="group"
+                    aria-label="Lediga tider"
+                  >
+                    {slots.map((s) => (
+                      <button
+                        key={s.time}
+                        type="button"
+                        disabled={!s.available}
+                        aria-pressed={time === s.time}
+                        onClick={() => setTime(s.time)}
+                        className={
+                          "rounded-md border px-2 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
+                          (time === s.time
+                            ? "border-riva-teal bg-riva-teal text-on-dark"
+                            : s.available
+                              ? "border-riva-ink/20 text-riva-ink hover:border-riva-teal"
+                              : "cursor-not-allowed border-riva-ink/10 text-riva-taupe/40 line-through")
+                        }
+                      >
+                        {s.time}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Step 3 — Kontakt */}
+      {time && (
+        <div className="mt-6 space-y-4 border-t border-riva-ink/10 pt-6">
+          <div>
+            <Label htmlFor="res-name">Namn</Label>
+            <Input
+              id="res-name"
+              value={contact.name}
+              error={Boolean(errors.name)}
+              aria-invalid={Boolean(errors.name)}
+              onChange={(e) => setContact({ ...contact, name: e.target.value })}
+              className="mt-1.5"
+            />
+            {errors.name && <p className="mt-1.5 text-xs text-riva-error">{errors.name}</p>}
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="res-phone">Telefon</Label>
+              <Input
+                id="res-phone"
+                type="tel"
+                value={contact.phone}
+                error={Boolean(errors.phone)}
+                aria-invalid={Boolean(errors.phone)}
+                onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                className="mt-1.5"
+              />
+              {errors.phone && <p className="mt-1.5 text-xs text-riva-error">{errors.phone}</p>}
+            </div>
+            <div>
+              <Label htmlFor="res-email">E-post</Label>
+              <Input
+                id="res-email"
+                type="email"
+                value={contact.email}
+                error={Boolean(errors.email)}
+                aria-invalid={Boolean(errors.email)}
+                onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                className="mt-1.5"
+              />
+              {errors.email && <p className="mt-1.5 text-xs text-riva-error">{errors.email}</p>}
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="res-special">Särskilda önskemål (valfritt)</Label>
+            <Textarea
+              id="res-special"
+              value={contact.special}
+              placeholder="Allergier, barnstol, fönsterbord…"
+              onChange={(e) => setContact({ ...contact, special: e.target.value })}
+              className="mt-1.5"
+            />
+          </div>
+
+          {serverError && (
+            <p className="text-sm text-riva-error" role="alert">
+              {serverError}
+            </p>
+          )}
+
+          <Button type="submit" size="lg" variant="gold" loading={submitting} className="w-full">
+            Bekräfta bokning
+          </Button>
+          <p className="text-center text-xs text-riva-taupe">
+            Du får en direkt bekräftelse med bokningsnummer.
+          </p>
+        </div>
+      )}
     </form>
   );
 }
