@@ -24,16 +24,16 @@ export default async function HomePage() {
             Riva Bistro
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-riva-ivory/75 md:text-lg">
-            Premium svensk gastronomi med mediterran själ. Beställ online eller boka bord för en
-            kväll vid vattnet.
+            Premium svensk gastronomi med mediterran själ — boka bord för en kväll
+            vid vattnet i hjärtat av Stockholm.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/meny">
-              <Button size="lg">Beställ från menyn</Button>
-            </Link>
             <Link href="/boka">
+              <Button size="lg">Boka bord</Button>
+            </Link>
+            <Link href="/meny">
               <Button size="lg" variant="outline">
-                Boka bord
+                Utforska menyn
               </Button>
             </Link>
           </div>
