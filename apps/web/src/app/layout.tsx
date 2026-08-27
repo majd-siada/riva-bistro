@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
+import localFont from "next/font/local";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Footer } from "@/components/layout/footer";
@@ -10,17 +10,18 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+// Self-hosted (variable) fonts — no build-time or runtime network dependency.
+const display = localFont({
   variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  src: "./fonts/CormorantGaramond.woff2",
+  weight: "400 700",
   display: "swap",
 });
 
-const sans = Source_Sans_3({
+const sans = localFont({
   variable: "--font-sans",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  src: "./fonts/SourceSans3.woff2",
+  weight: "400 700",
   display: "swap",
 });
 

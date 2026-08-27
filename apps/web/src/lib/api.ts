@@ -30,12 +30,22 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+  opts?: { revalidate?: number },
+): Promise<T> {
+  // A revalidate hint makes the fetch cacheable, which keeps pages (and the
+  // shared layout) statically generatable. Without it we opt out of caching.
+  const cacheOpts =
+    opts?.revalidate != null
+      ? { next: { revalidate: opts.revalidate } }
+      : { cache: "no-store" as const };
   const res = await fetch(`${getApiBase()}/api/v1${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
     credentials: "include",
-    cache: "no-store",
+    ...cacheOpts,
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
@@ -181,7 +191,9 @@ export async function fetchProduct(slug: string): Promise<Product> {
 }
 
 export async function fetchHours(): Promise<OpeningHour[]> {
-  return apiFetch("/hours/");
+  // Opening hours change rarely — cache with periodic revalidation so the
+  // shared footer does not force every route to be dynamic.
+  return apiFetch("/hours/", undefined, { revalidate: 300 });
 }
 
 export async function fetchAvailability(date: string): Promise<Availability> {
