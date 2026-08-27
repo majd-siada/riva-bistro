@@ -7,7 +7,14 @@ import { useState } from "react";
 
 import { CartDrawer } from "@/components/commerce/cart-drawer";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 
@@ -96,6 +103,9 @@ export function Header() {
               <SheetContent side="left" className="w-72">
                 <SheetHeader>
                   <SheetTitle>Navigation</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Länkar till sidorna på Riva Bistro.
+                  </SheetDescription>
                 </SheetHeader>
                 <nav className="mt-6 flex flex-col gap-4" aria-label="Mobilnavigation">
                   {navItems.map((item) => (

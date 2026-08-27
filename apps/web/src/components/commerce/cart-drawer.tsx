@@ -6,7 +6,13 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { PriceDisplay } from "@/components/commerce/price-display";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StateMessage } from "@/components/ui/state-message";
 import { useCart } from "@/contexts/cart-context";
@@ -25,6 +31,9 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
       <SheetContent side="right" className="flex flex-col">
         <SheetHeader>
           <SheetTitle>Varukorg</SheetTitle>
+          <SheetDescription className="sr-only">
+            Översikt över artiklarna i din varukorg med summering och kassa.
+          </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-1 flex-col overflow-y-auto py-4">
