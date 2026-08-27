@@ -40,7 +40,12 @@ class Product(models.Model):
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_rate = models.DecimalField(max_digits=5, decimal_places=4, default=Decimal("0.25"))
     image_url = models.URLField(max_length=500, blank=True)
+    # FileField (not ImageField) to avoid a hard Pillow dependency; uploads are
+    # validated (type/size) in the admin image endpoint.
+    image = models.FileField(upload_to="menu/", null=True, blank=True)
     is_available = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    featured_order = models.PositiveIntegerField(default=0)
     inventory_count = models.PositiveIntegerField(default=999)
     sort_order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

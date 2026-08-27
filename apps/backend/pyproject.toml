@@ -8,6 +8,8 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/migrations/*.py" = ["E501"]
+# Seed data tables are naturally wide (menu rows).
+"**/management/commands/seed_*.py" = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"

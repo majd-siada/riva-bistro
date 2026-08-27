@@ -1,131 +1,114 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.management.base import BaseCommand
 
-from catalog.models import Category, ModifierGroup, ModifierOption, Product
+from catalog.models import Category, Product
 
-IMG = "https://images.unsplash.com/photo-{id}?w=800"
+# Swedish restaurant food VAT is 12%. Menu prices below are the real
+# customer-facing prices (inkl. moms); we store the ex-VAT base so the
+# displayed inc-VAT price matches the printed menu.
+FOOD_VAT = Decimal("0.12")
+
+
+def ex_vat(inc: int) -> Decimal:
+    return (Decimal(inc) / (Decimal("1") + FOOD_VAT)).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+
+
+CATEGORIES = [
+    ("Varmrätter", "varmratter", "Husets varma rätter, tillagade med omsorg."),
+    ("Sallader", "sallader", "Fräscha sallader med säsongens råvaror."),
+    ("Pasta", "pasta", "Italienskt hantverk, à la Riva."),
+    ("Barnmeny", "barnmeny", "För våra minsta gäster."),
+    ("Desserter", "desserter", "Söta avslut på måltiden."),
+]
+
+# (category_slug, name, slug, description, price_inc_vat)
+PRODUCTS = [
+    ("varmratter", "Entrecôte", "entrecote", "Grillad entrecôte med tillbehör.", 305),
+    ("varmratter", "Grillad lammracks", "grillad-lammracks", "Grillad lammracks, säsongens tillbehör.", 315),
+    ("varmratter", "Rivas köttbullar", "rivas-kottbullar", "Husets köttbullar med gräddsås och lingon.", 185),
+    ("varmratter", "Halstrad röding", "halstrad-roding", "Halstrad röding med brynt smör.", 265),
+    ("varmratter", "Havets delikatesser", "havets-delikatesser", "Utvalda delikatesser från havet.", 299),
+    ("varmratter", "Hängmörad ryggbiff", "hangmorad-ryggbiff", "Hängmörad ryggbiff, grillad till perfektion.", 299),
+    ("varmratter", "Rivas Fisk & Skaldjurssoppa", "fisk-skaldjurssoppa", "Rustik soppa på fisk och skaldjur.", 199),
+    ("varmratter", "Rivas burgare / halloumi", "rivas-burgare", "Rivas burgare — välj nötfärs eller halloumi.", 175),
+    ("sallader", "Caesarsallad", "caesarsallad", "Klassisk caesarsallad.", 175),
+    ("sallader", "Räksallad deluxe", "raksallad-deluxe", "Generös räksallad med handskalade räkor.", 185),
+    ("sallader", "Grekisk sallad", "grekisk-sallad", "Fetaost, oliver, tomat och gurka.", 165),
+    ("pasta", "Pasta Filetto di manzo premium", "filetto-di-manzo", "Premiumpasta med oxfilé.", 245),
+    ("pasta", "Pesto Pollo", "pesto-pollo", "Pasta med kyckling och pesto.", 169),
+    ("pasta", "Vegetariano", "vegetariano", "Vegetarisk pasta med säsongens grönsaker.", 169),
+    ("barnmeny", "Rivas Köttbullar", "barn-kottbullar", "Köttbullar med potatismos.", 80),
+    ("barnmeny", "Pannkakor", "barn-pannkakor", "Pannkakor med sylt och grädde.", 75),
+    ("barnmeny", "Hamburgare", "barn-hamburgare", "Liten hamburgare med pommes.", 105),
+    ("barnmeny", "Rivas köttbullar med pasta", "barn-kottbullar-pasta", "Köttbullar med pasta.", 75),
+    ("barnmeny", "Barnglass", "barn-glass", "En kula glass.", 30),
+    ("barnmeny", "Barndricka", "barn-dricka", "Läsk eller saft.", 25),
+    ("desserter", "Varm Chokladfondant", "varm-chokladfondant", "Varm chokladfondant med glass.", 85),
+    ("desserter", "Crème Brûlée", "creme-brulee", "Klassisk crème brûlée.", 75),
+    ("desserter", "Klassisk Tiramisu", "klassisk-tiramisu", "Italiensk tiramisu.", 89),
+    ("desserter", "Pavlova", "pavlova", "Maräng med bär och grädde.", 79),
+    ("desserter", "Vaniljglass", "vaniljglass", "Vaniljglass med tillbehör.", 89),
+    ("desserter", "Husets ostar", "husets-ostar", "Utvalda ostar med tillbehör.", 145),
+    ("desserter", "KTC", "ktc", "Husets specialdessert.", 135),
+    ("desserter", "Dagens Cheesecake", "dagens-cheesecake", "Dagens cheesecake.", 75),
+]
+
+# Dishes shown on the homepage. Editable later from the admin.
+FEATURED = {
+    "entrecote": 0,
+    "grillad-lammracks": 1,
+    "halstrad-roding": 2,
+    "rivas-kottbullar": 3,
+}
 
 
 class Command(BaseCommand):
-    help = "Seed sample menu data for Riva Bistro"
+    help = "Seed the real Riva Bistro menu (idempotent)."
 
     def handle(self, *args, **options):
-        categories_data = [
-            ("Förrätter", "forratter", "Små rätter med säsongens råvaror."),
-            ("Huvudrätter", "huvudratter", "Klassiska och moderna rätter från köket."),
-            ("Desserter", "desserter", "Avsluta måltiden med något sött."),
-            ("Drycker", "drycker", "Viner, cocktails och alkoholfria alternativ."),
-        ]
-
-        products_data = [
-            (
-                "forratter",
-                "Gravad lax",
-                "gravad-lax",
-                "Hovmästarsås, dill, rostat bröd.",
-                145,
-                IMG.format(id="1519708227418-c8fd9a32b9a2"),
-            ),
-            (
-                "forratter",
-                "Skagenröra",
-                "skagenrora",
-                "Toast Skagen med löjrom och citron.",
-                165,
-                IMG.format(id="1544025162-d76694265947"),
-            ),
-            (
-                "huvudratter",
-                "Wallenbergare",
-                "wallenbergare",
-                "Potatispuré, gröna ärtor, lingon.",
-                245,
-                IMG.format(id="1546833999-b9f581a1996d"),
-            ),
-            (
-                "huvudratter",
-                "Halstrad röding",
-                "rodling",
-                "Brynt smör, haricots verts, citron.",
-                285,
-                IMG.format(id="1467003909585-2f8a72700288"),
-            ),
-            (
-                "huvudratter",
-                "Entrecôte",
-                "entrecote",
-                "Rödvinssås, pommes, bearnaisesås.",
-                325,
-                IMG.format(id="1600891964092-4316c288032e"),
-            ),
-            (
-                "desserter",
-                "Pannacotta",
-                "pannacotta",
-                "Vanilj, bärkompott, mynta.",
-                115,
-                IMG.format(id="1488477181946-6428a0291777"),
-            ),
-            (
-                "desserter",
-                "Chokladfondant",
-                "chokladfondant",
-                "Varm choklad, vaniljglass.",
-                125,
-                IMG.format(id="1624353368356-a1ab7033d422"),
-            ),
-            (
-                "drycker",
-                "Husets röda",
-                "husets-roda",
-                "Ett glas utvalt rödvin.",
-                95,
-                IMG.format(id="1510812431401-41e2bd2722f3"),
-            ),
-        ]
-
-        for i, (name, slug, desc) in enumerate(categories_data):
+        for i, (name, slug, desc) in enumerate(CATEGORIES):
             Category.objects.update_or_create(
                 slug=slug,
                 defaults={"name": name, "description": desc, "sort_order": i, "is_active": True},
             )
 
-        for cat_slug, name, slug, desc, price, image in products_data:
+        for i, (cat_slug, name, slug, desc, price) in enumerate(PRODUCTS):
             category = Category.objects.get(slug=cat_slug)
-            product, created = Product.objects.update_or_create(
+            Product.objects.update_or_create(
                 slug=slug,
                 defaults={
                     "category": category,
                     "name": name,
                     "description": desc,
-                    "base_price": Decimal(str(price)),
-                    "image_url": image,
+                    "base_price": ex_vat(price),
+                    "vat_rate": FOOD_VAT,
+                    # No stock photography — real Riva photos are added later via
+                    # the admin. Blank renders a neutral branded placeholder.
+                    "image_url": "",
                     "is_available": True,
-                    "inventory_count": 50,
+                    "is_featured": slug in FEATURED,
+                    "featured_order": FEATURED.get(slug, 0),
+                    "sort_order": i,
+                    "inventory_count": 999,
                 },
             )
-            if created and slug == "entrecote":
-                group, _ = ModifierGroup.objects.get_or_create(
-                    product=product,
-                    name="Stekning",
-                    defaults={"required": True, "min_selections": 1, "max_selections": 1},
-                )
-                for opt_name, delta in [("Rare", 0), ("Medium", 0), ("Well done", 0)]:
-                    ModifierOption.objects.get_or_create(
-                        group=group,
-                        name=opt_name,
-                        defaults={"price_delta": Decimal(str(delta)), "is_available": True},
-                    )
-                addon_group, _ = ModifierGroup.objects.get_or_create(
-                    product=product,
-                    name="Tillbehör",
-                    defaults={"required": False, "min_selections": 0, "max_selections": 3},
-                )
-                ModifierOption.objects.get_or_create(
-                    group=addon_group,
-                    name="Extra bearnaisesås",
-                    defaults={"price_delta": Decimal("25"), "is_available": True},
-                )
 
-        self.stdout.write(self.style.SUCCESS("Seeded menu data successfully."))
+        # Prune anything not part of the real menu so the catalog (the single
+        # source of truth) reflects the printed menu exactly. Products first
+        # (Category FK is PROTECT), then empty categories.
+        keep_product_slugs = {p[2] for p in PRODUCTS}
+        keep_category_slugs = {c[1] for c in CATEGORIES}
+        removed_products = Product.objects.exclude(slug__in=keep_product_slugs).delete()
+        removed_categories = Category.objects.exclude(
+            slug__in=keep_category_slugs
+        ).delete()
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Seeded Riva menu successfully "
+                f"(pruned products={removed_products[0]}, categories={removed_categories[0]})."
+            )
+        )

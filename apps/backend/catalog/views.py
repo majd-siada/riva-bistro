@@ -23,7 +23,23 @@ class ProductListView(APIView):
         category_slug = request.query_params.get("category")
         if category_slug:
             qs = qs.filter(category__slug=category_slug)
-        return Response(ProductListSerializer(qs, many=True).data)
+        if request.query_params.get("featured") in {"1", "true", "yes"}:
+            qs = qs.filter(is_featured=True).order_by("featured_order", "name")
+        serializer = ProductListSerializer(qs, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
+class FeaturedProductListView(APIView):
+    """Featured dishes for the homepage (admin-managed)."""
+
+    def get(self, request: Request) -> Response:
+        qs = (
+            Product.objects.filter(is_available=True, is_featured=True)
+            .select_related("category")
+            .order_by("featured_order", "name")[:8]
+        )
+        serializer = ProductListSerializer(qs, many=True, context={"request": request})
+        return Response(serializer.data)
 
 
 class ProductDetailView(APIView):
@@ -32,4 +48,5 @@ class ProductDetailView(APIView):
             Product.objects.prefetch_related("modifier_groups__options"),
             slug=slug,
         )
-        return Response(ProductDetailSerializer(product).data)
+        serializer = ProductDetailSerializer(product, context={"request": request})
+        return Response(serializer.data)
