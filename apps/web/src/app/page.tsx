@@ -54,7 +54,7 @@ export default async function HomePage() {
           </div>
         ) : (
           <p className="mt-12 text-center text-riva-mist">
-            Menyn laddas snart — starta backend med Docker Compose.
+            Menyn uppdateras just nu. Titta in igen om en liten stund.
           </p>
         )}
         <div className="mt-12 text-center">

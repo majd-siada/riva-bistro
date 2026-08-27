@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 
 import { PriceDisplay } from "@/components/commerce/price-display";
 import { WaveDivider } from "@/components/brand/wave-divider";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Section } from "@/components/layout/section";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +17,10 @@ import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
   const { cart, loading, updateItem, removeItem } = useCart();
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   return (
     <Section className="pt-24">
@@ -72,7 +78,17 @@ export default function CartPage() {
                     >
                       +
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => void removeItem(line.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setPendingRemoval({
+                          id: line.id,
+                          name: line.product_name,
+                        })
+                      }
+                      aria-label={`Ta bort ${line.product_name}`}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -103,6 +119,25 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingRemoval !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingRemoval(null);
+        }}
+        title="Ta bort ur varukorgen?"
+        description={
+          pendingRemoval
+            ? `Vill du ta bort ${pendingRemoval.name} från din beställning?`
+            : undefined
+        }
+        confirmLabel="Ta bort"
+        destructive
+        onConfirm={() => {
+          if (pendingRemoval) void removeItem(pendingRemoval.id);
+          setPendingRemoval(null);
+        }}
+      />
     </Section>
   );
 }
