@@ -1,5 +1,14 @@
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+function getApiBase(): string {
+  const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  // On the server (SSR / server components) the browser-facing URL
+  // (e.g. localhost:8000) resolves to the web container itself, not the API.
+  // Prefer the in-network URL (e.g. http://backend:8000) when running there.
+  if (typeof window === "undefined") {
+    const internalUrl = process.env.INTERNAL_API_URL?.replace(/\/$/, "");
+    return internalUrl ?? publicUrl ?? "http://localhost:8000";
+  }
+  return publicUrl ?? "http://localhost:8000";
+}
 
 export interface Pricing {
   price_ex_vat: string;
@@ -129,7 +138,7 @@ export interface ContactMessageRequest {
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}/api/v1${path}`, {
+  const res = await fetch(`${getApiBase()}/api/v1${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
