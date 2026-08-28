@@ -24,8 +24,8 @@ export function MenuContent({ categories, products }: MenuContentProps) {
     return (
       <StateMessage
         variant="empty"
-        title="Menyn är inte tillgänglig"
-        description="Kontrollera att backend-tjänsten körs och att menyn är seedad."
+        title="Menyn är inte tillgänglig just nu"
+        description="Vi uppdaterar menyn. Försök gärna igen om en liten stund."
       />
     );
   }

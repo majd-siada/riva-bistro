@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     # Local
     "core",
     "catalog",
-    "commerce",
 ]
 
 MIDDLEWARE = [
@@ -135,6 +134,10 @@ CORS_ALLOWED_ORIGINS = env_list(
     "DJANGO_CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 )
+# The frontend calls the API cross-origin with credentials (session cookie for
+# the cart). Without this the browser will not store/send the session cookie,
+# so the cart never persists. Origins remain restricted to the allowlist above.
+CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
@@ -157,7 +160,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Riva Bistro API",
-    "DESCRIPTION": "OpenAPI contract for Riva Bistro — menu, ordering, and reservations.",
+    "DESCRIPTION": "OpenAPI contract for Riva Bistro — menu and reservations.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",

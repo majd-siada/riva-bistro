@@ -1,3 +1,4 @@
+import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface PriceDisplayProps {
@@ -10,15 +11,7 @@ export interface PriceDisplayProps {
   className?: string;
 }
 
-function formatAmount(value: number | string, currency: string): string {
-  const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("sv-SE", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(num);
-}
+const formatAmount = formatPrice;
 
 export function PriceDisplay({
   priceIncVat,

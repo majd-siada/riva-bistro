@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
 
@@ -22,12 +23,31 @@ const sans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: {
-    default: "Riva Bistro",
-    template: "%s · Riva Bistro",
+    default: `${SITE_NAME} — Premium svensk gastronomi i Stockholm`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Riva Bistro — premium svensk restaurang med bordbokning, meny och galleri.",
-  metadataBase: new URL("http://localhost:3000"),
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "sv_SE",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — Premium svensk gastronomi i Stockholm`,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — Premium svensk gastronomi i Stockholm`,
+    description: SITE_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

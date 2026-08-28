@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { ProductDetailClient } from "@/components/commerce/product-detail-client";
+import { ProductDetail } from "@/components/commerce/product-detail";
 import { Section } from "@/components/layout/section";
 import { fetchProduct } from "@/lib/api";
 
@@ -29,7 +29,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <Section className="pt-24">
-      <ProductDetailClient product={product} />
+      <ProductDetail product={product} />
     </Section>
   );
 }

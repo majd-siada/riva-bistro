@@ -1,28 +1,32 @@
 import { WaveDivider } from "@/components/brand/wave-divider";
 import { Section } from "@/components/layout/section";
 
-export const metadata = { title: "FAQ" };
+export const metadata = {
+  title: "FAQ",
+  description:
+    "Vanliga frågor om Riva Bistro — moms, bordsbokning, avbokning, allergier och öppettider.",
+};
 
 const faqs = [
   {
-    q: "Ingår moms i priserna?",
-    a: "Ja, alla priser på menyn visas inklusive moms (25%). Vid checkout visas även en uppdelning exkl. moms och momsbelopp.",
+    q: "Hur bokar jag bord?",
+    a: "Använd vår bokningssida under ”Boka bord”. Välj datum, tid och antal gäster så bekräftar vi din bokning via e-post eller telefon.",
   },
   {
     q: "Kan jag avboka min bordsbokning?",
     a: "Ja, avbokningar kan göras kostnadsfritt upp till 24 timmar före bokad tid. Kontakta oss via e-post eller telefon.",
   },
   {
-    q: "Hur fungerar onlinebeställning?",
-    a: "Välj rätter från menyn, anpassa tillbehör, lägg i varukorgen och betala i kassan. Du får en orderreferens och kan följa statusen i realtid.",
+    q: "Ingår moms i priserna?",
+    a: "Ja, alla priser på menyn visas inklusive moms (25%).",
   },
   {
     q: "Har ni vegetariska alternativ?",
-    a: "Ja, vi har flera vegetariska rätter och kan anpassa de flesta rätter. Meddela oss gärna vid beställning.",
+    a: "Ja, vi har flera vegetariska rätter och kan anpassa de flesta rätter. Meddela oss gärna vid bokning.",
   },
   {
-    q: "Vilka betalningsmetoder accepteras?",
-    a: "Vi accepterar kortbetalning online. Betalning hanteras säkert via vår betalningspartner.",
+    q: "Vilka är era öppettider?",
+    a: "Mån–Fre 17:00–23:00 och Lör–Sön 12:00–23:00.",
   },
 ];
 
