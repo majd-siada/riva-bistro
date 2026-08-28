@@ -70,7 +70,7 @@ Import tokens from `packages/design-tokens/tokens.json` when building the Figma 
 
 ## Pages
 
-`/` (hem), `/meny`, `/meny/[slug]`, `/boka`, `/om-oss`, `/kontakt`, `/faq`
+`/` (hem), `/meny`, `/meny/[slug]`, `/boka`, `/om-oss`, `/kontakt`
 
 Online ordering (cart, checkout, order tracking, account) and the commerce admin dashboard have been removed from scope — the site is a restaurant website with table booking only.
 

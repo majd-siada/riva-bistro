@@ -26,7 +26,6 @@ const navItems = [
 
 const mobileExtra = [
   { href: "/kontakt", label: "Kontakt" },
-  { href: "/faq", label: "Vanliga frågor" },
 ] as const;
 
 export function Header() {

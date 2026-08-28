@@ -11,7 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/privata-event", priority: 0.8 },
     { path: "/om-oss", priority: 0.6 },
     { path: "/kontakt", priority: 0.6 },
-    { path: "/faq", priority: 0.5 },
   ];
 
   return routes.map(({ path, priority }) => ({
