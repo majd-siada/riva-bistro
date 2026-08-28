@@ -54,7 +54,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     } catch {
       /* ignore */
     }
-    router.replace("/admin/login");
+    // Full navigation so the shell re-mounts with a fresh (signed-out) session.
+    window.location.assign("/admin/login");
   };
 
   const isActive = (href: string) =>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
@@ -11,7 +10,6 @@ import { adminLogin } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +21,9 @@ export default function AdminLoginPage() {
     setSubmitting(true);
     try {
       await adminLogin(username, password);
-      router.replace("/admin");
+      // Full navigation so the admin shell re-mounts and re-checks the session
+      // (avoids a stale "not authenticated" bounce right after login).
+      window.location.assign("/admin");
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Något gick fel. Försök igen.",
