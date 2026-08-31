@@ -4,33 +4,29 @@ from django.core.management.base import BaseCommand
 
 from reservations.models import OpeningHours, ReservationSettings
 
-# PLACEHOLDER opening hours — real hours are unknown and must be confirmed by
-# the restaurant. Fully editable from the admin (/admin/oppettider).
-PLACEHOLDER_HOURS = {
-    0: (time(17, 0), time(23, 0), False),  # Mån
-    1: (time(17, 0), time(23, 0), False),  # Tis
-    2: (time(17, 0), time(23, 0), False),  # Ons
-    3: (time(17, 0), time(23, 0), False),  # Tor
-    4: (time(16, 0), time(0, 0), False),   # Fre (placeholder)
+# Reference opening hours from design brief.
+REFERENCE_HOURS = {
+    0: (time(16, 0), time(23, 0), False),  # Mån
+    1: (time(16, 0), time(23, 0), False),  # Tis
+    2: (time(16, 0), time(23, 0), False),  # Ons
+    3: (time(16, 0), time(23, 0), False),  # Tor
+    4: (time(16, 0), time(23, 0), False),  # Fre
     5: (time(12, 0), time(23, 0), False),  # Lör
-    6: (time(12, 0), time(22, 0), False),  # Sön
+    6: (time(12, 0), time(23, 0), False),  # Sön
 }
 
 
 class Command(BaseCommand):
-    help = "Seed placeholder opening hours + development reservation settings."
+    help = "Seed reference opening hours + development reservation settings."
 
     def handle(self, *args, **options):
-        for weekday, (opens, closes, closed) in PLACEHOLDER_HOURS.items():
+        for weekday, (opens, closes, closed) in REFERENCE_HOURS.items():
             OpeningHours.objects.update_or_create(
                 weekday=weekday,
                 defaults={"opens_at": opens, "closes_at": closes, "is_closed": closed},
             )
 
         config = ReservationSettings.load()
-        # DEVELOPMENT PLACEHOLDER capacity. production_ready stays False so that
-        # in production instant confirmation is disabled until staff set a real
-        # capacity and enable it explicitly.
         config.max_guests_per_slot = 20
         config.slot_interval_minutes = 30
         config.last_seating_buffer_minutes = 60
@@ -40,7 +36,6 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                "Seeded PLACEHOLDER opening hours + dev reservation settings. "
-                "Set real hours/capacity and enable production_ready before launch."
+                "Seeded reference opening hours + dev reservation settings."
             )
         )
