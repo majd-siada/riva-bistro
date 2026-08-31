@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Share2 } from "lucide-react";
+import type { Metadata } from "next";
+import { Mail, MapPin, Phone, Share2 } from "lucide-react";
 
 import { FAQ } from "@/components/brand/faq";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
@@ -9,7 +10,7 @@ import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { business, fullAddress } from "@/config/business";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Kontakt",
   description: "Kontakta Riva Bistro — adress, öppettider, karta och meddelandeformulär.",
 };
@@ -62,20 +63,28 @@ export default function ContactPage() {
           <div className="space-y-8">
             <div>
               <h2 className="riva-label">Besök oss</h2>
-              <p className="mt-3 text-lg text-riva-cream">{fullAddress()}</p>
+              <p className="mt-3 flex items-start gap-2 text-lg text-riva-cream">
+                <MapPin className="mt-1 h-4 w-4 shrink-0 text-riva-gold" strokeWidth={1.25} />
+                {fullAddress()}
+              </p>
             </div>
             <div>
               <h2 className="riva-label">Kontakt</h2>
               <p className="mt-3">
-                <a href={business.phoneHref} className="text-riva-cream hover:text-riva-gold">
+                <a
+                  href={business.phoneHref}
+                  className="inline-flex items-center gap-2 text-riva-cream hover:text-riva-gold"
+                >
+                  <Phone className="h-4 w-4 text-riva-gold" strokeWidth={1.25} />
                   {business.phone}
                 </a>
               </p>
-              <p>
+              <p className="mt-2">
                 <a
                   href={`mailto:${business.email}`}
-                  className="text-riva-cream hover:text-riva-gold"
+                  className="inline-flex items-center gap-2 text-riva-cream hover:text-riva-gold"
                 >
+                  <Mail className="h-4 w-4 text-riva-gold" strokeWidth={1.25} />
                   {business.email}
                 </a>
               </p>
@@ -87,12 +96,20 @@ export default function ContactPage() {
             </div>
             <div>
               <h2 className="riva-label">Följ oss</h2>
-              <div className="mt-3 flex gap-3">
+              <div className="mt-3 flex flex-wrap gap-3">
                 {business.social.instagram && (
                   <Button asChild variant="outline" size="sm">
                     <a href={business.social.instagram} target="_blank" rel="noopener noreferrer">
                       <Share2 className="mr-2 h-4 w-4" strokeWidth={1.25} />
                       Instagram
+                    </a>
+                  </Button>
+                )}
+                {business.social.facebook && (
+                  <Button asChild variant="outline" size="sm">
+                    <a href={business.social.facebook} target="_blank" rel="noopener noreferrer">
+                      <Share2 className="mr-2 h-4 w-4" strokeWidth={1.25} />
+                      Facebook
                     </a>
                   </Button>
                 )}
