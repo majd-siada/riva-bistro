@@ -12,17 +12,17 @@ interface StateMessageProps {
 }
 
 const variantStyles: Record<StateVariant, string> = {
-  empty: "border-riva-ink/10 bg-riva-cream-2",
+  empty: "border-riva-cream/10 bg-riva-card",
   error: "border-riva-error/40 bg-riva-error/10",
   success: "border-riva-success/45 bg-riva-success/12",
-  loading: "border-riva-ink/10 bg-riva-cream-2",
+  loading: "border-riva-cream/10 bg-riva-card",
 };
 
 const iconColor: Record<StateVariant, string> = {
-  empty: "text-riva-teal",
+  empty: "text-riva-gold",
   error: "text-riva-error",
   success: "text-riva-success",
-  loading: "text-riva-teal",
+  loading: "text-riva-gold",
 };
 
 export function StateMessage({
@@ -46,12 +46,12 @@ export function StateMessage({
       <h3
         className={cn(
           "font-display text-xl",
-          variant === "success" ? "text-riva-success" : "text-riva-ink",
+          variant === "success" ? "text-riva-success" : "text-riva-cream",
         )}
       >
         {title}
       </h3>
-      {description && <p className="mt-2 max-w-md text-sm text-riva-taupe">{description}</p>}
+      {description && <p className="mt-2 max-w-md text-sm text-riva-muted">{description}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

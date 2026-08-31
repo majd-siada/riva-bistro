@@ -78,6 +78,8 @@ describe("validateContact", () => {
   const valid: ContactFormValues = {
     name: "Anna",
     email: "anna@example.com",
+    phone: "",
+    subject: "",
     message: "Jag skulle vilja fråga om er meny.",
   };
 
@@ -86,7 +88,7 @@ describe("validateContact", () => {
   });
 
   it("requires a name, email and message", () => {
-    const errors = validateContact({ name: "", email: "", message: "" });
+    const errors = validateContact({ name: "", email: "", phone: "", subject: "", message: "" });
     expect(errors.name).toBeDefined();
     expect(errors.email).toBeDefined();
     expect(errors.message).toBeDefined();

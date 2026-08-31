@@ -154,6 +154,8 @@ export interface Reservation {
 export interface ContactMessageRequest {
   name: string;
   email: string;
+  phone?: string;
+  subject?: string;
   message: string;
 }
 

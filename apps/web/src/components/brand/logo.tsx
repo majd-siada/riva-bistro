@@ -1,40 +1,42 @@
-import Image from "next/image";
-
+import { GoldDivider } from "@/components/brand/gold-divider";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  tone?: "ink" | "light";
+  tone?: "light" | "gold";
+  showDivider?: boolean;
   showWordmark?: boolean;
   className?: string;
   size?: number;
 }
 
-export function Logo({ tone = "ink", showWordmark = true, className, size = 40 }: LogoProps) {
-  const wordColor = tone === "light" ? "text-on-dark" : "text-riva-ink";
-  const subColor = tone === "light" ? "text-on-dark-muted" : "text-riva-gold";
+export function Logo({
+  tone = "light",
+  showDivider = true,
+  showWordmark = true,
+  className,
+}: LogoProps) {
+  const wordColor = tone === "gold" ? "text-riva-gold" : "text-riva-cream";
+  const subColor = "text-riva-muted";
+
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <Image
-        src="/brand/riva-emblem.svg"
-        alt=""
-        width={size}
-        height={size}
-        priority
-        unoptimized
-        style={{ height: size, width: size }}
-      />
+    <span className={cn("inline-flex flex-col", className)}>
       {showWordmark && (
         <span className="flex flex-col leading-none">
-          <span className={cn("font-display text-2xl tracking-[0.14em]", wordColor)}>RIVA</span>
+          <span className={cn("font-display text-[1.65rem] tracking-[0.28em]", wordColor)}>
+            RIVA
+          </span>
           <span
             className={cn(
-              "mt-0.5 text-[0.58rem] font-semibold uppercase tracking-[0.4em]",
+              "mt-1 text-[0.55rem] font-semibold uppercase tracking-[0.55em]",
               subColor,
             )}
           >
-            Bistro
+            BISTRO
           </span>
         </span>
+      )}
+      {showDivider && showWordmark && (
+        <GoldDivider variant="short" className="mt-2.5 opacity-70" />
       )}
     </span>
   );

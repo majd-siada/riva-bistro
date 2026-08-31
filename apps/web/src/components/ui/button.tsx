@@ -6,20 +6,19 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium tracking-wide transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold focus-visible:ring-offset-2 focus-visible:ring-offset-riva-cream disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium tracking-wide transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold focus-visible:ring-offset-2 focus-visible:ring-offset-riva-black disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-riva-ink text-riva-ivory hover:bg-riva-ink-soft",
-        gold: "bg-riva-gold text-riva-ink hover:bg-[color-mix(in_srgb,var(--riva-gold)_88%,black)]",
-        teal: "bg-riva-teal text-on-dark hover:bg-[color-mix(in_srgb,var(--riva-teal)_88%,black)]",
+        default: "bg-riva-gold text-riva-black hover:bg-riva-gold-light",
+        gold: "bg-riva-gold text-riva-black hover:bg-riva-gold-light",
         outline:
-          "border border-riva-ink/25 bg-transparent text-riva-ink hover:border-riva-ink/60 hover:bg-riva-ink/[0.03]",
-        ghost: "text-riva-ink hover:bg-riva-ink/[0.06]",
-        link: "text-riva-teal underline-offset-4 hover:underline",
-        destructive: "bg-riva-error text-white hover:bg-[color-mix(in_srgb,var(--riva-error)_88%,black)]",
+          "border border-riva-gold/50 bg-transparent text-riva-gold hover:bg-riva-gold/10",
+        ghost: "text-riva-cream hover:bg-riva-card",
+        link: "text-riva-gold underline-offset-4 hover:underline",
+        destructive: "bg-riva-error text-white hover:opacity-90",
         "outline-light":
-          "border border-on-dark/40 bg-transparent text-on-dark hover:bg-on-dark/10",
+          "border border-riva-cream/30 bg-transparent text-riva-cream hover:border-riva-gold hover:text-riva-gold",
       },
       size: {
         default: "h-11 px-6 py-2",

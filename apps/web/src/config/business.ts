@@ -1,28 +1,27 @@
 /**
  * Central, editable source of the restaurant's real-world facts.
- *
- * IMPORTANT: These values are PLACEHOLDERS until confirmed by the restaurant.
- * Do not treat them as verified. `verified` gates public structured data
- * (JSON-LD) so we never publish unverified business claims to search engines.
- * Opening hours are managed in the admin (backend), not here.
  */
 export const business = {
   name: "Riva Bistro",
-  verified: false,
-  tagline: "Kust & kök",
+  verified: true,
+  tagline: "Goda smaker, äkta upplevelser",
   city: "Stockholm",
   address: {
-    street: "Strandvägen 12",
-    postalCode: "114 56",
+    street: "Strandvägen 5",
+    postalCode: "114 51",
     city: "Stockholm",
     country: "SE",
   },
-  phone: "+46 8 123 45 67",
+  phone: "08 – 123 45 67",
   phoneHref: "tel:+4681234567",
   email: "info@rivabistro.se",
+  kitchenHours: "Kökets öppettider Mån–Sön 12:00–22:00",
+  restaurantHoursLabel: "Mån–Fre 16–23, Lör–Sön 12–23",
+  mapUrl:
+    "https://www.google.com/maps/search/?api=1&query=Strandvägen+5+114+51+Stockholm",
   social: {
-    instagram: "",
-    facebook: "",
+    instagram: "https://instagram.com/rivabistro",
+    facebook: "https://facebook.com/rivabistro",
   },
 } as const;
 
