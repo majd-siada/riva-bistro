@@ -3,37 +3,29 @@
 @tailwind utilities;
 
 :root {
-  /* Riva Bistro — warm editorial palette (light, premium but relaxed) */
-  --riva-cream: #f7f2e9; /* page background */
-  --riva-cream-2: #fcf8f1; /* elevated surface */
-  --riva-ivory: #fffdf8; /* brightest surface */
-  --riva-ink: #262019; /* primary text (warm near-black) */
-  --riva-ink-soft: #4a4239;
-  --riva-taupe: #7a7063; /* muted text */
-  --riva-gold: #b08a46; /* accent for text/labels (AA on cream) */
-  --riva-gold-soft: #c6a56a; /* decorative gold (from logo) */
-  --riva-teal: #3e6e6a; /* secondary accent / links */
-  --riva-teal-soft: #5e8b8b; /* decorative teal (from logo) */
-  --riva-charcoal: #211d18; /* dark sections (hero/footer) */
-  --riva-charcoal-2: #2b261f;
-  --riva-error: #b4453c;
-  --riva-success: #4e7a57;
+  /* Riva Bistro — dark cinematic palette */
+  --riva-black: #050404;
+  --riva-surface: #0d0b0a;
+  --riva-card: #120f0e;
+  --riva-cream: #f5f2e8;
+  --riva-muted: #ada89c;
+  --riva-gold: #b8853d;
+  --riva-gold-light: #c69a52;
+  --riva-error: #c45c5c;
+  --riva-success: #5e8b6e;
 
   /* Semantic */
-  --surface: var(--riva-cream);
-  --surface-elevated: var(--riva-cream-2);
-  --surface-dark: var(--riva-charcoal);
-  --text: var(--riva-ink);
-  --text-muted: var(--riva-taupe);
-  --text-on-dark: #f3ecdd;
-  --text-on-dark-muted: #cdc3b1;
-  --border: color-mix(in srgb, var(--riva-ink) 12%, transparent);
-  --border-on-dark: color-mix(in srgb, #f3ecdd 16%, transparent);
+  --background: var(--riva-black);
+  --foreground: var(--riva-cream);
+  --surface: var(--riva-surface);
+  --surface-elevated: var(--riva-card);
+  --text: var(--riva-cream);
+  --text-muted: var(--riva-muted);
+  --text-on-dark: var(--riva-cream);
+  --text-on-dark-muted: var(--riva-muted);
+  --border: color-mix(in srgb, var(--riva-cream) 12%, transparent);
+  --border-on-dark: color-mix(in srgb, var(--riva-cream) 14%, transparent);
 
-  --background: var(--surface);
-  --foreground: var(--text);
-
-  /* Spacing (4px base) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -44,23 +36,20 @@
   --space-16: 64px;
   --space-24: 96px;
 
-  /* Radius — intentional, softly rounded */
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 14px;
+  --radius-lg: 12px;
   --radius-full: 999px;
   --radius: var(--radius-md);
 
-  /* Motion */
   --duration-fast: 150ms;
   --duration-normal: 260ms;
   --duration-slow: 500ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Shadows — soft and warm, restrained */
-  --shadow-subtle: 0 1px 2px rgba(38, 32, 25, 0.06), 0 1px 3px rgba(38, 32, 25, 0.08);
-  --shadow-card: 0 8px 24px -12px rgba(38, 32, 25, 0.18);
-  --shadow-elevated: 0 18px 48px -20px rgba(38, 32, 25, 0.28);
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 12px 40px -16px rgba(0, 0, 0, 0.65);
+  --shadow-elevated: 0 24px 64px -24px rgba(0, 0, 0, 0.75);
 }
 
 @layer base {
@@ -84,7 +73,7 @@
   h3,
   h4 {
     font-family: var(--font-display), ui-serif, Georgia, serif;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     color: var(--text);
     text-wrap: balance;
   }
@@ -96,8 +85,8 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--riva-gold-soft) 45%, transparent);
-    color: var(--riva-ink);
+    background: color-mix(in srgb, var(--riva-gold) 35%, transparent);
+    color: var(--riva-cream);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -116,11 +105,11 @@
 
 @layer components {
   .riva-label {
-    @apply text-xs font-semibold uppercase tracking-[0.22em] text-riva-gold;
+    @apply text-xs font-semibold uppercase tracking-[0.24em] text-riva-gold;
   }
 
   .riva-card {
-    @apply rounded-lg border bg-riva-cream-2 transition-all;
+    @apply rounded-lg border bg-riva-card transition-all;
     border-color: var(--border);
     box-shadow: var(--shadow-subtle);
     transition-duration: var(--duration-normal);
@@ -129,7 +118,7 @@
 
   .riva-card:hover {
     box-shadow: var(--shadow-card);
-    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--riva-gold) 25%, transparent);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -140,27 +129,20 @@
 
   .riva-price {
     font-variant-numeric: tabular-nums;
-    @apply font-semibold text-riva-ink;
+    @apply font-semibold text-riva-gold;
   }
 
-  /* Dark editorial section (hero, footer, cinematic blocks) */
   .riva-dark {
-    background: var(--surface-dark);
-    color: var(--text-on-dark);
-  }
-  .riva-dark h1,
-  .riva-dark h2,
-  .riva-dark h3,
-  .riva-dark h4 {
+    background: var(--riva-black);
     color: var(--text-on-dark);
   }
 
   .riva-shimmer {
     background: linear-gradient(
       90deg,
-      var(--riva-cream-2) 0%,
-      color-mix(in srgb, var(--riva-ink) 6%, var(--riva-cream-2)) 50%,
-      var(--riva-cream-2) 100%
+      var(--riva-card) 0%,
+      color-mix(in srgb, var(--riva-cream) 8%, var(--riva-card)) 50%,
+      var(--riva-card) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
@@ -199,7 +181,6 @@
     transition-timing-function: var(--ease-out);
   }
 
-  /* Scroll reveal — progressive enhancement; visible by default (no-JS safe) */
   .reveal {
     opacity: 0;
     transform: translateY(16px);
