@@ -4,7 +4,7 @@ import { GoldDivider } from "@/components/brand/gold-divider";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
-import { isWineCategory, menuImagePath } from "@/lib/menu-images";
+import { isWineCategory, resolveProductImage } from "@/lib/menu-images";
 import type { Product } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export function FeaturedDish({ product, className, reverse }: FeaturedDishProps)
       )}
     >
       <RestaurantImage
-        src={menuImagePath(product.slug)}
+        src={resolveProductImage(product)}
         alt={`${product.name} — utvald rätt på Riva Bistro`}
         aspectRatio="hero"
         priority

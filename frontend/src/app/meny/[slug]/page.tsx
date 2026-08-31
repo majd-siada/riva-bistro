@@ -6,7 +6,7 @@ import { PriceDisplay } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { fetchProduct } from "@/lib/api";
-import { isWineCategory, menuImagePath } from "@/lib/menu-images";
+import { isWineCategory, resolveProductImage } from "@/lib/menu-images";
 import Link from "next/link";
 
 interface Props {
@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: Props) {
     <Section>
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <RestaurantImage
-          src={menuImagePath(slug)}
+          src={resolveProductImage(product)}
           alt={`${product.name} — ${product.description}`}
           aspectRatio="hero"
           priority

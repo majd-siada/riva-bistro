@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { formatPrice } from "@/lib/format";
-import { isWineCategory, menuImagePath } from "@/lib/menu-images";
+import { isWineCategory, resolveProductImage } from "@/lib/menu-images";
 import type { Product } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ export function FoodCard({ product, className }: FoodCardProps) {
       className={cn("group riva-card block overflow-hidden", className)}
     >
       <RestaurantImage
-        src={menuImagePath(product.slug)}
+        src={resolveProductImage(product)}
         alt={`${product.name} — ${product.description || "Riva Bistro"}`}
         aspectRatio="wide"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
