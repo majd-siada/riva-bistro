@@ -1,3 +1,19 @@
+export type {
+  Availability,
+  AvailabilitySlot,
+  Category,
+  ContactMessageRequest,
+  EventInquiryRequest,
+  ModifierGroup,
+  ModifierOption,
+  OpeningHour,
+  Pricing,
+  Product,
+  ProductDetail,
+  Reservation,
+  ReservationRequest,
+} from "@riva-bistro/api-client";
+
 function getApiBase(): string {
   const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   if (typeof window === "undefined") {
@@ -35,8 +51,6 @@ async function apiFetch<T>(
   init?: RequestInit,
   opts?: { revalidate?: number },
 ): Promise<T> {
-  // A revalidate hint makes the fetch cacheable, which keeps pages (and the
-  // shared layout) statically generatable. Without it we opt out of caching.
   const cacheOpts =
     opts?.revalidate != null
       ? { next: { revalidate: opts.revalidate } }
@@ -58,116 +72,17 @@ async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
-// --- Types -------------------------------------------------------------------
-
-export interface Pricing {
-  price_ex_vat: string;
-  vat_amount: string;
-  price_inc_vat: string;
-  vat_rate: string;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  product_count: number;
-}
-
-export interface ModifierOption {
-  id: number;
-  name: string;
-  price_delta: string;
-  is_available: boolean;
-  pricing: Pricing;
-}
-
-export interface ModifierGroup {
-  id: number;
-  name: string;
-  min_selections: number;
-  max_selections: number;
-  required: boolean;
-  options: ModifierOption[];
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  image_url: string;
-  is_available: boolean;
-  is_featured: boolean;
-  category_name: string;
-  category_slug: string;
-  pricing: Pricing;
-  modifier_groups?: ModifierGroup[];
-}
-
-export interface OpeningHour {
-  weekday: number;
-  weekday_label: string;
-  opens_at: string | null;
-  closes_at: string | null;
-  is_closed: boolean;
-}
-
-export interface AvailabilitySlot {
-  time: string;
-  remaining: number;
-  available: boolean;
-}
-
-export interface Availability {
-  date: string;
-  enabled: boolean;
-  closed: boolean;
-  max_party_size: number;
-  slots: AvailabilitySlot[];
-}
-
-export interface ReservationRequest {
-  name: string;
-  phone: string;
-  email: string;
-  party_size: number;
-  date: string;
-  time: string;
-  special_request?: string;
-}
-
-export interface Reservation {
-  id: number;
-  ref: string;
-  name: string;
-  email: string;
-  party_size: number;
-  date: string;
-  time: string;
-  status: string;
-  status_label: string;
-  email_sent?: boolean;
-}
-
-export interface ContactMessageRequest {
-  name: string;
-  email: string;
-  message: string;
-}
-
-export interface EventInquiryRequest {
-  name: string;
-  email: string;
-  phone?: string;
-  event_type?: string;
-  guests?: string;
-  date?: string;
-  message: string;
-}
-
-// --- Public endpoints --------------------------------------------------------
+import type {
+  Availability,
+  Category,
+  ContactMessageRequest,
+  EventInquiryRequest,
+  OpeningHour,
+  Product,
+  ProductDetail,
+  Reservation,
+  ReservationRequest,
+} from "@riva-bistro/api-client";
 
 export async function fetchHealth(): Promise<{ status: string }> {
   return apiFetch("/health/");
@@ -186,13 +101,11 @@ export async function fetchFeatured(): Promise<Product[]> {
   return apiFetch("/menu/featured/");
 }
 
-export async function fetchProduct(slug: string): Promise<Product> {
+export async function fetchProduct(slug: string): Promise<ProductDetail> {
   return apiFetch(`/menu/products/${slug}/`);
 }
 
 export async function fetchHours(): Promise<OpeningHour[]> {
-  // Opening hours change rarely — cache with periodic revalidation so the
-  // shared footer does not force every route to be dynamic.
   return apiFetch("/hours/", undefined, { revalidate: 300 });
 }
 

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,12 +13,21 @@ from catalog.serializers import (
 
 
 class CategoryListView(APIView):
+    @extend_schema(tags=["menu"], responses={200: CategorySerializer(many=True)})
     def get(self, request: Request) -> Response:
         categories = Category.objects.filter(is_active=True)
         return Response(CategorySerializer(categories, many=True).data)
 
 
 class ProductListView(APIView):
+    @extend_schema(
+        tags=["menu"],
+        parameters=[
+            OpenApiParameter(name="category", type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="featured", type=str, location=OpenApiParameter.QUERY),
+        ],
+        responses={200: ProductListSerializer(many=True)},
+    )
     def get(self, request: Request) -> Response:
         qs = Product.objects.filter(is_available=True).select_related("category")
         category_slug = request.query_params.get("category")
@@ -32,6 +42,7 @@ class ProductListView(APIView):
 class FeaturedProductListView(APIView):
     """Featured dishes for the homepage (admin-managed)."""
 
+    @extend_schema(tags=["menu"], responses={200: ProductListSerializer(many=True)})
     def get(self, request: Request) -> Response:
         qs = (
             Product.objects.filter(is_available=True, is_featured=True)
@@ -43,6 +54,7 @@ class FeaturedProductListView(APIView):
 
 
 class ProductDetailView(APIView):
+    @extend_schema(tags=["menu"], responses={200: ProductDetailSerializer})
     def get(self, request: Request, slug: str) -> Response:
         product = get_object_or_404(
             Product.objects.prefetch_related("modifier_groups__options"),

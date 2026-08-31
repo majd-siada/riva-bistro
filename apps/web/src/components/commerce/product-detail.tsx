@@ -5,10 +5,10 @@ import { ProductImage } from "@/components/commerce/product-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
-import type { Product } from "@/lib/api";
+import type { ProductDetail } from "@/lib/api";
 
 interface ProductDetailProps {
-  product: Product;
+  product: ProductDetail;
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {

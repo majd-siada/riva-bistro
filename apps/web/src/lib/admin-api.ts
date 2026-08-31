@@ -1,5 +1,26 @@
 "use client";
 
+export type {
+  AdminCategory,
+  AdminClosure,
+  AdminOpeningHour,
+  AdminOverview,
+  AdminProduct,
+  AdminReservation,
+  AdminSession,
+  AdminSettings,
+} from "@riva-bistro/api-client";
+
+import type {
+  AdminCategory,
+  AdminClosure,
+  AdminOpeningHour,
+  AdminOverview,
+  AdminProduct,
+  AdminReservation,
+  AdminSession,
+  AdminSettings,
+} from "@riva-bistro/api-client";
 import { ApiError, publicApiOrigin } from "@/lib/api";
 
 const BASE = `${publicApiOrigin()}/api/v1`;
@@ -54,14 +75,6 @@ async function request<T>(
   return res.json() as Promise<T>;
 }
 
-// --- Auth --------------------------------------------------------------------
-
-export interface AdminSession {
-  authenticated: boolean;
-  username?: string;
-  is_staff?: boolean;
-}
-
 export async function adminLogin(username: string, password: string) {
   return request<AdminSession>("/admin/auth/login/", {
     method: "POST",
@@ -75,32 +88,6 @@ export async function adminLogout() {
 
 export async function adminMe(): Promise<AdminSession> {
   return request<AdminSession>("/admin/auth/me/");
-}
-
-// --- Reservations ------------------------------------------------------------
-
-export interface AdminReservation {
-  id: number;
-  ref: string;
-  name: string;
-  phone: string;
-  email: string;
-  party_size: number;
-  date: string;
-  time: string;
-  special_request: string;
-  status: string;
-  status_label: string;
-  created_at: string;
-}
-
-export interface AdminOverview {
-  today_count: number;
-  today_guests: number;
-  upcoming_count: number;
-  production_ready: boolean;
-  max_guests_per_slot: number;
-  todays_reservations: AdminReservation[];
 }
 
 export async function adminOverview() {
@@ -127,28 +114,12 @@ export async function adminUpdateReservationStatus(id: number, status: string) {
   });
 }
 
-// --- Opening hours + closures + settings -------------------------------------
-
-export interface AdminOpeningHour {
-  weekday: number;
-  weekday_label: string;
-  opens_at: string | null;
-  closes_at: string | null;
-  is_closed: boolean;
-}
-
 export async function adminGetHours() {
   return request<AdminOpeningHour[]>("/admin/hours/");
 }
 
 export async function adminSaveHours(hours: AdminOpeningHour[]) {
   return request<AdminOpeningHour[]>("/admin/hours/", { method: "PUT", body: hours });
-}
-
-export interface AdminClosure {
-  id: number;
-  date: string;
-  reason: string;
 }
 
 export async function adminListClosures() {
@@ -166,34 +137,12 @@ export async function adminDeleteClosure(id: number) {
   return request<void>(`/admin/closures/${id}/`, { method: "DELETE" });
 }
 
-export interface AdminSettings {
-  max_guests_per_slot: number;
-  slot_interval_minutes: number;
-  last_seating_buffer_minutes: number;
-  max_party_size: number;
-  booking_lead_minutes: number;
-  booking_horizon_days: number;
-  production_ready: boolean;
-}
-
 export async function adminGetSettings() {
   return request<AdminSettings>("/admin/settings/");
 }
 
 export async function adminUpdateSettings(patch: Partial<AdminSettings>) {
   return request<AdminSettings>("/admin/settings/", { method: "PATCH", body: patch });
-}
-
-// --- Menu (writes to the same catalog data) ----------------------------------
-
-export interface AdminCategory {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  sort_order: number;
-  is_active: boolean;
-  product_count: number;
 }
 
 export async function adminListCategories() {
@@ -213,23 +162,6 @@ export async function adminUpdateCategory(id: number, data: Partial<AdminCategor
 
 export async function adminDeleteCategory(id: number) {
   return request<void>(`/admin/menu/categories/${id}/`, { method: "DELETE" });
-}
-
-export interface AdminProduct {
-  id: number;
-  category: number;
-  category_name: string;
-  name: string;
-  slug: string;
-  description: string;
-  base_price: string;
-  vat_rate: string;
-  image_url: string;
-  image_upload_url: string;
-  is_available: boolean;
-  is_featured: boolean;
-  featured_order: number;
-  sort_order: number;
 }
 
 export async function adminListProducts() {

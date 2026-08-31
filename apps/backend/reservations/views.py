@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date as date_cls
 
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,7 +13,9 @@ from reservations.availability import compute_availability
 from reservations.booking import BookingError, create_reservation
 from reservations.models import OpeningHours
 from reservations.serializers import (
+    AvailabilitySerializer,
     OpeningHoursSerializer,
+    ReservationCreateResponseSerializer,
     ReservationCreateSerializer,
     ReservationSerializer,
 )
@@ -21,6 +24,7 @@ from reservations.serializers import (
 class HoursView(APIView):
     """Public opening hours for footer / booking display."""
 
+    @extend_schema(tags=["hours"], responses={200: OpeningHoursSerializer(many=True)})
     def get(self, request: Request) -> Response:
         hours = OpeningHours.objects.all()
         return Response(OpeningHoursSerializer(hours, many=True).data)
@@ -29,6 +33,19 @@ class HoursView(APIView):
 class AvailabilityView(APIView):
     """Public availability for a given date: open slots with remaining capacity."""
 
+    @extend_schema(
+        tags=["reservations"],
+        parameters=[
+            OpenApiParameter(
+                name="date",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description="ISO date (YYYY-MM-DD)",
+            ),
+        ],
+        responses={200: AvailabilitySerializer},
+    )
     def get(self, request: Request) -> Response:
         raw = request.query_params.get("date")
         if not raw:
@@ -54,6 +71,11 @@ class ReservationCreateView(APIView):
     authentication_classes: list = []
     permission_classes: list = []
 
+    @extend_schema(
+        tags=["reservations"],
+        request=ReservationCreateSerializer,
+        responses={201: ReservationCreateResponseSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = ReservationCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

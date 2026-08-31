@@ -133,17 +133,18 @@ docker compose exec web npm run test
 
 ## OpenAPI → generated TypeScript client
 
-Phase 1 exposes the schema. Phase 3 wires generation into `packages/api-client`.
-
-Intended workflow:
+The Django schema is the contract. Regenerate types after API changes:
 
 ```bash
 # Export schema from Django
 docker compose exec backend python manage.py spectacular --file /tmp/openapi.yaml
+docker compose cp backend:/tmp/openapi.yaml packages/api-client/openapi.yaml
 
-# Generate client into packages/api-client (Phase 3 script)
-# npm run generate:api -w packages/api-client
+# Generate TypeScript types into packages/api-client
+npm run generate:api
 ```
+
+The web app imports types from `@riva-bistro/api-client` (thin fetch wrappers remain in `apps/web/src/lib/api.ts` and `admin-api.ts`).
 
 **Rule:** frontend must not invent API request/response shapes.
 
@@ -170,7 +171,7 @@ riva-bistro/
 
 ## Phase roadmap
 
-See `docs/product/mvp.md`. Phase 1 = foundation only. Reservation domain arrives in Phase 2.
+See `docs/product/mvp.md`. Phases 1–3 (foundation, reservations, typed client) are complete. Phase 4 CMS is partial.
 
 ## License
 

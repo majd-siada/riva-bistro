@@ -1,0 +1,1611 @@
+openapi: 3.0.3
+info:
+  title: Riva Bistro API
+  version: 0.1.0
+  description: OpenAPI contract for Riva Bistro — menu and reservations.
+paths:
+  /api/v1/admin/auth/csrf/:
+    get:
+      operationId: admin_auth_csrf_retrieve
+      description: Sets the csrftoken cookie so the admin client can send X-CSRFToken.
+      tags:
+      - admin
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailResponse'
+          description: ''
+  /api/v1/admin/auth/login/:
+    post:
+      operationId: admin_auth_login_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+  /api/v1/admin/auth/logout/:
+    post:
+      operationId: admin_auth_logout_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSession'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+  /api/v1/admin/auth/me/:
+    get:
+      operationId: admin_auth_me_retrieve
+      description: Returns the current admin session state (200 always, client-friendly).
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+  /api/v1/admin/closures/:
+    get:
+      operationId: admin_closures_list
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpecialClosure'
+          description: ''
+    post:
+      operationId: admin_closures_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialClosure'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialClosure'
+          description: ''
+  /api/v1/admin/closures/{id}/:
+    delete:
+      operationId: admin_closures_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/hours/:
+    get:
+      operationId: admin_hours_list
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpeningHours'
+          description: ''
+    put:
+      operationId: admin_hours_update
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpeningHours'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpeningHours'
+          description: ''
+  /api/v1/admin/menu/categories/:
+    get:
+      operationId: admin_menu_categories_list
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminCategory'
+          description: ''
+    post:
+      operationId: admin_menu_categories_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCategory'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCategory'
+          description: ''
+  /api/v1/admin/menu/categories/{id}/:
+    get:
+      operationId: admin_menu_categories_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCategory'
+          description: ''
+    put:
+      operationId: admin_menu_categories_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCategory'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCategory'
+          description: ''
+    patch:
+      operationId: admin_menu_categories_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminCategory'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCategory'
+          description: ''
+    delete:
+      operationId: admin_menu_categories_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/menu/products/:
+    get:
+      operationId: admin_menu_products_list
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminProduct'
+          description: ''
+    post:
+      operationId: admin_menu_products_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminProduct'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProduct'
+          description: ''
+  /api/v1/admin/menu/products/{id}/:
+    get:
+      operationId: admin_menu_products_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProduct'
+          description: ''
+    put:
+      operationId: admin_menu_products_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminProduct'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProduct'
+          description: ''
+    patch:
+      operationId: admin_menu_products_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminProduct'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProduct'
+          description: ''
+    delete:
+      operationId: admin_menu_products_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/menu/products/{id}/image/:
+    post:
+      operationId: admin_menu_products_image_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+              required:
+              - image
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProduct'
+          description: ''
+  /api/v1/admin/overview/:
+    get:
+      operationId: admin_overview_retrieve
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminOverview'
+          description: ''
+  /api/v1/admin/reservations/:
+    get:
+      operationId: admin_reservations_list
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+      - in: query
+        name: q
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/v1/admin/reservations/{id}/:
+    get:
+      operationId: admin_reservations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+    patch:
+      operationId: admin_reservations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReservationStatus'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+          description: ''
+  /api/v1/admin/settings/:
+    get:
+      operationId: admin_settings_retrieve
+      tags:
+      - admin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationSettings'
+          description: ''
+    patch:
+      operationId: admin_settings_partial_update
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReservationSettings'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationSettings'
+          description: ''
+  /api/v1/contact/:
+    post:
+      operationId: contact_create
+      description: Public contact form → emails the restaurant notification inbox.
+      tags:
+      - inquiries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+          description: ''
+  /api/v1/events/inquiry/:
+    post:
+      operationId: events_inquiry_create
+      description: Public private-events inquiry → emails the restaurant notification
+        inbox.
+      tags:
+      - inquiries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventInquiry'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+          description: ''
+  /api/v1/health/:
+    get:
+      operationId: health_retrieve
+      description: Reports API and database readiness for local Docker healthchecks.
+      summary: Service health
+      tags:
+      - health
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: riva-bistro-backend
+                  database:
+                    type: string
+                    example: ok
+          description: ''
+        '503':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: degraded
+                  service:
+                    type: string
+                  database:
+                    type: string
+                    example: unavailable
+                  detail:
+                    type: string
+          description: ''
+  /api/v1/hours/:
+    get:
+      operationId: hours_list
+      description: Public opening hours for footer / booking display.
+      tags:
+      - hours
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpeningHours'
+          description: ''
+  /api/v1/menu/categories/:
+    get:
+      operationId: menu_categories_list
+      tags:
+      - menu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+  /api/v1/menu/featured/:
+    get:
+      operationId: menu_featured_list
+      description: Featured dishes for the homepage (admin-managed).
+      tags:
+      - menu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/v1/menu/products/:
+    get:
+      operationId: menu_products_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: featured
+        schema:
+          type: string
+      tags:
+      - menu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/v1/menu/products/{slug}/:
+    get:
+      operationId: menu_products_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+  /api/v1/reservations/:
+    post:
+      operationId: reservations_create
+      description: |-
+        Create a real, confirmed reservation (backend-enforced availability).
+
+        Public endpoint: no session auth (and therefore no CSRF), so it works for
+        anonymous guests even if a Django session happens to be authenticated.
+      tags:
+      - reservations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationCreateResponse'
+          description: ''
+  /api/v1/reservations/availability/:
+    get:
+      operationId: reservations_availability_retrieve
+      description: 'Public availability for a given date: open slots with remaining
+        capacity.'
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: ISO date (YYYY-MM-DD)
+        required: true
+      tags:
+      - reservations
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+          description: ''
+components:
+  schemas:
+    AdminCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        product_count:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - name
+      - product_count
+      - slug
+    AdminOverview:
+      type: object
+      properties:
+        today_count:
+          type: integer
+        today_guests:
+          type: integer
+        upcoming_count:
+          type: integer
+        production_ready:
+          type: boolean
+        max_guests_per_slot:
+          type: integer
+        todays_reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+      required:
+      - max_guests_per_slot
+      - production_ready
+      - today_count
+      - today_guests
+      - todays_reservations
+      - upcoming_count
+    AdminProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          type: integer
+        category_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        base_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        vat_rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,4})?$
+        image_url:
+          type: string
+          format: uri
+          maxLength: 500
+        image_upload_url:
+          type: string
+          readOnly: true
+        is_available:
+          type: boolean
+        is_featured:
+          type: boolean
+        featured_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - base_price
+      - category
+      - category_name
+      - id
+      - image_upload_url
+      - name
+      - slug
+    AdminSession:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        username:
+          type: string
+        is_staff:
+          type: boolean
+      required:
+      - authenticated
+    Availability:
+      type: object
+      properties:
+        date:
+          type: string
+        enabled:
+          type: boolean
+        closed:
+          type: boolean
+        max_party_size:
+          type: integer
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailabilitySlot'
+      required:
+      - closed
+      - date
+      - enabled
+      - max_party_size
+      - slots
+    AvailabilitySlot:
+      type: object
+      properties:
+        time:
+          type: string
+        remaining:
+          type: integer
+        available:
+          type: boolean
+      required:
+      - available
+      - remaining
+      - time
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        slug:
+          type: string
+          maxLength: 140
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        product_count:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - name
+      - product_count
+      - slug
+    Contact:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+          maxLength: 3000
+      required:
+      - email
+      - message
+      - name
+    DetailResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    EventInquiry:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          default: ''
+          maxLength: 40
+        event_type:
+          type: string
+          default: ''
+          maxLength: 120
+        guests:
+          type: string
+          default: ''
+          maxLength: 40
+        date:
+          type: string
+          default: ''
+          maxLength: 40
+        message:
+          type: string
+          maxLength: 3000
+      required:
+      - email
+      - message
+      - name
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+    ModifierGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        min_selections:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        max_selections:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        required:
+          type: boolean
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModifierOption'
+          readOnly: true
+      required:
+      - id
+      - name
+      - options
+    ModifierOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        price_delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        is_available:
+          type: boolean
+        pricing:
+          allOf:
+          - $ref: '#/components/schemas/Pricing'
+          readOnly: true
+      required:
+      - id
+      - name
+      - pricing
+    OpeningHours:
+      type: object
+      properties:
+        weekday:
+          allOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          minimum: 0
+          maximum: 32767
+        weekday_label:
+          type: string
+          readOnly: true
+        opens_at:
+          type: string
+          format: time
+          nullable: true
+        closes_at:
+          type: string
+          format: time
+          nullable: true
+        is_closed:
+          type: boolean
+      required:
+      - weekday
+      - weekday_label
+    PatchedAdminCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        product_count:
+          type: integer
+          readOnly: true
+    PatchedAdminProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          type: integer
+        category_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        base_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        vat_rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,4})?$
+        image_url:
+          type: string
+          format: uri
+          maxLength: 500
+        image_upload_url:
+          type: string
+          readOnly: true
+        is_available:
+          type: boolean
+        is_featured:
+          type: boolean
+        featured_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+    PatchedReservationSettings:
+      type: object
+      properties:
+        max_guests_per_slot:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        slot_interval_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        last_seating_buffer_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        max_party_size:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        booking_lead_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        booking_horizon_days:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        production_ready:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedReservationStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+    Pricing:
+      type: object
+      properties:
+        price_ex_vat:
+          type: string
+        vat_amount:
+          type: string
+        price_inc_vat:
+          type: string
+        vat_rate:
+          type: string
+      required:
+      - price_ex_vat
+      - price_inc_vat
+      - vat_amount
+      - vat_rate
+    ProductDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 220
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        image_url:
+          type: string
+          description: |-
+            Prefer an uploaded image over an external URL.
+
+            Uploaded images are returned as a root-relative media path (e.g.
+            /media/menu/x.webp). The frontend resolves it against the public API
+            origin, which works for both SSR and browser (unlike an absolute URL
+            built from the internal container host).
+          readOnly: true
+        is_available:
+          type: boolean
+        is_featured:
+          type: boolean
+        category_name:
+          type: string
+          readOnly: true
+        category_slug:
+          type: string
+          readOnly: true
+        pricing:
+          allOf:
+          - $ref: '#/components/schemas/Pricing'
+          readOnly: true
+        modifier_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModifierGroup'
+          readOnly: true
+        inventory_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - category_name
+      - category_slug
+      - id
+      - image_url
+      - modifier_groups
+      - name
+      - pricing
+      - slug
+    ProductList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 220
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        image_url:
+          type: string
+          description: |-
+            Prefer an uploaded image over an external URL.
+
+            Uploaded images are returned as a root-relative media path (e.g.
+            /media/menu/x.webp). The frontend resolves it against the public API
+            origin, which works for both SSR and browser (unlike an absolute URL
+            built from the internal container host).
+          readOnly: true
+        is_available:
+          type: boolean
+        is_featured:
+          type: boolean
+        category_name:
+          type: string
+          readOnly: true
+        category_slug:
+          type: string
+          readOnly: true
+        pricing:
+          allOf:
+          - $ref: '#/components/schemas/Pricing'
+          readOnly: true
+      required:
+      - category_name
+      - category_slug
+      - id
+      - image_url
+      - name
+      - pricing
+      - slug
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ref:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        party_size:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        time:
+          type: string
+          format: time
+          readOnly: true
+        special_request:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        status_label:
+          type: string
+          readOnly: true
+        confirmation_email_sent:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - confirmation_email_sent
+      - created_at
+      - date
+      - email
+      - id
+      - name
+      - party_size
+      - phone
+      - ref
+      - special_request
+      - status
+      - status_label
+      - time
+    ReservationCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        phone:
+          type: string
+          maxLength: 40
+        email:
+          type: string
+          format: email
+        party_size:
+          type: integer
+          maximum: 100
+          minimum: 1
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          format: time
+        special_request:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - date
+      - email
+      - name
+      - party_size
+      - phone
+      - time
+    ReservationCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ref:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        party_size:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        time:
+          type: string
+          format: time
+          readOnly: true
+        special_request:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        status_label:
+          type: string
+          readOnly: true
+        confirmation_email_sent:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        email_sent:
+          type: boolean
+          readOnly: true
+      required:
+      - confirmation_email_sent
+      - created_at
+      - date
+      - email
+      - email_sent
+      - id
+      - name
+      - party_size
+      - phone
+      - ref
+      - special_request
+      - status
+      - status_label
+      - time
+    ReservationSettings:
+      type: object
+      properties:
+        max_guests_per_slot:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        slot_interval_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        last_seating_buffer_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        max_party_size:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        booking_lead_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        booking_horizon_days:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        production_ready:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - updated_at
+    SpecialClosure:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 200
+      required:
+      - date
+      - id
+    StatusEnum:
+      enum:
+      - confirmed
+      - seated
+      - cancelled
+      - no_show
+      type: string
+      description: |-
+        * `confirmed` - Bekräftad
+        * `seated` - Anländ
+        * `cancelled` - Avbokad
+        * `no_show` - Uteblev
+    StatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    WeekdayEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Måndag
+        * `1` - Tisdag
+        * `2` - Onsdag
+        * `3` - Torsdag
+        * `4` - Fredag
+        * `5` - Lördag
+        * `6` - Söndag
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

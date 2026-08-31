@@ -216,7 +216,7 @@ export default function AdminMenuPage() {
                 <td className="px-4 py-3 font-medium text-riva-ink">{p.name}</td>
                 <td className="px-4 py-3 text-riva-taupe">{p.category_name}</td>
                 <td className="px-4 py-3 tabular-nums">
-                  {formatPrice(incFromBase(p.base_price, p.vat_rate))}
+                  {formatPrice(incFromBase(p.base_price, p.vat_rate ?? String(VAT)))}
                 </td>
                 <td className="px-4 py-3">
                   <input
@@ -246,12 +246,12 @@ export default function AdminMenuPage() {
                           id: p.id,
                           category: p.category,
                           name: p.name,
-                          description: p.description,
-                          priceInc: String(incFromBase(p.base_price, p.vat_rate)),
-                          is_available: p.is_available,
-                          is_featured: p.is_featured,
-                          featured_order: p.featured_order,
-                          vat_rate: p.vat_rate,
+                          description: p.description ?? "",
+                          priceInc: String(incFromBase(p.base_price, p.vat_rate ?? String(VAT))),
+                          is_available: p.is_available ?? true,
+                          is_featured: p.is_featured ?? false,
+                          featured_order: p.featured_order ?? 0,
+                          vat_rate: p.vat_rate ?? String(VAT),
                         })
                       }
                     >

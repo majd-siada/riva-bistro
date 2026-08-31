@@ -73,3 +73,8 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm run test
+      - name: Typecheck generated API client
+        working-directory: packages/api-client
+        run: |
+          npm ci
+          npm run typecheck

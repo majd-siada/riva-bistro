@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date as date_cls
 
 from django.db.models import Q, Sum
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
@@ -16,6 +17,7 @@ from reservations.models import (
     SpecialClosure,
 )
 from reservations.serializers import (
+    AdminOverviewSerializer,
     OpeningHoursSerializer,
     ReservationSerializer,
     ReservationSettingsSerializer,
@@ -27,6 +29,15 @@ from reservations.serializers import (
 class AdminReservationListView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(
+        tags=["admin"],
+        parameters=[
+            OpenApiParameter(name="date", type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="status", type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="q", type=str, location=OpenApiParameter.QUERY),
+        ],
+        responses={200: ReservationSerializer(many=True)},
+    )
     def get(self, request: Request) -> Response:
         qs = Reservation.objects.all()
         date_param = request.query_params.get("date")
@@ -58,12 +69,18 @@ class AdminReservationDetailView(APIView):
     def get_object(self, pk: int) -> Reservation | None:
         return Reservation.objects.filter(pk=pk).first()
 
+    @extend_schema(tags=["admin"], responses={200: ReservationSerializer})
     def get(self, request: Request, pk: int) -> Response:
         reservation = self.get_object(pk)
         if not reservation:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(ReservationSerializer(reservation).data)
 
+    @extend_schema(
+        tags=["admin"],
+        request=ReservationStatusSerializer,
+        responses={200: ReservationSerializer},
+    )
     def patch(self, request: Request, pk: int) -> Response:
         reservation = self.get_object(pk)
         if not reservation:
@@ -78,9 +95,15 @@ class AdminReservationDetailView(APIView):
 class AdminHoursView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(tags=["admin"], responses={200: OpeningHoursSerializer(many=True)})
     def get(self, request: Request) -> Response:
         return Response(OpeningHoursSerializer(OpeningHours.objects.all(), many=True).data)
 
+    @extend_schema(
+        tags=["admin"],
+        request=OpeningHoursSerializer(many=True),
+        responses={200: OpeningHoursSerializer(many=True)},
+    )
     def put(self, request: Request) -> Response:
         serializer = OpeningHoursSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
@@ -99,11 +122,17 @@ class AdminHoursView(APIView):
 class AdminClosureListView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(tags=["admin"], responses={200: SpecialClosureSerializer(many=True)})
     def get(self, request: Request) -> Response:
         return Response(
             SpecialClosureSerializer(SpecialClosure.objects.all(), many=True).data
         )
 
+    @extend_schema(
+        tags=["admin"],
+        request=SpecialClosureSerializer,
+        responses={201: SpecialClosureSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = SpecialClosureSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -114,6 +143,7 @@ class AdminClosureListView(APIView):
 class AdminClosureDetailView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(tags=["admin"], responses={204: None})
     def delete(self, request: Request, pk: int) -> Response:
         SpecialClosure.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -122,9 +152,15 @@ class AdminClosureDetailView(APIView):
 class AdminSettingsView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(tags=["admin"], responses={200: ReservationSettingsSerializer})
     def get(self, request: Request) -> Response:
         return Response(ReservationSettingsSerializer(ReservationSettings.load()).data)
 
+    @extend_schema(
+        tags=["admin"],
+        request=ReservationSettingsSerializer,
+        responses={200: ReservationSettingsSerializer},
+    )
     def patch(self, request: Request) -> Response:
         config = ReservationSettings.load()
         serializer = ReservationSettingsSerializer(config, data=request.data, partial=True)
@@ -136,6 +172,7 @@ class AdminSettingsView(APIView):
 class AdminReservationOverviewView(APIView):
     permission_classes = [IsAdminUser]
 
+    @extend_schema(tags=["admin"], responses={200: AdminOverviewSerializer})
     def get(self, request: Request) -> Response:
         today = date_cls.today()
         todays = Reservation.objects.filter(

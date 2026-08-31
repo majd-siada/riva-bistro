@@ -3,13 +3,14 @@ from __future__ import annotations
 from django.contrib.auth import authenticate, login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.serializers import LoginSerializer
+from core.serializers import AdminSessionSerializer, DetailResponseSerializer, LoginSerializer
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
@@ -19,6 +20,7 @@ class CsrfView(APIView):
     authentication_classes: list = []
     permission_classes: list = []
 
+    @extend_schema(tags=["admin"], responses={200: DetailResponseSerializer})
     def get(self, request: Request) -> Response:
         return Response({"detail": "CSRF cookie set"})
 
@@ -28,6 +30,11 @@ class LoginView(APIView):
     authentication_classes: list = []
     permission_classes: list = []
 
+    @extend_schema(
+        tags=["admin"],
+        request=LoginSerializer,
+        responses={200: AdminSessionSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -54,7 +61,9 @@ class LoginView(APIView):
 
 class LogoutView(APIView):
     permission_classes = [IsAdminUser]
+    serializer_class = AdminSessionSerializer
 
+    @extend_schema(tags=["admin"], responses={200: AdminSessionSerializer})
     def post(self, request: Request) -> Response:
         logout(request)
         return Response({"authenticated": False})
@@ -63,6 +72,7 @@ class LogoutView(APIView):
 class MeView(APIView):
     """Returns the current admin session state (200 always, client-friendly)."""
 
+    @extend_schema(tags=["admin"], responses={200: AdminSessionSerializer})
     def get(self, request: Request) -> Response:
         user = request.user
         if user.is_authenticated and user.is_staff:

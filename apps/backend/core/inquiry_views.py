@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.email import send_contact_message, send_event_inquiry
-from core.serializers import ContactSerializer, EventInquirySerializer
+from core.serializers import (
+    ContactSerializer,
+    EventInquirySerializer,
+    StatusResponseSerializer,
+)
 
 FAIL_MESSAGE = "Något gick fel. Försök igen eller kontakta oss direkt."
 
@@ -17,6 +22,11 @@ class ContactView(APIView):
     authentication_classes: list = []
     permission_classes: list = []
 
+    @extend_schema(
+        tags=["inquiries"],
+        request=ContactSerializer,
+        responses={200: StatusResponseSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = ContactSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -34,6 +44,11 @@ class EventInquiryView(APIView):
     authentication_classes: list = []
     permission_classes: list = []
 
+    @extend_schema(
+        tags=["inquiries"],
+        request=EventInquirySerializer,
+        responses={200: StatusResponseSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = EventInquirySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

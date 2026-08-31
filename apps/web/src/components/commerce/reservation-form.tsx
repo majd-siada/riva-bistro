@@ -114,7 +114,7 @@ export function ReservationForm() {
         party_size: guests,
         date,
         time,
-        special_request: contact.special.trim() || undefined,
+        special_request: contact.special.trim() || "",
       });
       setResult(reservation);
       toast.success("Bokningen är bekräftad.");

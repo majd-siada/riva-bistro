@@ -77,3 +77,34 @@ class ReservationSettingsSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["updated_at"]
+
+
+class AvailabilitySlotSerializer(serializers.Serializer):
+    time = serializers.CharField()
+    remaining = serializers.IntegerField()
+    available = serializers.BooleanField()
+
+
+class AvailabilitySerializer(serializers.Serializer):
+    date = serializers.CharField()
+    enabled = serializers.BooleanField()
+    closed = serializers.BooleanField()
+    max_party_size = serializers.IntegerField()
+    slots = AvailabilitySlotSerializer(many=True)
+
+
+class ReservationCreateResponseSerializer(ReservationSerializer):
+    email_sent = serializers.BooleanField(read_only=True)
+
+    class Meta(ReservationSerializer.Meta):
+        fields = [*ReservationSerializer.Meta.fields, "email_sent"]
+        read_only_fields = fields
+
+
+class AdminOverviewSerializer(serializers.Serializer):
+    today_count = serializers.IntegerField()
+    today_guests = serializers.IntegerField()
+    upcoming_count = serializers.IntegerField()
+    production_ready = serializers.BooleanField()
+    max_guests_per_slot = serializers.IntegerField()
+    todays_reservations = ReservationSerializer(many=True)

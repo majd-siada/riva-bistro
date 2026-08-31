@@ -70,6 +70,7 @@ services:
       - "3000:3000"
     volumes:
       - ./apps/web:/app
+      - ./packages/api-client:/app/packages/api-client:ro
       - /app/node_modules
       - /app/.next
     depends_on:

@@ -1,9 +1,17 @@
 from decimal import Decimal
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from catalog.models import Category, ModifierGroup, ModifierOption, Product
 from catalog.pricing import price_from_ex_vat
+
+
+class PricingSerializer(serializers.Serializer):
+    price_ex_vat = serializers.CharField()
+    vat_amount = serializers.CharField()
+    price_inc_vat = serializers.CharField()
+    vat_rate = serializers.CharField()
 
 
 class ModifierOptionSerializer(serializers.ModelSerializer):
@@ -13,6 +21,7 @@ class ModifierOptionSerializer(serializers.ModelSerializer):
         model = ModifierOption
         fields = ["id", "name", "price_delta", "is_available", "pricing"]
 
+    @extend_schema_field(PricingSerializer)
     def get_pricing(self, obj: ModifierOption) -> dict:
         return price_from_ex_vat(Decimal(str(obj.price_delta)))
 
@@ -53,6 +62,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "pricing",
         ]
 
+    @extend_schema_field(PricingSerializer)
     def get_pricing(self, obj: Product) -> dict:
         return price_from_ex_vat(Decimal(str(obj.base_price)), Decimal(str(obj.vat_rate)))
 

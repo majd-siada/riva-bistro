@@ -4,7 +4,7 @@ import { Logo } from "@/components/brand/logo";
 import { business, fullAddress } from "@/config/business";
 import { fetchHours, type OpeningHour } from "@/lib/api";
 
-function fmt(t: string | null): string {
+function fmt(t: string | null | undefined): string {
   if (!t) return "";
   return t.slice(0, 5);
 }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser
@@ -49,6 +50,17 @@ class AdminProductImageView(APIView):
     ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
     MAX_BYTES = 5 * 1024 * 1024
 
+    @extend_schema(
+        tags=["admin"],
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {"image": {"type": "string", "format": "binary"}},
+                "required": ["image"],
+            }
+        },
+        responses={200: AdminProductSerializer},
+    )
     def post(self, request: Request, pk: int) -> Response:
         product = Product.objects.filter(pk=pk).first()
         if not product:

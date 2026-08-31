@@ -20,3 +20,17 @@ class EventInquirySerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(style={"input_type": "password"})
+
+
+class AdminSessionSerializer(serializers.Serializer):
+    authenticated = serializers.BooleanField()
+    username = serializers.CharField(required=False)
+    is_staff = serializers.BooleanField(required=False)
+
+
+class StatusResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+
+
+class DetailResponseSerializer(serializers.Serializer):
+    detail = serializers.CharField()

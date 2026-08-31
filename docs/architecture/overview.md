@@ -52,5 +52,6 @@ Telegram is a side effect. Reservation creation must succeed even if Telegram fa
 
 ## Phase status
 
-- **Phase 1 (this milestone):** monorepo, Docker, Django health, Next.js foundation, OpenAPI scaffolding, docs/DX.
-- Later phases add reservation domain, CMS, Telegram, premium public UI, and production hardening.
+- **Phases 1–3:** monorepo, Docker, reservation domain, booking UI, generated OpenAPI TypeScript client (`packages/api-client`).
+- **Phase 4 (partial):** admin CMS for menu, hours, and reservation settings.
+- **Later phases:** gallery/news CMS, Telegram notifications, public-site polish, production hardening.

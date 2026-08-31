@@ -18,7 +18,7 @@ import {
   type AdminOpeningHour,
 } from "@/lib/admin-api";
 
-function trim(t: string | null): string {
+function trim(t: string | null | undefined): string {
   return t ? t.slice(0, 5) : "";
 }
 

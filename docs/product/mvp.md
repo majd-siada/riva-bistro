@@ -10,7 +10,7 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 
 ## MVP capabilities (by phase)
 
-### Phase 1 — Foundation (current)
+### Phase 1 — Foundation
 
 - Monorepo layout
 - Docker Compose (Postgres, Django, Next.js)
@@ -19,7 +19,7 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 - Frontend design-system foundation
 - Developer documentation
 
-### Phase 2 — Reservation engine
+### Phase 2 — Reservation engine (implemented)
 
 - Domain models + migrations
 - Availability engine
@@ -27,15 +27,16 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 - Reservation create API with final availability check
 - Heavy unit/API tests
 
-### Phase 3 — Booking UI + typed client
+### Phase 3 — Booking UI + typed client (implemented)
 
-- Generated OpenAPI TypeScript client
+- Generated OpenAPI TypeScript client (`packages/api-client`)
 - Public booking flow wired to real API
 
-### Phase 4 — Content management (menu, gallery, news)
+### Phase 4 — Content management (partial)
 
-- Auth / roles
-- Menu, gallery, news, settings management
+- Auth / roles (admin session)
+- Menu, hours, reservation settings management
+- Gallery and news — not yet implemented
 
 > Online ordering and the commerce dashboard (cart, checkout, order tracking, inventory, sales) are out of scope and have been removed.
 
