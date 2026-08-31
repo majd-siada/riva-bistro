@@ -6,9 +6,14 @@
     "frontend",
     "frontend/packages/api-client"
   ],
+  "dependencies": {
+    "next": "^15.5.9",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
   "scripts": {
     "build": "npm run build --prefix frontend",
-    "start": "npm run start --prefix frontend",
+    "start": "node .next/standalone/server.js",
     "dev": "docker compose up --build",
     "down": "docker compose down",
     "backend:test": "docker compose exec backend pytest",

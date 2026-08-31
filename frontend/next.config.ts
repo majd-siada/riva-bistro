@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
-  outputFileTracingRoot: path.join(__dirname),
+  // Monorepo: production deps (e.g. next) are hoisted to the repository root.
+  outputFileTracingRoot: path.join(__dirname, ".."),
   transpilePackages: ["@riva-bistro/api-client"],
   images: {
     remotePatterns: [
