@@ -4,7 +4,8 @@ import path from "node:path";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  outputFileTracingRoot: path.resolve(process.cwd()),
+  output: "standalone",
+  outputFileTracingRoot: path.join(__dirname),
   transpilePackages: ["@riva-bistro/api-client"],
   images: {
     remotePatterns: [
