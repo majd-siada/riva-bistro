@@ -7,8 +7,9 @@
     "frontend/packages/api-client"
   ],
   "scripts": {
-    "build": "npm run build -w frontend",
-    "start": "npm run start -w frontend",
+    "build": "npm run build --prefix frontend",
+    "postbuild": "node scripts/hostinger-sync-next-output.mjs",
+    "start": "npm run start --prefix frontend",
     "dev": "docker compose up --build",
     "down": "docker compose down",
     "backend:test": "docker compose exec backend pytest",
