@@ -183,24 +183,24 @@ export default function AdminMenuPage() {
     }
   };
 
-  if (loading) return <p className="text-riva-taupe">Laddar…</p>;
+  if (loading) return <p className="text-riva-muted">Laddar…</p>;
   if (error) return <StateMessage variant="error" title="Kunde inte ladda menyn" />;
 
   return (
     <div className="space-y-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-riva-ink">Meny</h1>
-          <p className="mt-1 text-riva-taupe">Hantera rätter, priser och utvalda dishes.</p>
+          <h1 className="font-display text-3xl text-riva-cream">Meny</h1>
+          <p className="mt-1 text-riva-muted">Hantera rätter, priser och utvalda dishes.</p>
         </div>
         <Button variant="gold" onClick={() => setDraft(emptyDraft(categories[0]?.id))}>
           Ny rätt
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-riva-ink/10">
+      <div className="overflow-x-auto rounded-lg border border-riva-cream/10">
         <table className="w-full text-sm">
-          <thead className="bg-riva-cream-2 text-left text-riva-taupe">
+          <thead className="bg-riva-surface text-left text-riva-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Namn</th>
               <th className="px-4 py-3 font-medium">Kategori</th>
@@ -210,11 +210,11 @@ export default function AdminMenuPage() {
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-riva-ink/10">
+          <tbody className="divide-y divide-riva-cream/10">
             {products.map((p) => (
-              <tr key={p.id} className="bg-riva-ivory">
-                <td className="px-4 py-3 font-medium text-riva-ink">{p.name}</td>
-                <td className="px-4 py-3 text-riva-taupe">{p.category_name}</td>
+              <tr key={p.id} className="bg-riva-card">
+                <td className="px-4 py-3 font-medium text-riva-cream">{p.name}</td>
+                <td className="px-4 py-3 text-riva-muted">{p.category_name}</td>
                 <td className="px-4 py-3 tabular-nums">
                   {formatPrice(incFromBase(p.base_price, p.vat_rate ?? String(VAT)))}
                 </td>
@@ -223,7 +223,7 @@ export default function AdminMenuPage() {
                     type="checkbox"
                     checked={p.is_available}
                     onChange={() => void toggleProduct(p, "is_available")}
-                    className="h-5 w-5 accent-riva-teal"
+                    className="h-5 w-5 accent-riva-gold"
                     aria-label={`${p.name} tillgänglig`}
                   />
                 </td>
@@ -274,13 +274,13 @@ export default function AdminMenuPage() {
       </div>
 
       {/* Categories */}
-      <section className="border-t border-riva-ink/10 pt-10">
-        <h2 className="font-display text-2xl text-riva-ink">Kategorier</h2>
+      <section className="border-t border-riva-cream/10 pt-10">
+        <h2 className="font-display text-2xl text-riva-cream">Kategorier</h2>
         <div className="mt-4 max-w-2xl space-y-2">
           {categories.map((c) => (
             <div
               key={c.id}
-              className="flex items-center gap-3 rounded-md border border-riva-ink/10 bg-riva-ivory px-3 py-2"
+              className="flex items-center gap-3 rounded-md border border-riva-cream/10 bg-riva-card px-3 py-2"
             >
               <Input
                 defaultValue={c.name}
@@ -288,7 +288,7 @@ export default function AdminMenuPage() {
                 className="h-9 flex-1"
                 aria-label="Kategorinamn"
               />
-              <span className="text-xs text-riva-taupe">{c.product_count} rätter</span>
+              <span className="text-xs text-riva-muted">{c.product_count} rätter</span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -372,16 +372,16 @@ export default function AdminMenuPage() {
                   />
                 </div>
                 <div className="flex flex-wrap gap-6">
-                  <label className="inline-flex items-center gap-2 text-sm text-riva-ink">
+                  <label className="inline-flex items-center gap-2 text-sm text-riva-cream">
                     <input
                       type="checkbox"
                       checked={draft.is_available}
                       onChange={(e) => setDraft({ ...draft, is_available: e.target.checked })}
-                      className="h-5 w-5 accent-riva-teal"
+                      className="h-5 w-5 accent-riva-gold"
                     />
                     Tillgänglig
                   </label>
-                  <label className="inline-flex items-center gap-2 text-sm text-riva-ink">
+                  <label className="inline-flex items-center gap-2 text-sm text-riva-cream">
                     <input
                       type="checkbox"
                       checked={draft.is_featured}
@@ -402,7 +402,7 @@ export default function AdminMenuPage() {
                         const file = e.target.files?.[0];
                         if (file && draft.id) void uploadImage(draft.id, file);
                       }}
-                      className="mt-1.5 block w-full text-sm text-riva-ink-soft file:mr-3 file:rounded-md file:border-0 file:bg-riva-ink file:px-4 file:py-2 file:text-riva-ivory"
+                      className="mt-1.5 block w-full text-sm text-riva-muted file:mr-3 file:rounded-md file:border-0 file:bg-riva-gold file:px-4 file:py-2 file:text-riva-black"
                     />
                   </div>
                 )}

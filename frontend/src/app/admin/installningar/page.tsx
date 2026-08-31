@@ -43,13 +43,13 @@ export default function AdminSettingsPage() {
   };
 
   if (error) return <StateMessage variant="error" title="Kunde inte ladda inställningar" />;
-  if (!settings) return <p className="text-riva-taupe">Laddar…</p>;
+  if (!settings) return <p className="text-riva-muted">Laddar…</p>;
 
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-riva-ink">Bokningsinställningar</h1>
-        <p className="mt-1 text-riva-taupe">Kapacitet och regler för onlinebokning.</p>
+        <h1 className="font-display text-3xl text-riva-cream">Bokningsinställningar</h1>
+        <p className="mt-1 text-riva-muted">Kapacitet och regler för onlinebokning.</p>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -66,7 +66,7 @@ export default function AdminSettingsPage() {
               }
               className="mt-1.5"
             />
-            <p className="mt-1 text-xs text-riva-taupe">{f.help}</p>
+            <p className="mt-1 text-xs text-riva-muted">{f.help}</p>
           </div>
         ))}
       </div>
@@ -75,19 +75,19 @@ export default function AdminSettingsPage() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
           <div className="flex-1">
-            <p className="font-medium text-riva-ink">Produktionsläge</p>
-            <p className="mt-1 text-sm text-riva-ink-soft">
+            <p className="font-medium text-riva-cream">Produktionsläge</p>
+            <p className="mt-1 text-sm text-riva-muted">
               Aktivera först när kapaciteten ovan speglar restaurangens verkliga
               förmåga. I produktion ges inga bokningsbekräftelser förrän detta är på.
             </p>
-            <label className="mt-3 inline-flex items-center gap-2 text-sm text-riva-ink">
+            <label className="mt-3 inline-flex items-center gap-2 text-sm text-riva-cream">
               <input
                 type="checkbox"
                 checked={settings.production_ready}
                 onChange={(e) =>
                   setSettings({ ...settings, production_ready: e.target.checked })
                 }
-                className="h-5 w-5 accent-riva-teal"
+                className="h-5 w-5 accent-riva-gold"
               />
               Aktivera onlinebokning i produktion
             </label>

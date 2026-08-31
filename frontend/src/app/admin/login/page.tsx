@@ -39,9 +39,9 @@ export default function AdminLoginPage() {
         <div className="flex justify-center">
           <Logo />
         </div>
-        <div className="mt-8 rounded-lg border border-riva-ink/10 bg-riva-ivory p-8 shadow-subtle">
-          <h1 className="font-display text-2xl text-riva-ink">Logga in</h1>
-          <p className="mt-1 text-sm text-riva-taupe">Administration för Riva Bistro.</p>
+        <div className="mt-8 rounded-lg border border-riva-cream/10 bg-riva-card p-8 shadow-card">
+          <h1 className="font-display text-2xl text-riva-cream">Logga in</h1>
+          <p className="mt-1 text-sm text-riva-muted">Administration för Riva Bistro.</p>
           <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-4" noValidate>
             <div>
               <Label htmlFor="username">Användarnamn</Label>

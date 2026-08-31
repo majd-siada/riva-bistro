@@ -25,11 +25,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="lg:pt-4">
         <Link
           href="/meny"
-          className="riva-label transition-riva hover:text-riva-ink"
+          className="riva-label transition-riva hover:text-riva-cream"
         >
           {product.category_name}
         </Link>
-        <h1 className="mt-3 font-display text-4xl text-riva-ink md:text-5xl">
+        <h1 className="mt-3 font-display text-4xl text-riva-cream md:text-5xl">
           {product.name}
         </h1>
         {!product.is_available && (
@@ -38,7 +38,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </Badge>
         )}
         {product.description && (
-          <p className="mt-5 max-w-prose leading-relaxed text-riva-ink-soft">
+          <p className="mt-5 max-w-prose leading-relaxed text-riva-muted">
             {product.description}
           </p>
         )}
@@ -49,15 +49,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
         {groups.map((group) => (
           <div key={group.id} className="mt-8">
             <h2 className="riva-label">{group.name}</h2>
-            <ul className="mt-3 space-y-2 border-t border-riva-ink/10 pt-3">
+            <ul className="mt-3 space-y-2 border-t border-riva-cream/10 pt-3">
               {group.options.map((opt) => (
                 <li
                   key={opt.id}
-                  className="flex items-center justify-between text-sm text-riva-ink-soft"
+                  className="flex items-center justify-between text-sm text-riva-muted"
                 >
                   <span>{opt.name}</span>
                   {Number(opt.price_delta) > 0 && (
-                    <span className="tabular-nums text-riva-taupe">
+                    <span className="tabular-nums text-riva-muted">
                       +{formatPrice(opt.pricing.price_inc_vat)}
                     </span>
                   )}
@@ -67,7 +67,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
         ))}
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-riva-ink/10 pt-8 sm:flex-row">
+        <div className="mt-10 flex flex-col gap-3 border-t border-riva-cream/10 pt-8 sm:flex-row">
           <Button asChild size="lg">
             <Link href="/boka">Boka bord</Link>
           </Button>

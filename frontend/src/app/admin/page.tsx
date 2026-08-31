@@ -20,7 +20,7 @@ export default function AdminDashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-riva-taupe">Laddar…</p>;
+  if (loading) return <p className="text-riva-muted">Laddar…</p>;
   if (error || !data)
     return <StateMessage variant="error" title="Kunde inte ladda översikten" />;
 
@@ -33,12 +33,12 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-riva-ink">Översikt</h1>
-        <p className="mt-1 text-riva-taupe">Dagens läge och kommande bokningar.</p>
+        <h1 className="font-display text-3xl text-riva-cream">Översikt</h1>
+        <p className="mt-1 text-riva-muted">Dagens läge och kommande bokningar.</p>
       </div>
 
       {!data.production_ready && (
-        <div className="flex items-start gap-3 rounded-lg border border-riva-gold/40 bg-riva-gold/10 p-4 text-sm text-riva-ink">
+        <div className="flex items-start gap-3 rounded-lg border border-riva-gold/40 bg-riva-gold/10 p-4 text-sm text-riva-cream">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
           <p>
             Onlinebokning körs i utvecklingsläge med en platshållarkapacitet. Ange
@@ -55,12 +55,12 @@ export default function AdminDashboardPage() {
         {kpis.map((k) => (
           <Card key={k.label}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-sans font-semibold uppercase tracking-wide text-riva-taupe">
+              <CardTitle className="text-xs font-sans font-semibold uppercase tracking-wide text-riva-muted">
                 {k.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="font-display text-4xl tabular-nums text-riva-ink">{k.value}</p>
+              <p className="font-display text-4xl tabular-nums text-riva-cream">{k.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -68,8 +68,8 @@ export default function AdminDashboardPage() {
 
       <div>
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-2xl text-riva-ink">Dagens bokningar</h2>
-          <Link href="/admin/bokningar" className="text-sm text-riva-teal hover:underline">
+          <h2 className="font-display text-2xl text-riva-cream">Dagens bokningar</h2>
+          <Link href="/admin/bokningar" className="text-sm text-riva-gold hover:underline">
             Alla bokningar →
           </Link>
         </div>
@@ -81,9 +81,9 @@ export default function AdminDashboardPage() {
             className="mt-4"
           />
         ) : (
-          <div className="mt-4 overflow-hidden rounded-lg border border-riva-ink/10">
+          <div className="mt-4 overflow-hidden rounded-lg border border-riva-cream/10">
             <table className="w-full text-sm">
-              <thead className="bg-riva-cream-2 text-left text-riva-taupe">
+              <thead className="bg-riva-surface text-left text-riva-muted">
                 <tr>
                   <th className="px-4 py-3 font-medium">Tid</th>
                   <th className="px-4 py-3 font-medium">Namn</th>
@@ -91,13 +91,13 @@ export default function AdminDashboardPage() {
                   <th className="px-4 py-3 font-medium">Referens</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-riva-ink/10">
+              <tbody className="divide-y divide-riva-cream/10">
                 {data.todays_reservations.map((r) => (
-                  <tr key={r.id} className="bg-riva-ivory">
+                  <tr key={r.id} className="bg-riva-card">
                     <td className="px-4 py-3 tabular-nums">{r.time.slice(0, 5)}</td>
                     <td className="px-4 py-3">{r.name}</td>
                     <td className="px-4 py-3 tabular-nums">{r.party_size}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-riva-taupe">{r.ref}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-riva-muted">{r.ref}</td>
                   </tr>
                 ))}
               </tbody>

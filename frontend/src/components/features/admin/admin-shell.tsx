@@ -37,12 +37,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [session, isLogin, router]);
 
   if (isLogin) {
-    return <div className="min-h-screen bg-riva-cream">{children}</div>;
+    return <div className="min-h-screen bg-riva-black">{children}</div>;
   }
 
   if (session === null || !session.authenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-riva-cream text-riva-taupe">
+      <div className="flex min-h-screen items-center justify-center bg-riva-black text-riva-muted">
         Laddar…
       </div>
     );
@@ -62,15 +62,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-riva-cream">
-      <header className="border-b border-riva-ink/10 bg-riva-ivory">
+    <div className="min-h-screen bg-riva-black">
+      <header className="border-b border-riva-cream/10 bg-riva-black/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 md:px-8">
           <div className="flex items-center gap-3">
             <Logo showWordmark={false} size={32} />
-            <span className="font-display text-lg text-riva-ink">Riva Admin</span>
+            <span className="font-display text-lg text-riva-cream">Riva Admin</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-riva-taupe sm:inline">
+            <span className="hidden text-sm text-riva-muted sm:inline">
               {session.username}
             </span>
             <Button variant="outline" size="sm" onClick={() => void handleLogout()}>
@@ -90,8 +90,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 "whitespace-nowrap border-b-2 px-4 py-3 text-sm transition-riva",
                 isActive(item.href)
-                  ? "border-riva-teal text-riva-ink"
-                  : "border-transparent text-riva-taupe hover:text-riva-ink",
+                  ? "border-riva-gold text-riva-cream"
+                  : "border-transparent text-riva-muted hover:text-riva-cream",
               )}
             >
               {item.label}

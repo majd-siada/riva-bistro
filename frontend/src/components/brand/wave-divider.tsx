@@ -10,8 +10,8 @@ export function WaveDivider({ className, variant = "default" }: WaveDividerProps
     variant === "gold"
       ? "stroke-riva-gold/40"
       : variant === "subtle"
-        ? "stroke-riva-teal/20"
-        : "stroke-riva-teal/40";
+        ? "stroke-riva-gold/20"
+        : "stroke-riva-gold/40";
 
   return (
     <svg

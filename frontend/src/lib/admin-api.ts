@@ -65,6 +65,15 @@ async function request<T>(
     body: payload,
     credentials: "include",
     cache: "no-store",
+  }).catch((error: unknown) => {
+    if (error instanceof TypeError) {
+      throw new ApiError(
+        "Kunde inte nå API:t. Kontrollera att backend körs och att CORS är konfigurerad.",
+        0,
+        "network",
+      );
+    }
+    throw error;
   });
   if (!res.ok) {
     const data = await res.json().catch(() => null);

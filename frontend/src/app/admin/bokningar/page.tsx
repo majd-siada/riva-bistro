@@ -89,8 +89,8 @@ export default function AdminBookingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl text-riva-ink">Bokningar</h1>
-        <p className="mt-1 text-riva-taupe">Hantera och följ upp bokningar.</p>
+        <h1 className="font-display text-3xl text-riva-cream">Bokningar</h1>
+        <p className="mt-1 text-riva-muted">Hantera och följ upp bokningar.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-[1fr_1fr_1.5fr] sm:items-end">
@@ -137,7 +137,7 @@ export default function AdminBookingsPage() {
       </div>
 
       {loading ? (
-        <p className="text-riva-taupe">Laddar…</p>
+        <p className="text-riva-muted">Laddar…</p>
       ) : error ? (
         <StateMessage variant="error" title="Kunde inte ladda bokningar" />
       ) : rows.length === 0 ? (
@@ -147,9 +147,9 @@ export default function AdminBookingsPage() {
           description="Det finns inga bokningar för det valda filtret."
         />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-riva-ink/10">
+        <div className="overflow-x-auto rounded-lg border border-riva-cream/10">
           <table className="w-full text-sm">
-            <thead className="bg-riva-cream-2 text-left text-riva-taupe">
+            <thead className="bg-riva-surface text-left text-riva-muted">
               <tr>
                 <th className="px-4 py-3 font-medium">Datum</th>
                 <th className="px-4 py-3 font-medium">Tid</th>
@@ -160,9 +160,9 @@ export default function AdminBookingsPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-riva-ink/10">
+            <tbody className="divide-y divide-riva-cream/10">
               {rows.map((r) => (
-                <tr key={r.id} className="bg-riva-ivory">
+                <tr key={r.id} className="bg-riva-card">
                   <td className="px-4 py-3 tabular-nums">{r.date}</td>
                   <td className="px-4 py-3 tabular-nums">{r.time.slice(0, 5)}</td>
                   <td className="px-4 py-3">{r.name}</td>
@@ -170,7 +170,7 @@ export default function AdminBookingsPage() {
                   <td className="px-4 py-3">
                     <Badge variant={statusVariant(r.status)}>{r.status_label}</Badge>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-riva-taupe">{r.ref}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-riva-muted">{r.ref}</td>
                   <td className="px-4 py-3 text-right">
                     <Button variant="ghost" size="sm" onClick={() => setSelected(r)}>
                       Visa
@@ -199,9 +199,9 @@ export default function AdminBookingsPage() {
                 <Detail label="E-post" value={selected.email} />
               </dl>
               {selected.special_request && (
-                <div className="rounded-md bg-riva-cream-2 p-3 text-sm">
+                <div className="rounded-md bg-riva-surface p-3 text-sm">
                   <p className="riva-label">Särskilda önskemål</p>
-                  <p className="mt-1 text-riva-ink-soft">{selected.special_request}</p>
+                  <p className="mt-1 text-riva-muted">{selected.special_request}</p>
                 </div>
               )}
               <div>
@@ -233,8 +233,8 @@ export default function AdminBookingsPage() {
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-riva-taupe">{label}</dt>
-      <dd className="mt-0.5 text-riva-ink">{value}</dd>
+      <dt className="text-xs uppercase tracking-wide text-riva-muted">{label}</dt>
+      <dd className="mt-0.5 text-riva-cream">{value}</dd>
     </div>
   );
 }

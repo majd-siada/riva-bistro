@@ -83,19 +83,19 @@ export default function AdminHoursPage() {
     }
   };
 
-  if (loading) return <p className="text-riva-taupe">Laddar…</p>;
+  if (loading) return <p className="text-riva-muted">Laddar…</p>;
   if (error) return <StateMessage variant="error" title="Kunde inte ladda öppettider" />;
 
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="font-display text-3xl text-riva-ink">Öppettider</h1>
-        <p className="mt-1 text-riva-taupe">Styr vilka tider som går att boka.</p>
+        <h1 className="font-display text-3xl text-riva-cream">Öppettider</h1>
+        <p className="mt-1 text-riva-muted">Styr vilka tider som går att boka.</p>
       </div>
 
-      <div className="max-w-2xl overflow-hidden rounded-lg border border-riva-ink/10">
+      <div className="max-w-2xl overflow-hidden rounded-lg border border-riva-cream/10">
         <table className="w-full text-sm">
-          <thead className="bg-riva-cream-2 text-left text-riva-taupe">
+          <thead className="bg-riva-surface text-left text-riva-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Dag</th>
               <th className="px-4 py-3 font-medium">Öppnar</th>
@@ -103,9 +103,9 @@ export default function AdminHoursPage() {
               <th className="px-4 py-3 font-medium">Stängt</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-riva-ink/10">
+          <tbody className="divide-y divide-riva-cream/10">
             {hours.map((row) => (
-              <tr key={row.weekday} className="bg-riva-ivory">
+              <tr key={row.weekday} className="bg-riva-card">
                 <td className="px-4 py-3">{row.weekday_label}</td>
                 <td className="px-4 py-2">
                   <Input
@@ -132,7 +132,7 @@ export default function AdminHoursPage() {
                     type="checkbox"
                     checked={row.is_closed}
                     onChange={(e) => updateRow(row.weekday, { is_closed: e.target.checked })}
-                    className="h-5 w-5 accent-riva-teal"
+                    className="h-5 w-5 accent-riva-gold"
                     aria-label={`${row.weekday_label} stängt`}
                   />
                 </td>
@@ -145,9 +145,9 @@ export default function AdminHoursPage() {
         Spara öppettider
       </Button>
 
-      <div className="max-w-2xl border-t border-riva-ink/10 pt-10">
-        <h2 className="font-display text-2xl text-riva-ink">Specialstängningar</h2>
-        <p className="mt-1 text-riva-taupe">Enskilda dagar då restaurangen håller stängt.</p>
+      <div className="max-w-2xl border-t border-riva-cream/10 pt-10">
+        <h2 className="font-display text-2xl text-riva-cream">Specialstängningar</h2>
+        <p className="mt-1 text-riva-muted">Enskilda dagar då restaurangen håller stängt.</p>
 
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <div>
@@ -175,12 +175,12 @@ export default function AdminHoursPage() {
         </div>
 
         {closures.length > 0 && (
-          <ul className="mt-4 divide-y divide-riva-ink/10 rounded-lg border border-riva-ink/10">
+          <ul className="mt-4 divide-y divide-riva-cream/10 rounded-lg border border-riva-cream/10">
             {closures.map((c) => (
-              <li key={c.id} className="flex items-center justify-between bg-riva-ivory px-4 py-3 text-sm">
+              <li key={c.id} className="flex items-center justify-between bg-riva-card px-4 py-3 text-sm">
                 <span>
-                  <span className="tabular-nums text-riva-ink">{c.date}</span>
-                  {c.reason && <span className="text-riva-taupe"> — {c.reason}</span>}
+                  <span className="tabular-nums text-riva-cream">{c.date}</span>
+                  {c.reason && <span className="text-riva-muted"> — {c.reason}</span>}
                 </span>
                 <Button
                   variant="ghost"

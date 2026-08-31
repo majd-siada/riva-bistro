@@ -30,7 +30,7 @@ export function ProductImage({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg bg-riva-cream-2",
+        "relative overflow-hidden rounded-lg bg-riva-surface",
         aspectClasses[aspectRatio],
         className,
       )}
@@ -57,7 +57,7 @@ export function ProductImage({
 function PlaceholderMark() {
   return (
     <div
-      className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_40%,rgba(94,139,139,0.10),transparent_60%)]"
+      className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_40%,rgba(184,133,61,0.12),transparent_60%)]"
       aria-hidden="true"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
