@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
@@ -20,11 +20,8 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { href: "/", label: "Hem" },
   { href: "/meny", label: "Meny" },
-  { href: "/om-oss", label: "Om Riva" },
-  { href: "/privata-event", label: "Privata event" },
-] as const;
-
-const mobileExtra = [
+  { href: "/om-oss", label: "Om oss" },
+  { href: "/privata-event", label: "Privat event" },
   { href: "/kontakt", label: "Kontakt" },
 ] as const;
 
@@ -36,21 +33,21 @@ export function Header() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-riva-ink/10 bg-riva-cream/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-riva-cream/10 bg-riva-black/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
         <Link href="/" aria-label="Riva Bistro — startsida" className="shrink-0">
-          <Logo />
+          <Logo showDivider={false} />
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Huvudnavigation">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Huvudnavigation">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "relative text-sm tracking-wide text-riva-ink-soft transition-riva hover:text-riva-ink",
-                isActive(item.href) && "text-riva-ink",
+                "relative text-sm tracking-wide text-riva-muted transition-riva hover:text-riva-cream",
+                isActive(item.href) && "text-riva-gold",
               )}
             >
               {item.label}
@@ -65,7 +62,15 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="hidden items-center gap-1 text-xs uppercase tracking-[0.2em] text-riva-muted lg:flex"
+            aria-label="Språk: Svenska"
+          >
+            SV
+            <ChevronDown className="h-3 w-3 text-riva-gold" strokeWidth={1.25} />
+          </button>
           <Button asChild variant="gold" size="sm" className="hidden sm:inline-flex">
             <Link href="/boka">Boka bord</Link>
           </Button>
@@ -75,30 +80,30 @@ export function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex flex-col">
+            <SheetContent side="right" className="flex flex-col border-riva-cream/10 bg-riva-surface">
               <SheetHeader>
                 <SheetTitle>
-                  <Logo />
+                  <Logo showDivider={false} />
                 </SheetTitle>
-                <SheetDescription className="sr-only">
-                  Navigering på Riva Bistro
-                </SheetDescription>
+                <SheetDescription className="sr-only">Navigering på Riva Bistro</SheetDescription>
               </SheetHeader>
               <nav className="mt-8 flex flex-col gap-1" aria-label="Mobilnavigation">
-                {[...navItems, ...mobileExtra].map((item) => (
+                {[...navItems, { href: "/boka", label: "Boka bord" }].map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-3 py-3 text-lg text-riva-ink transition-riva hover:bg-riva-ink/[0.05]"
+                    className={cn(
+                      "rounded-md px-3 py-3 text-lg transition-riva",
+                      isActive(item.href)
+                        ? "text-riva-gold"
+                        : "text-riva-cream hover:bg-riva-card",
+                    )}
                   >
                     {item.label}
                   </Link>
                 ))}
               </nav>
-              <Button asChild variant="gold" className="mt-auto w-full" onClick={() => setOpen(false)}>
-                <Link href="/boka">Boka bord</Link>
-              </Button>
             </SheetContent>
           </Sheet>
         </div>

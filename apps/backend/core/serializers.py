@@ -4,6 +4,8 @@ from rest_framework import serializers
 class ContactSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=120)
     email = serializers.EmailField()
+    phone = serializers.CharField(max_length=40, allow_blank=True, required=False, default="")
+    subject = serializers.CharField(max_length=120, allow_blank=True, required=False, default="")
     message = serializers.CharField(max_length=3000)
 
 

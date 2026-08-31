@@ -505,6 +505,10 @@ export interface components {
             name: string;
             /** Format: email */
             email: string;
+            /** @default  */
+            phone: string;
+            /** @default  */
+            subject: string;
             message: string;
         };
         DetailResponse: {

@@ -1,79 +1,84 @@
 import Link from "next/link";
-import type { Metadata } from "next";
+import { Heart, Leaf, Sparkles, Users } from "lucide-react";
 
-import { WaveDivider } from "@/components/brand/wave-divider";
+import { RestaurantImage } from "@/components/brand/restaurant-image";
+import { SectionHeading } from "@/components/brand/section-heading";
+import { ValueCard } from "@/components/brand/value-card";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
-import { business } from "@/config/business";
 
-export const metadata: Metadata = {
-  title: "Om Riva",
-  description:
-    "Om Riva Bistro — svensk gastronomi med mediterran själ, vid vattnet i Stockholm.",
+export const metadata = {
+  title: "Om oss",
+  description: "Lär känna Riva Bistro — vår historia, värderingar och passion för god mat.",
 };
 
-/*
- * NOTE: The story below is carefully written, editable placeholder copy — not
- * fabricated facts (no invented history, chefs, or awards). Replace with the
- * restaurant's real story when available.
- */
 export default function AboutPage() {
   return (
     <>
-      <section className="riva-dark relative isolate overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(198,165,106,0.18),transparent_55%)]"
-        />
-        <div className="relative mx-auto max-w-3xl px-5 py-24 text-center">
-          <p className="riva-label text-riva-gold-soft">Om Riva</p>
-          <h1 className="mt-4 font-display text-5xl text-on-dark md:text-6xl">
-            En plats vid vattnet
-          </h1>
-          <WaveDivider className="mx-auto mt-6 max-w-[200px]" variant="gold" />
-          <p className="mx-auto mt-6 max-w-xl leading-relaxed text-on-dark-muted">
-            Riva Bistro är tänkt som en fristad i vardagen — där god mat, varm
-            gästfrihet och en vacker miljö möts.
-          </p>
+      <section className="relative overflow-hidden bg-riva-black">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-24">
+          <div>
+            <p className="riva-label">Om Riva Bistro</p>
+            <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">
+              Vår historia
+            </h1>
+            <p className="mt-6 max-w-md leading-relaxed text-riva-muted">
+              Riva Bistro föddes ur en enkel idé: att skapa en plats där mat, miljö och
+              människor möts i lugn takt — vid vattnet, mitt i Stockholm.
+            </p>
+          </div>
+          <RestaurantImage
+            src="/scenes/home-interior.jpg"
+            alt="Riva Bistros interiör — elegant mörk matsal med varm belysning"
+            aspectRatio="hero"
+            priority
+          />
         </div>
       </section>
 
       <Section>
-        <div className="reveal mx-auto max-w-prose space-y-6 text-lg leading-relaxed text-riva-ink-soft">
-          <p>
-            Hos oss möter skandinavisk enkelhet mediterran värme. Vi tror på
-            råvaror som får tala för sig själva, tillagade med omsorg och
-            serverade utan krångel.
-          </p>
-          <p>
-            Rummet är ljust och dämpat på samma gång — en plats där en
-            vardagsmiddag känns lika självklar som det stora firandet. Här får du
-            tid att stanna kvar, dela en flaska och låta kvällen ta sin egen takt.
-          </p>
-          <p>
-            Vårt värdskap är hjärtat i allt vi gör. Från stunden du kliver in vill
-            vi att du ska känna dig sedd, väl omhändertagen och hemma.
-          </p>
+        <SectionHeading
+          eyebrow="Värderingar"
+          title="Det vi tror på"
+          description="Fyra pelare som genomsyrar allt vi gör — från råvaruval till värdskap vid bordet."
+          align="center"
+          className="mx-auto"
+        />
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <ValueCard
+            icon={Sparkles}
+            title="Kvalitet"
+            body="Vi väljer råvaror med omsorg och tillagar dem med respekt för smak och säsong."
+          />
+          <ValueCard
+            icon={Heart}
+            title="Passion"
+            body="Matglädje är hjärtat i vår verksamhet — i köket, i salen och i varje detalj."
+          />
+          <ValueCard
+            icon={Users}
+            title="Gemenskap"
+            body="Riva är en plats för samtal, skratt och gemensamma stunder vid bordet."
+          />
+          <ValueCard
+            icon={Leaf}
+            title="Upplevelse"
+            body="En kväll hos oss ska kännas cinematisk, varm och minnesvärd — inte stressig."
+          />
         </div>
       </Section>
 
-      <Section className="bg-riva-cream-2">
-        <div className="reveal grid items-center gap-10 md:grid-cols-3 md:gap-14">
-          <div className="md:col-span-2">
-            <p className="riva-label">Välkommen in</p>
-            <h2 className="mt-3 font-display text-4xl text-riva-ink">
-              Slå dig ner hos oss
-            </h2>
-            <p className="mt-5 max-w-prose leading-relaxed text-riva-ink-soft">
-              Vare sig det gäller en spontan middag eller ett planerat firande —
-              vi håller ditt bord redo i {business.city}.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 md:items-end">
-            <Button asChild size="lg" variant="gold">
+      <Section className="bg-riva-surface/40">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-3xl text-riva-cream">Vill du uppleva Riva?</h2>
+          <p className="mt-4 text-riva-muted">
+            Boka bord eller utforska menyn — vi ser fram emot att välkomna dig.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button asChild variant="gold">
               <Link href="/boka">Boka bord</Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild variant="outline">
               <Link href="/meny">Se menyn</Link>
             </Button>
           </div>

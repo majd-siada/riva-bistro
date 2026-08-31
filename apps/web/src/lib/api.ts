@@ -1,4 +1,4 @@
-export type {
+import type {
   Availability,
   AvailabilitySlot,
   Category,
@@ -13,6 +13,22 @@ export type {
   Reservation,
   ReservationRequest,
 } from "@riva-bistro/api-client";
+
+export type {
+  Availability,
+  AvailabilitySlot,
+  Category,
+  ContactMessageRequest,
+  EventInquiryRequest,
+  ModifierGroup,
+  ModifierOption,
+  OpeningHour,
+  Pricing,
+  Product,
+  ProductDetail,
+  Reservation,
+  ReservationRequest,
+};
 
 function getApiBase(): string {
   const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
@@ -71,18 +87,6 @@ async function apiFetch<T>(
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
-
-import type {
-  Availability,
-  Category,
-  ContactMessageRequest,
-  EventInquiryRequest,
-  OpeningHour,
-  Product,
-  ProductDetail,
-  Reservation,
-  ReservationRequest,
-} from "@riva-bistro/api-client";
 
 export async function fetchHealth(): Promise<{ status: string }> {
   return apiFetch("/health/");

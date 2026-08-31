@@ -4,4 +4,4 @@ export const SITE_URL =
 export const SITE_NAME = "Riva Bistro";
 
 export const SITE_DESCRIPTION =
-  "Riva Bistro — premium svensk gastronomi med mediterran själ. Boka bord för en kväll vid vattnet i Stockholm.";
+  "Riva Bistro — goda smaker, äkta upplevelser vid Strandvägen i Stockholm. Boka bord och utforska menyn.";

@@ -55,10 +55,18 @@ def send_reservation_confirmation(reservation) -> bool:
     return _send(subject, body, [reservation.email])
 
 
-def send_contact_message(*, name: str, email: str, message: str) -> bool:
-    subject = f"Nytt kontaktmeddelande från {name}"
-    body = f"Namn: {name}\nE-post: {email}\n\nMeddelande:\n{message}\n"
-    return _send(subject, body, [_notification_recipient()], reply_to=email)
+def send_contact_message(
+    *, name: str, email: str, message: str, phone: str = "", subject: str = ""
+) -> bool:
+    mail_subject = subject.strip() or f"Nytt kontaktmeddelande från {name}"
+    body = (
+        f"Namn: {name}\n"
+        f"E-post: {email}\n"
+        f"Telefon: {phone or '-'}\n"
+        f"Ämne: {subject.strip() or '-'}\n\n"
+        f"Meddelande:\n{message}\n"
+    )
+    return _send(mail_subject, body, [_notification_recipient()], reply_to=email)
 
 
 def send_event_inquiry(

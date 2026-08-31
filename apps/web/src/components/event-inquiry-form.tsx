@@ -125,7 +125,7 @@ export function EventInquiryForm() {
     <form
       onSubmit={(e) => void handleSubmit(e)}
       noValidate
-      className="space-y-5 rounded-lg border border-riva-ink/10 bg-riva-ivory p-6 shadow-subtle md:p-8"
+      className="space-y-5 rounded-lg border border-riva-cream/10 bg-riva-card p-6 md:p-8"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>

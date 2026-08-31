@@ -1,17 +1,17 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 
-import { WaveDivider } from "@/components/brand/wave-divider";
+import { RestaurantImage } from "@/components/brand/restaurant-image";
+import { SectionHeading } from "@/components/brand/section-heading";
+import { FeaturedDish } from "@/components/commerce/featured-dish";
+import { FoodCard } from "@/components/commerce/food-card";
+import { MenuCategoryNav } from "@/components/commerce/menu-category-nav";
 import { Section } from "@/components/layout/section";
-import { Badge } from "@/components/ui/badge";
-import { StateMessage } from "@/components/ui/state-message";
-import { formatPrice } from "@/lib/format";
+import { Button } from "@/components/ui/button";
 import { fetchCategories, fetchProducts, type Category, type Product } from "@/lib/api";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Meny",
-  description:
-    "Riva Bistros meny — varmrätter, sallader, pasta, barnmeny och desserter. Alla priser inklusive moms.",
+  description: "Utforska Riva Bistros meny — förrätter, varmrätter, pasta, sallader och mer.",
 };
 
 export default async function MenuPage() {
@@ -24,94 +24,86 @@ export default async function MenuPage() {
     products = [];
   }
 
-  const byCategory = categories
-    .map((c) => ({
-      category: c,
-      items: products.filter((p) => p.category_slug === c.slug),
-    }))
-    .filter((group) => group.items.length > 0);
+  const byCategory = categories.map((cat) => ({
+    ...cat,
+    items: products.filter((p) => p.category_slug === cat.slug),
+  }));
+
+  const varm = products.filter((p) => p.category_slug === "varmratter");
+  const featuredMain = varm.find((p) => p.slug === "entrecote") ?? varm[0];
 
   return (
-    <Section className="pt-16 md:pt-20">
-      <header className="mx-auto max-w-2xl text-center">
-        <p className="riva-label">Mat &amp; dryck</p>
-        <h1 className="mt-3 font-display text-5xl text-riva-ink md:text-6xl">Menyn</h1>
-        <WaveDivider className="mx-auto mt-6 max-w-[200px]" />
-        <p className="mt-5 text-riva-taupe">Alla priser anges inklusive moms.</p>
-      </header>
+    <>
+      <section className="relative overflow-hidden bg-riva-black">
+        <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 py-16 md:grid-cols-2 md:px-8 md:py-20">
+          <div>
+            <p className="riva-label">Mat &amp; dryck</p>
+            <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Meny</h1>
+            <p className="mt-4 max-w-md text-riva-muted">
+              Säsongens råvaror, tillagade med omsorg. Alla priser inklusive moms.
+            </p>
+          </div>
+          <RestaurantImage
+            src="/scenes/menu-tabletop.jpg"
+            alt="Upplagd middag på mörk tabletop — Riva Bistro"
+            aspectRatio="wide"
+            priority
+          />
+        </div>
+      </section>
 
-      {byCategory.length === 0 ? (
-        <StateMessage
-          variant="empty"
-          title="Menyn är inte tillgänglig just nu"
-          description="Vi uppdaterar menyn. Försök gärna igen om en liten stund."
-          className="mx-auto mt-12 max-w-xl"
-        />
-      ) : (
-        <>
-          <nav
-            aria-label="Menykategorier"
-            className="sticky top-[73px] z-30 mt-10 -mx-5 flex gap-2 overflow-x-auto border-y border-riva-ink/10 bg-riva-cream/90 px-5 py-3 backdrop-blur-md md:mx-0 md:rounded-md md:border md:px-4"
-          >
-            {byCategory.map(({ category }) => (
-              <a
-                key={category.slug}
-                href={`#${category.slug}`}
-                className="whitespace-nowrap rounded-full px-4 py-1.5 text-sm text-riva-ink-soft transition-riva hover:bg-riva-ink/[0.06] hover:text-riva-ink"
-              >
-                {category.name}
-              </a>
-            ))}
-          </nav>
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
+          <div className="hidden lg:block">
+            <div className="sticky top-28">
+              <MenuCategoryNav
+                categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
+              />
+            </div>
+          </div>
 
-          <div className="mt-16 space-y-20">
-            {byCategory.map(({ category, items }) => (
-              <section key={category.slug} id={category.slug} className="scroll-mt-32">
-                <div className="reveal">
-                  <h2 className="font-display text-3xl text-riva-ink md:text-4xl">
-                    {category.name}
-                  </h2>
-                  {category.description && (
-                    <p className="mt-2 max-w-prose text-riva-taupe">{category.description}</p>
-                  )}
-                  <WaveDivider className="mt-5 max-w-[120px]" variant="gold" />
+          <div className="min-w-0 space-y-16">
+            <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
+              {categories.map((cat) => (
+                <a
+                  key={cat.slug}
+                  href={`#${cat.slug}`}
+                  className="shrink-0 rounded-full border border-riva-gold/30 px-4 py-2 text-sm text-riva-cream"
+                >
+                  {cat.name}
+                </a>
+              ))}
+            </div>
+
+            {featuredMain && (
+              <div id="varmratter">
+                <SectionHeading eyebrow="Utvalt" title="Varmrätter" />
+                <FeaturedDish product={featuredMain} className="mt-10" reverse />
+                <div className="mt-8 text-right">
+                  <Button asChild variant="link">
+                    <Link href="#varmratter-grid">Visa alla →</Link>
+                  </Button>
                 </div>
-                <ul className="reveal mt-8 grid gap-x-14 gap-y-7 md:grid-cols-2">
-                  {items.map((item) => (
-                    <li key={item.id}>
-                      <Link
-                        href={`/meny/${item.slug}`}
-                        className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-riva-gold focus-visible:ring-offset-4 focus-visible:ring-offset-riva-cream"
-                      >
-                        <div className="flex items-baseline gap-3">
-                          <h3 className="font-display text-xl text-riva-ink transition-riva group-hover:text-riva-teal">
-                            {item.name}
-                          </h3>
-                          <span
-                            className="mb-1 flex-1 border-b border-dotted border-riva-ink/20"
-                            aria-hidden="true"
-                          />
-                          <span className="riva-price tabular-nums text-lg">
-                            {formatPrice(item.pricing.price_inc_vat)}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-3">
-                          {item.description && (
-                            <p className="text-sm leading-relaxed text-riva-taupe">
-                              {item.description}
-                            </p>
-                          )}
-                          {!item.is_available && <Badge variant="soldOut">Slut</Badge>}
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+              </div>
+            )}
+
+            {byCategory.map((cat) => (
+              <section key={cat.slug} id={cat.slug === "varmratter" ? "varmratter-grid" : cat.slug}>
+                <SectionHeading title={cat.name} description={cat.description} />
+                {cat.items.length > 0 ? (
+                  <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {cat.items.map((item) => (
+                      <FoodCard key={item.id} product={item} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-6 text-riva-muted">Inga rätter i denna kategori just nu.</p>
+                )}
               </section>
             ))}
           </div>
-        </>
-      )}
-    </Section>
+        </div>
+      </Section>
+    </>
   );
 }

@@ -167,7 +167,7 @@ export function ReservationForm() {
     <form
       onSubmit={(e) => void handleSubmit(e)}
       noValidate
-      className="rounded-lg border border-riva-ink/10 bg-riva-ivory p-6 shadow-subtle md:p-8"
+      className="rounded-lg border border-riva-cream/10 bg-riva-card p-6 md:p-8"
     >
       {/* Step 1 — Datum */}
       <div>
@@ -188,7 +188,7 @@ export function ReservationForm() {
 
       {/* Step 2 — Tid + gäster */}
       {date && (
-        <div className="mt-6 border-t border-riva-ink/10 pt-6">
+        <div className="mt-6 border-t border-riva-cream/10 pt-6">
           {loadingAvail ? (
             <div className="space-y-3">
               <Skeleton className="h-4 w-24" />
@@ -215,7 +215,7 @@ export function ReservationForm() {
           ) : (
             <>
               <div>
-                <span className="text-sm font-medium text-riva-ink">Antal gäster</span>
+                <span className="text-sm font-medium text-riva-cream">Antal gäster</span>
                 <div className="mt-2 flex items-center gap-4">
                   <Button
                     type="button"
@@ -227,7 +227,7 @@ export function ReservationForm() {
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="w-10 text-center text-lg font-semibold tabular-nums text-riva-ink">
+                  <span className="w-10 text-center text-lg font-semibold tabular-nums text-riva-cream">
                     {guests}
                   </span>
                   <Button
@@ -240,16 +240,16 @@ export function ReservationForm() {
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
-                  <span className="text-sm text-riva-taupe">
+                  <span className="text-sm text-riva-muted">
                     Upp till {maxParty} gäster online
                   </span>
                 </div>
               </div>
 
               <div className="mt-6">
-                <span className="text-sm font-medium text-riva-ink">Välj tid</span>
+                <span className="text-sm font-medium text-riva-cream">Välj tid</span>
                 {slots.length === 0 ? (
-                  <p className="mt-2 text-sm text-riva-taupe">
+                  <p className="mt-2 text-sm text-riva-muted">
                     Inga lediga tider den här dagen. Prova en annan dag.
                   </p>
                 ) : (
@@ -268,10 +268,10 @@ export function ReservationForm() {
                         className={
                           "rounded-md border px-2 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
                           (time === s.time
-                            ? "border-riva-teal bg-riva-teal text-on-dark"
+                            ? "border-riva-gold bg-riva-gold text-riva-black"
                             : s.available
-                              ? "border-riva-ink/20 text-riva-ink hover:border-riva-teal"
-                              : "cursor-not-allowed border-riva-ink/10 text-riva-taupe/40 line-through")
+                              ? "border-riva-cream/20 text-riva-cream hover:border-riva-gold"
+                              : "cursor-not-allowed border-riva-cream/10 text-riva-muted/40 line-through")
                         }
                       >
                         {s.time}
@@ -287,7 +287,7 @@ export function ReservationForm() {
 
       {/* Step 3 — Kontakt */}
       {time && (
-        <div className="mt-6 space-y-4 border-t border-riva-ink/10 pt-6">
+        <div className="mt-6 space-y-4 border-t border-riva-cream/10 pt-6">
           <div>
             <Label htmlFor="res-name">Namn</Label>
             <Input
@@ -348,7 +348,7 @@ export function ReservationForm() {
           <Button type="submit" size="lg" variant="gold" loading={submitting} className="w-full">
             Bekräfta bokning
           </Button>
-          <p className="text-center text-xs text-riva-taupe">
+          <p className="text-center text-xs text-riva-muted">
             Du får en direkt bekräftelse med bokningsnummer.
           </p>
         </div>

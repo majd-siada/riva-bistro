@@ -995,6 +995,14 @@ components:
         email:
           type: string
           format: email
+        phone:
+          type: string
+          default: ''
+          maxLength: 40
+        subject:
+          type: string
+          default: ''
+          maxLength: 120
         message:
           type: string
           maxLength: 3000

@@ -16,18 +16,13 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         riva: {
+          black: "var(--riva-black)",
+          surface: "var(--riva-surface)",
+          card: "var(--riva-card)",
           cream: "var(--riva-cream)",
-          "cream-2": "var(--riva-cream-2)",
-          ivory: "var(--riva-ivory)",
-          ink: "var(--riva-ink)",
-          "ink-soft": "var(--riva-ink-soft)",
-          taupe: "var(--riva-taupe)",
+          muted: "var(--riva-muted)",
           gold: "var(--riva-gold)",
-          "gold-soft": "var(--riva-gold-soft)",
-          teal: "var(--riva-teal)",
-          "teal-soft": "var(--riva-teal-soft)",
-          charcoal: "var(--riva-charcoal)",
-          "charcoal-2": "var(--riva-charcoal-2)",
+          "gold-light": "var(--riva-gold-light)",
           error: "var(--riva-error)",
           success: "var(--riva-success)",
         },
@@ -63,9 +58,11 @@ const config: Config = {
       },
       backgroundImage: {
         "riva-image-fade":
-          "linear-gradient(180deg, transparent 30%, rgba(33,29,24,0.78) 100%)",
+          "linear-gradient(180deg, transparent 20%, rgba(5,4,4,0.85) 100%)",
         "riva-hero-veil":
-          "linear-gradient(180deg, rgba(33,29,24,0.35) 0%, rgba(33,29,24,0.55) 55%, rgba(33,29,24,0.82) 100%)",
+          "linear-gradient(90deg, rgba(5,4,4,0.92) 0%, rgba(5,4,4,0.55) 45%, rgba(5,4,4,0.25) 100%)",
+        "riva-scene-veil":
+          "linear-gradient(180deg, rgba(5,4,4,0.15) 0%, rgba(5,4,4,0.75) 100%)",
       },
       keyframes: {
         "fade-in": {

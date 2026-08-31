@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { GoldDivider } from "@/components/brand/gold-divider";
 import { Logo } from "@/components/brand/logo";
 import { business, fullAddress } from "@/config/business";
 import { fetchHours, type OpeningHour } from "@/lib/api";
@@ -21,29 +22,29 @@ export async function Footer() {
   const hours = await getHours();
 
   return (
-    <footer className="riva-dark">
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1.5fr_1fr_1fr_1.2fr] md:px-8">
+    <footer className="border-t border-riva-cream/10 bg-riva-black">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] md:px-8">
         <div>
-          <Logo tone="light" />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-on-dark-muted">
-            Svensk gastronomi med mediterran själ — en kväll vid vattnet i hjärtat
-            av {business.city}.
+          <Logo />
+          <p className="mt-6 max-w-xs text-sm leading-relaxed text-riva-muted">
+            {business.tagline}. Svensk gastronomi i en stillsam, cinematisk miljö vid
+            Strandvägen.
           </p>
+          <GoldDivider className="mt-6 max-w-[80px] opacity-40" variant="short" />
         </div>
 
         <nav aria-label="Sidfotsnavigation">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-riva-gold-soft">
-            Utforska
-          </h2>
-          <ul className="mt-4 space-y-2.5 text-sm text-on-dark-muted">
+          <h2 className="riva-label">Utforska</h2>
+          <ul className="mt-4 space-y-2.5 text-sm text-riva-muted">
             {[
               { href: "/meny", label: "Meny" },
-              { href: "/om-oss", label: "Om Riva" },
-              { href: "/privata-event", label: "Privata event" },
+              { href: "/om-oss", label: "Om oss" },
+              { href: "/privata-event", label: "Privat event" },
               { href: "/boka", label: "Boka bord" },
+              { href: "/kontakt", label: "Kontakt" },
             ].map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="transition-riva hover:text-on-dark">
+                <Link href={l.href} className="transition-riva hover:text-riva-cream">
                   {l.label}
                 </Link>
               </li>
@@ -52,59 +53,51 @@ export async function Footer() {
         </nav>
 
         <div>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-riva-gold-soft">
-            Besök oss
-          </h2>
-          <address className="mt-4 space-y-2.5 text-sm not-italic text-on-dark-muted">
+          <h2 className="riva-label">Besök oss</h2>
+          <address className="mt-4 space-y-2.5 text-sm not-italic text-riva-muted">
             <p>{fullAddress()}</p>
             <p>
-              <a href={business.phoneHref} className="transition-riva hover:text-on-dark">
+              <a href={business.phoneHref} className="transition-riva hover:text-riva-cream">
                 {business.phone}
               </a>
             </p>
             <p>
               <a
                 href={`mailto:${business.email}`}
-                className="transition-riva hover:text-on-dark"
+                className="transition-riva hover:text-riva-cream"
               >
                 {business.email}
               </a>
-            </p>
-            <p>
-              <Link href="/kontakt" className="transition-riva hover:text-on-dark">
-                Kontakt &amp; vägbeskrivning
-              </Link>
             </p>
           </address>
         </div>
 
         <div>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-riva-gold-soft">
-            Öppettider
-          </h2>
+          <h2 className="riva-label">Öppettider</h2>
           {hours.length > 0 ? (
-            <ul className="mt-4 space-y-1.5 text-sm text-on-dark-muted">
+            <ul className="mt-4 space-y-1.5 text-sm text-riva-muted">
               {hours.map((h) => (
                 <li key={h.weekday} className="flex justify-between gap-4">
                   <span>{h.weekday_label}</span>
                   <span className="tabular-nums">
-                    {h.is_closed || !h.opens_at ? "Stängt" : `${fmt(h.opens_at)}–${fmt(h.closes_at)}`}
+                    {h.is_closed || !h.opens_at
+                      ? "Stängt"
+                      : `${fmt(h.opens_at)}–${fmt(h.closes_at)}`}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-4 text-sm text-on-dark-muted">
-              Öppettider uppdateras inom kort.
-            </p>
+            <p className="mt-4 text-sm text-riva-muted">{business.restaurantHoursLabel}</p>
           )}
+          <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
         </div>
       </div>
 
-      <div className="border-t border-on-dark/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between md:px-8">
+      <div className="border-t border-riva-cream/10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-riva-muted md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} Riva Bistro</p>
-          <p>Svensk gastronomi i en stillsam, cinematisk miljö.</p>
+          <p>Strandvägen · Stockholm</p>
         </div>
       </div>
     </footer>
