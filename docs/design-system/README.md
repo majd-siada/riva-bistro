@@ -4,7 +4,7 @@ Production-ready visual identity and component library for the Riva Bistro resta
 
 ## Brand Tokens
 
-Source of truth: [`packages/design-tokens/tokens.json`](../../packages/design-tokens/tokens.json)
+Source of truth: [`frontend/packages/design-tokens/tokens.json`](../../frontend/packages/design-tokens/tokens.json)
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -15,7 +15,7 @@ Source of truth: [`packages/design-tokens/tokens.json`](../../packages/design-to
 | `--riva-error` | `#C45C5C` | Errors |
 | `--riva-success` | `#5E8B6E` | Confirmation |
 
-CSS implementation: [`apps/web/src/app/globals.css`](../../apps/web/src/app/globals.css)
+CSS implementation: [`frontend/src/app/globals.css`](../../frontend/src/app/globals.css)
 
 ## Typography
 
@@ -24,7 +24,7 @@ CSS implementation: [`apps/web/src/app/globals.css`](../../apps/web/src/app/glob
 
 ## Components
 
-All components live in `apps/web/src/components/ui/`:
+All components live in `frontend/src/components/ui/`:
 
 | Component | Variants |
 |-----------|----------|
@@ -64,9 +64,9 @@ All customer-facing prices show **inkl. moms** (25% VAT). The dish detail page a
 
 ## Figma Handoff
 
-Figma MCP authentication is required to create the Figma file. Code Connect mapping stub: [`apps/web/src/components/ui/button.figma.ts`](../../apps/web/src/components/ui/button.figma.ts)
+Figma MCP authentication is required to create the Figma file. Code Connect mapping stub: [`frontend/src/components/ui/button.figma.ts`](../../frontend/src/components/ui/button.figma.ts)
 
-Import tokens from `packages/design-tokens/tokens.json` when building the Figma variable collections.
+Import tokens from `frontend/packages/design-tokens/tokens.json` when building the Figma variable collections.
 
 ## Pages
 

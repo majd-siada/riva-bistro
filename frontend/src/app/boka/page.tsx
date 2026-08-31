@@ -1,6 +1,6 @@
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
-import { ReservationForm } from "@/components/commerce/reservation-form";
+import { ReservationForm } from "@/components/features/booking";
 import { Section } from "@/components/layout/section";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

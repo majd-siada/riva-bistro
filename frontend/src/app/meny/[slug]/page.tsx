@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { GoldDivider } from "@/components/brand/gold-divider";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
-import { PriceDisplay } from "@/components/commerce/price-display";
+import { PriceDisplay } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { fetchProduct } from "@/lib/api";

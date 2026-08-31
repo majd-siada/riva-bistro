@@ -57,14 +57,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/web
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: apps/web/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Lint
@@ -74,7 +74,7 @@ jobs:
       - name: Unit tests
         run: npm run test
       - name: Typecheck generated API client
-        working-directory: packages/api-client
+        working-directory: frontend/packages/api-client
         run: |
           npm ci
           npm run typecheck

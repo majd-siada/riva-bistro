@@ -29,7 +29,7 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 
 ### Phase 3 — Booking UI + typed client (implemented)
 
-- Generated OpenAPI TypeScript client (`packages/api-client`)
+- Generated OpenAPI TypeScript client (`frontend/packages/api-client`)
 - Public booking flow wired to real API
 
 ### Phase 4 — Content management (partial)

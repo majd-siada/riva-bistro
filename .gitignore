@@ -6,7 +6,7 @@ venv/
 # Next.js
 .next/
 out/
-apps/web/.turbo/
+frontend/.turbo/
 *.tsbuildinfo
 
 # Python

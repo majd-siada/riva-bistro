@@ -4,9 +4,8 @@ Premium Swedish restaurant website and reservation platform.
 
 Monorepo:
 
-- `apps/web` — Next.js (App Router, TypeScript, Tailwind, shadcn/ui foundation)
+- `frontend/` — Next.js (App Router, TypeScript, Tailwind, shadcn/ui) + `packages/api-client` and `packages/design-tokens`
 - `apps/backend` — Django + Django REST Framework + PostgreSQL
-- `packages/api-client` — generated OpenAPI TypeScript client (Phase 3)
 - `docs/` — architecture, API, and product documentation
 - `infrastructure/docker/` — Dockerfiles and entrypoints
 
@@ -102,7 +101,7 @@ docker compose exec web npm run test
 Locally:
 
 ```bash
-cd apps/web
+cd frontend
 npm install
 npm run dev
 npm run lint
@@ -138,13 +137,13 @@ The Django schema is the contract. Regenerate types after API changes:
 ```bash
 # Export schema from Django
 docker compose exec backend python manage.py spectacular --file /tmp/openapi.yaml
-docker compose cp backend:/tmp/openapi.yaml packages/api-client/openapi.yaml
+docker compose cp backend:/tmp/openapi.yaml frontend/packages/api-client/openapi.yaml
 
-# Generate TypeScript types into packages/api-client
+# Generate TypeScript types into frontend/packages/api-client
 npm run generate:api
 ```
 
-The web app imports types from `@riva-bistro/api-client` (thin fetch wrappers remain in `apps/web/src/lib/api.ts` and `admin-api.ts`).
+The web app imports types from `@riva-bistro/api-client` (thin fetch wrappers remain in `frontend/src/lib/api.ts` and `admin-api.ts`).
 
 **Rule:** frontend must not invent API request/response shapes.
 
@@ -152,11 +151,17 @@ The web app imports types from `@riva-bistro/api-client` (thin fetch wrappers re
 
 ```text
 riva-bistro/
+├── frontend/                # Next.js frontend (+ api-client, design-tokens)
+│   ├── src/
+│   │   ├── app/             # Next.js routes
+│   │   ├── components/      # UI, layout, brand, features
+│   │   ├── lib/             # API clients, validation, utils
+│   │   └── config/          # Business constants
+│   └── packages/
+│       ├── api-client/      # generated OpenAPI client/types
+│       └── design-tokens/
 ├── apps/
-│   ├── web/                 # Next.js frontend
 │   └── backend/             # Django backend
-├── packages/
-│   └── api-client/          # generated OpenAPI client/types
 ├── docs/
 │   ├── architecture/
 │   ├── api/

@@ -5,9 +5,9 @@
 Riva Bistro is a **modular monolith**:
 
 - One Django backend (`apps/backend`)
-- One Next.js frontend (`apps/web`)
+- One Next.js frontend (`frontend/`)
 - One PostgreSQL database
-- One generated TypeScript API client (`packages/api-client`)
+- One generated TypeScript API client (`frontend/packages/api-client`)
 
 OpenAPI is the **single source of truth** for the HTTP contract:
 
@@ -52,6 +52,6 @@ Telegram is a side effect. Reservation creation must succeed even if Telegram fa
 
 ## Phase status
 
-- **Phases 1–3:** monorepo, Docker, reservation domain, booking UI, generated OpenAPI TypeScript client (`packages/api-client`).
+- **Phases 1–3:** monorepo, Docker, reservation domain, booking UI, generated OpenAPI TypeScript client (`frontend/packages/api-client`).
 - **Phase 4 (partial):** admin CMS for menu, hours, and reservation settings.
 - **Later phases:** gallery/news CMS, Telegram notifications, public-site polish, production hardening.

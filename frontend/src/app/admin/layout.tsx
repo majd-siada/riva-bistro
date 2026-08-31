@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminShell } from "@/components/features/admin";
 
 export const metadata: Metadata = {
   title: "Admin",

@@ -2,9 +2,7 @@ import Link from "next/link";
 
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
-import { FeaturedDish } from "@/components/commerce/featured-dish";
-import { FoodCard } from "@/components/commerce/food-card";
-import { MenuCategoryNav } from "@/components/commerce/menu-category-nav";
+import { FeaturedDish, FoodCard, MenuCategoryNav } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { fetchCategories, fetchProducts, type Category, type Product } from "@/lib/api";
