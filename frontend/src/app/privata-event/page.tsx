@@ -3,7 +3,7 @@ import { Building2, Heart, Sparkles, Users } from "lucide-react";
 import { InfoFeature } from "@/components/brand/info-feature";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
-import { EventInquiryForm } from "@/components/event-inquiry-form";
+import { EventInquiryForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 
 export const metadata = {

@@ -5,11 +5,11 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 \
     WATCHPACK_POLLING=true
 
-COPY apps/web/package.json apps/web/package-lock.json* ./
-COPY packages/api-client /app/packages/api-client
+COPY frontend/package.json frontend/package-lock.json* ./
+COPY frontend/packages/api-client /app/packages/api-client
 RUN npm install
 
-COPY apps/web /app
+COPY frontend /app
 
 EXPOSE 3000
 

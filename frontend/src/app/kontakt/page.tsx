@@ -5,7 +5,7 @@ import { Mail, MapPin, Phone, Share2 } from "lucide-react";
 import { FAQ } from "@/components/brand/faq";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
-import { ContactForm } from "@/components/contact-form";
+import { ContactForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { business, fullAddress } from "@/config/business";

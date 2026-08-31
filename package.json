@@ -3,8 +3,8 @@
   "private": true,
   "description": "Riva Bistro monorepo helper scripts",
   "workspaces": [
-    "apps/web",
-    "packages/api-client"
+    "frontend",
+    "frontend/packages/api-client"
   ],
   "scripts": {
     "dev": "docker compose up --build",

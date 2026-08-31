@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fallback cinematic placeholders when generated images are missing.
 set -euo pipefail
-ROOT="/workspace/apps/web/public"
+ROOT="/workspace/frontend/public"
 MENU="$ROOT/menu"
 SCENES="$ROOT/scenes"
 mkdir -p "$MENU" "$SCENES"

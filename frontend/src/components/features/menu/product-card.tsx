@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { PriceDisplay } from "@/components/commerce/price-display";
-import { ProductImage } from "@/components/commerce/product-image";
+import { PriceDisplay, ProductImage } from "@/components/features/menu";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/lib/api";
 
