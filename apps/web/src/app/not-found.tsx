@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { WaveDivider } from "@/components/brand/wave-divider";
+import { GoldDivider } from "@/components/brand/gold-divider";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/layout/section";
 
@@ -9,11 +9,11 @@ export default function NotFound() {
     <Section className="pt-20">
       <div className="mx-auto max-w-lg text-center">
         <p className="riva-label">404</p>
-        <h1 className="mt-3 font-display text-4xl text-riva-ink md:text-5xl">
+        <h1 className="mt-3 font-display text-4xl text-riva-cream md:text-5xl">
           Sidan kunde inte hittas
         </h1>
-        <WaveDivider className="mx-auto mt-6 max-w-[200px]" />
-        <p className="mt-5 text-riva-ink-soft">
+        <GoldDivider className="mx-auto mt-6 max-w-[200px]" variant="short" />
+        <p className="mt-5 text-riva-muted">
           Sidan du letar efter finns inte längre eller har flyttat.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

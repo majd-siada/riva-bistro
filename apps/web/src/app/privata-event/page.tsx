@@ -1,16 +1,41 @@
-import type { Metadata } from "next";
+import { Building2, Heart, Sparkles, Users } from "lucide-react";
 
-import { WaveDivider } from "@/components/brand/wave-divider";
+import { InfoFeature } from "@/components/brand/info-feature";
+import { RestaurantImage } from "@/components/brand/restaurant-image";
+import { SectionHeading } from "@/components/brand/section-heading";
 import { EventInquiryForm } from "@/components/event-inquiry-form";
 import { Section } from "@/components/layout/section";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Privata event",
   description:
-    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro. Skicka en förfrågan så formar vi kvällen tillsammans.",
+    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro.",
 };
 
-const categories = [
+const WHY = [
+  {
+    icon: Sparkles,
+    label: "Skräddarsytt",
+    text: "Meny och upplägg anpassas efter ert tillfälle och era önskemål.",
+  },
+  {
+    icon: Building2,
+    label: "Flexibelt",
+    text: "Hela eller delar av restaurangen — från affärslunch till galakväll.",
+  },
+  {
+    icon: Heart,
+    label: "Personligt",
+    text: "Ett dedikerat team som tar hand om kvällen från första fråga till sista tack.",
+  },
+  {
+    icon: Users,
+    label: "Gemenskap",
+    text: "En miljö som uppmuntrar samtal, firande och minnesvärda stunder.",
+  },
+];
+
+const EVENT_TYPES = [
   {
     title: "Företag & möten",
     body: "Affärsluncher, kundmiddagar och mötesdagar i en avslappnad miljö.",
@@ -23,56 +48,65 @@ const categories = [
     title: "Slutna sällskap",
     body: "Hela eller delar av restaurangen för er och era gäster.",
   },
+  {
+    title: "Provningar",
+    body: "Vin- och matprovningar i intim skala med vår kock.",
+  },
 ];
 
 export default function PrivateEventsPage() {
   return (
     <>
-      <section className="riva-dark relative isolate overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(198,165,106,0.2),transparent_55%)]"
-        />
-        <div className="relative mx-auto max-w-3xl px-5 py-24 text-center">
-          <p className="riva-label text-riva-gold-soft">Er tillställning, vår plats</p>
-          <h1 className="mt-4 font-display text-5xl text-on-dark md:text-6xl">
-            Privata event på Riva
-          </h1>
-          <WaveDivider className="mx-auto mt-6 max-w-[200px]" variant="gold" />
-          <p className="mx-auto mt-6 max-w-xl leading-relaxed text-on-dark-muted">
-            Föreställ dig kvällen: dukade bord, dämpat ljus och mat som får
-            samtalet att flöda. Berätta om ert tillfälle så tar vi hand om resten.
-          </p>
+      <section className="relative overflow-hidden bg-riva-black">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-24">
+          <div>
+            <p className="riva-label">Er tillställning, vår plats</p>
+            <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">
+              Privata event
+            </h1>
+            <p className="mt-6 max-w-md leading-relaxed text-riva-muted">
+              Företagsmiddagar, möten, firanden och slutna sällskap. Berätta om
+              ert tillfälle så formar vi en kväll som känns som er.
+            </p>
+          </div>
+          <RestaurantImage
+            src="/scenes/private-event.jpg"
+            alt="Privat middag i elegant matsal — Riva Bistro"
+            aspectRatio="hero"
+            priority
+          />
         </div>
       </section>
 
       <Section>
-        <div className="reveal grid gap-10 md:grid-cols-3 md:gap-14">
-          {categories.map((c) => (
-            <div key={c.title}>
-              <h2 className="font-display text-2xl text-riva-ink">{c.title}</h2>
-              <WaveDivider className="mt-3 max-w-[80px]" variant="gold" />
-              <p className="mt-4 leading-relaxed text-riva-ink-soft">{c.body}</p>
+        <SectionHeading eyebrow="Varför Riva Bistro?" title="Det här får ni" align="center" className="mx-auto" />
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {WHY.map((item) => (
+            <InfoFeature key={item.label} {...item} />
+          ))}
+        </div>
+      </Section>
+
+      <Section className="bg-riva-surface/40">
+        <SectionHeading title="Typer av event" align="center" className="mx-auto" />
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          {EVENT_TYPES.map((e) => (
+            <div key={e.title} className="riva-card p-6">
+              <h3 className="font-display text-xl text-riva-cream">{e.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-riva-muted">{e.body}</p>
             </div>
           ))}
         </div>
       </Section>
 
-      <Section className="bg-riva-cream-2">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <div className="reveal">
-            <p className="riva-label">Skicka en förfrågan</p>
-            <h2 className="mt-3 font-display text-4xl text-riva-ink">
-              Låt oss forma er kväll
-            </h2>
-            <p className="mt-5 max-w-md leading-relaxed text-riva-ink-soft">
-              Fyll i formuläret så återkommer vi med förslag på upplägg. Ju mer du
-              berättar, desto bättre kan vi anpassa kvällen efter era önskemål.
-            </p>
-          </div>
-          <div className="reveal">
-            <EventInquiryForm />
-          </div>
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-2">
+          <SectionHeading
+            eyebrow="Förfrågan"
+            title="Låt oss forma er kväll"
+            description="Fyll i formuläret så återkommer vi med förslag på upplägg."
+          />
+          <EventInquiryForm />
         </div>
       </Section>
     </>

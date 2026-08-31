@@ -1,77 +1,74 @@
-import type { Metadata } from "next";
-
-import { WaveDivider } from "@/components/brand/wave-divider";
+import { RestaurantImage } from "@/components/brand/restaurant-image";
+import { SectionHeading } from "@/components/brand/section-heading";
 import { ReservationForm } from "@/components/commerce/reservation-form";
 import { Section } from "@/components/layout/section";
-import { business } from "@/config/business";
-import { fetchHours, type OpeningHour } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Boka bord",
-  description:
-    "Boka bord på Riva Bistro. Välj datum, tid och antal gäster — du får en direkt bekräftelse.",
+  description: "Boka bord på Riva Bistro — välj datum, tid och antal gäster.",
 };
 
-export default async function BookingPage() {
-  let hours: OpeningHour[] = [];
-  try {
-    hours = await fetchHours();
-  } catch {
-    hours = [];
-  }
+const GOOD_TO_KNOW = [
+  {
+    title: "Bekräftelse",
+    body: "Du får en direkt bekräftelse med bokningsnummer när bokningen är genomförd.",
+  },
+  {
+    title: "Avbokning",
+    body: "Kontakta oss minst 24 timmar innan om du behöver ändra eller avboka.",
+  },
+  {
+    title: "Försenad?",
+    body: "Hör av dig om du blir försenad — vi håller bordet så länge vi kan.",
+  },
+];
 
+export default function BookingPage() {
   return (
-    <Section className="pt-16 md:pt-20">
-      <header className="max-w-2xl">
-        <p className="riva-label">Boka bord</p>
-        <h1 className="mt-3 font-display text-5xl text-riva-ink md:text-6xl">
-          Reservera ert bord
-        </h1>
-        <WaveDivider className="mt-6 max-w-[200px]" />
-        <p className="mt-5 text-riva-ink-soft">
-          Välj dag, tid och sällskap. Vi bekräftar direkt — inget konto krävs.
-        </p>
-      </header>
-
-      <div className="mt-12 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <ReservationForm />
-
-        <aside className="space-y-8 lg:pt-2">
+    <>
+      <section className="relative overflow-hidden bg-riva-black">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-20">
           <div>
-            <h2 className="riva-label">Öppettider</h2>
-            {hours.length > 0 ? (
-              <ul className="mt-4 space-y-1.5 text-sm text-riva-ink-soft">
-                {hours.map((h) => (
-                  <li key={h.weekday} className="flex justify-between gap-4">
-                    <span>{h.weekday_label}</span>
-                    <span className="tabular-nums">
-                      {h.is_closed || !h.opens_at
-                        ? "Stängt"
-                        : `${h.opens_at.slice(0, 5)}–${h.closes_at?.slice(0, 5)}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-4 text-sm text-riva-taupe">Öppettider uppdateras inom kort.</p>
-            )}
-          </div>
-
-          <div className="border-t border-riva-ink/10 pt-8">
-            <h2 className="riva-label">Större sällskap</h2>
-            <p className="mt-4 text-sm leading-relaxed text-riva-ink-soft">
-              Planerar ni ett event eller ett större sällskap? Kontakta oss så
-              hjälper vi till.
+            <p className="riva-label">Reservation</p>
+            <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Boka bord</h1>
+            <p className="mt-4 max-w-md text-riva-muted">
+              Välj dag, tid och sällskap — du får en direkt bekräftelse.
             </p>
-            <a
-              href={business.phoneHref}
-              className="mt-3 inline-block text-sm text-riva-teal underline-offset-4 hover:underline"
-            >
-              {business.phone}
-            </a>
           </div>
-        </aside>
-      </div>
-    </Section>
+          <RestaurantImage
+            src="/scenes/booking-table.jpg"
+            alt="Duktat bord med vinglas i mörk restaurangmiljö — Riva Bistro"
+            aspectRatio="wide"
+          />
+        </div>
+      </section>
+
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-[1fr_340px]">
+          <div>
+            <SectionHeading title="Din bokning" />
+            <div className="mt-8">
+              <ReservationForm />
+            </div>
+          </div>
+          <aside>
+            <h2 className="riva-label">Bra att veta</h2>
+            <div className="mt-4 space-y-4">
+              {GOOD_TO_KNOW.map((item) => (
+                <Card key={item.title}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm leading-relaxed text-riva-muted">{item.body}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </Section>
+    </>
   );
 }
