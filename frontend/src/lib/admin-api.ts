@@ -77,11 +77,22 @@ async function request<T>(
   });
   if (!res.ok) {
     const data = await res.json().catch(() => null);
-    const detail = (data && (data.detail || data.message)) || "Något gick fel.";
+    const detail =
+      (data && (data.detail || data.message)) ||
+      res.statusText ||
+      "Något gick fel. Försök igen.";
     throw new ApiError(detail, res.status, (data && data.code) || "error");
   }
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  try {
+    return (await res.json()) as T;
+  } catch {
+    throw new ApiError(
+      "API:t returnerade ogiltigt svar. Kontrollera NEXT_PUBLIC_API_URL.",
+      res.status,
+      "invalid_response",
+    );
+  }
 }
 
 export async function adminLogin(username: string, password: string) {

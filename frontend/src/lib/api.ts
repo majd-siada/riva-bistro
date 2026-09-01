@@ -44,6 +44,53 @@ export function publicApiOrigin(): string {
   return process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
 }
 
+/** Warn when the built API URL cannot work in the current browser context. */
+export function getApiMisconfigurationMessage(): string | null {
+  if (typeof window === "undefined") return null;
+
+  const api = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  const host = window.location.hostname;
+  const isLocalHost =
+    host === "localhost" || host === "127.0.0.1" || host === "backend";
+
+  if (!api) {
+    return "NEXT_PUBLIC_API_URL saknas. Admin kräver en publik API-URL vid build.";
+  }
+
+  if (
+    !isLocalHost &&
+    (api.includes("localhost") ||
+      api.includes("127.0.0.1") ||
+      api.includes("backend:"))
+  ) {
+    return "API-pekaren går till en lokal adress. Sätt NEXT_PUBLIC_API_URL till din publika backend-URL.";
+  }
+
+  return null;
+}
+
+export async function checkApiHealth(): Promise<{ ok: true } | { ok: false; message: string }> {
+  const configError = getApiMisconfigurationMessage();
+  if (configError) return { ok: false, message: configError };
+
+  try {
+    const res = await fetch(`${publicApiOrigin()}/api/v1/health/`, {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return { ok: false, message: `API svarade med fel (${res.status}).` };
+    }
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      message:
+        "Kunde inte nå API:t. Kontrollera att backend körs och att CORS är konfigurerad.",
+    };
+  }
+}
+
 /** Resolve a possibly-relative media path (e.g. /media/x.webp) to an absolute URL. */
 export function resolveImageUrl(url: string): string {
   if (!url) return "";
