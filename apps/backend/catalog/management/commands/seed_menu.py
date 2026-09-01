@@ -4,68 +4,69 @@ from django.core.management.base import BaseCommand
 
 from catalog.models import Category, Product
 
+# Swedish restaurant food VAT is 12%. Menu prices below are the real
+# customer-facing prices (inkl. moms); we store the ex-VAT base so the
+# displayed inc-VAT price matches the printed menu.
 FOOD_VAT = Decimal("0.12")
-WINE_VAT = Decimal("0.25")
 
 
-def ex_vat(inc: int, vat: Decimal = FOOD_VAT) -> Decimal:
-    return (Decimal(inc) / (Decimal("1") + vat)).quantize(
+def ex_vat(inc: int) -> Decimal:
+    return (Decimal(inc) / (Decimal("1") + FOOD_VAT)).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
 
 
 CATEGORIES = [
-    ("Förrätter", "forratter", "Små rätter som väcker aptiten."),
     ("Varmrätter", "varmratter", "Husets varma rätter, tillagade med omsorg."),
-    ("Pasta", "pasta", "Italienskt hantverk, à la Riva."),
     ("Sallader", "sallader", "Fräscha sallader med säsongens råvaror."),
-    ("Sidor", "sidor", "Tillbehör som kompletterar måltiden."),
+    ("Pasta", "pasta", "Italienskt hantverk, à la Riva."),
+    ("Barnmeny", "barnmeny", "För våra minsta gäster."),
     ("Desserter", "desserter", "Söta avslut på måltiden."),
-    ("Drycker", "drycker", "Förfriskande drycker."),
-    ("Viner", "viner", "Noggrant utvalda viner per glas."),
 ]
 
 # (category_slug, name, slug, description, price_inc_vat)
 PRODUCTS = [
-    ("forratter", "Burrata", "burrata", "Krämig burrata med tomater, basilika, olivolja och balsamico.", 129),
-    ("forratter", "Carpaccio", "carpaccio", "Tunnskivad oxfilé med ruccola, parmesan och citronolja.", 129),
-    ("forratter", "Skagen på brioche", "skagen-pa-brioche", "Räkor i krämig majonnäs med dill, citron och rödlök.", 119),
-    ("forratter", "Tomatsoppa", "tomatsoppa", "Krämig tomatsoppa med basilika och rostad vitlök.", 99),
-    ("forratter", "Getost", "getost", "Varm getost med honung, valnötter och ruccola.", 119),
-    ("forratter", "Marinerade oliver", "marinerade-oliver", "Blandade oliver marinerade med örter och citron.", 59),
-    ("varmratter", "Entrecôte", "entrecote", "Grillad entrecôte med rödvinssås, rostad potatis och säsongens grönsaker.", 269),
-    ("varmratter", "Laxfilé", "laxfile", "Stekt lax med dillsås, färskpotatis och säsongens grönsaker.", 229),
-    ("varmratter", "Ribs", "ribs", "Halstrade ribs med BBQ-sås, coleslaw och pommes.", 219),
-    ("pasta", "Pasta Alfredo", "pasta-alfredo", "Krämig pasta med kyckling, parmesan och färsk persilja.", 159),
-    ("pasta", "Pasta Carbonara", "pasta-carbonara", "Pasta med guanciale, äggula, pecorino och svartpeppar.", 149),
-    ("pasta", "Pasta Scampi", "pasta-scampi", "Pasta med scampi, vitlök, chili, persilja och körsbärstomater.", 179),
-    ("sallader", "Caesarsallad", "caesarsallad", "Romansallad med caesardressing, krutonger, parmesan och kyckling.", 139),
-    ("sallader", "Räksallad", "raksallad", "Räkor med blandad sallad, avocado, ägg, körsbärstomater och citron.", 149),
-    ("sallader", "Halloumisallad", "halloumisallad", "Grillad halloumi med sallad, quinoa, rostade rötter och balsamico.", 139),
-    ("sidor", "Pommes frites", "pommes-frites", "Krispiga pommes frites med örtsalt.", 49),
-    ("sidor", "Sötpotatispommes", "sotpotatispommes", "Krispiga sötpotatispommes med aioli.", 59),
-    ("sidor", "Grillade grönsaker", "grillade-gronsaker", "Grillade säsongens grönsaker med olivolja.", 59),
-    ("desserter", "Chokladfondant", "chokladfondant", "Varm chokladfondant med vaniljglass och bär.", 99),
-    ("desserter", "Tiramisu", "tiramisu", "Klassisk tiramisu med mascarpone och kaffe.", 89),
-    ("desserter", "Crème Brûlée", "creme-brulee", "Vaniljkräm med knäckigt täcke och färska bär.", 89),
-    ("drycker", "Lemonad", "lemonad", "Hemgjord citronlemonad med mynta.", 49),
-    ("drycker", "Coca-Cola", "coca-cola", "Klassisk Coca-Cola.", 39),
-    ("drycker", "Mineralvatten", "mineralvatten", "Kolsyrat eller stilla vatten.", 29),
-    ("viner", "Rött vin", "rott-vin", "Noggrant utvalda röda viner.", 89),
-    ("viner", "Vitt vin", "vitt-vin", "Noggrant utvalda vita viner.", 89),
-    ("viner", "Rosé vin", "rose-vin", "Noggrant utvalda roséviner.", 89),
+    ("varmratter", "Entrecôte", "entrecote", "Grillad entrecôte med tillbehör.", 305),
+    ("varmratter", "Grillad lammracks", "grillad-lammracks", "Grillad lammracks, säsongens tillbehör.", 315),
+    ("varmratter", "Rivas köttbullar", "rivas-kottbullar", "Husets köttbullar med gräddsås och lingon.", 185),
+    ("varmratter", "Halstrad röding", "halstrad-roding", "Halstrad röding med brynt smör.", 265),
+    ("varmratter", "Havets delikatesser", "havets-delikatesser", "Utvalda delikatesser från havet.", 299),
+    ("varmratter", "Hängmörad ryggbiff", "hangmorad-ryggbiff", "Hängmörad ryggbiff, grillad till perfektion.", 299),
+    ("varmratter", "Rivas Fisk & Skaldjurssoppa", "fisk-skaldjurssoppa", "Rustik soppa på fisk och skaldjur.", 199),
+    ("varmratter", "Rivas burgare / halloumi", "rivas-burgare", "Rivas burgare — välj nötfärs eller halloumi.", 175),
+    ("sallader", "Caesarsallad", "caesarsallad", "Klassisk caesarsallad.", 175),
+    ("sallader", "Räksallad deluxe", "raksallad-deluxe", "Generös räksallad med handskalade räkor.", 185),
+    ("sallader", "Grekisk sallad", "grekisk-sallad", "Fetaost, oliver, tomat och gurka.", 165),
+    ("pasta", "Pasta Filetto di manzo premium", "filetto-di-manzo", "Premiumpasta med oxfilé.", 245),
+    ("pasta", "Pesto Pollo", "pesto-pollo", "Pasta med kyckling och pesto.", 169),
+    ("pasta", "Vegetariano", "vegetariano", "Vegetarisk pasta med säsongens grönsaker.", 169),
+    ("barnmeny", "Rivas Köttbullar", "barn-kottbullar", "Köttbullar med potatismos.", 80),
+    ("barnmeny", "Pannkakor", "barn-pannkakor", "Pannkakor med sylt och grädde.", 75),
+    ("barnmeny", "Hamburgare", "barn-hamburgare", "Liten hamburgare med pommes.", 105),
+    ("barnmeny", "Rivas köttbullar med pasta", "barn-kottbullar-pasta", "Köttbullar med pasta.", 75),
+    ("barnmeny", "Barnglass", "barn-glass", "En kula glass.", 30),
+    ("barnmeny", "Barndricka", "barn-dricka", "Läsk eller saft.", 25),
+    ("desserter", "Varm Chokladfondant", "varm-chokladfondant", "Varm chokladfondant med glass.", 85),
+    ("desserter", "Crème Brûlée", "creme-brulee", "Klassisk crème brûlée.", 75),
+    ("desserter", "Klassisk Tiramisu", "klassisk-tiramisu", "Italiensk tiramisu.", 89),
+    ("desserter", "Pavlova", "pavlova", "Maräng med bär och grädde.", 79),
+    ("desserter", "Vaniljglass", "vaniljglass", "Vaniljglass med tillbehör.", 89),
+    ("desserter", "Husets ostar", "husets-ostar", "Utvalda ostar med tillbehör.", 145),
+    ("desserter", "KTC", "ktc", "Husets specialdessert.", 135),
+    ("desserter", "Dagens Cheesecake", "dagens-cheesecake", "Dagens cheesecake.", 75),
 ]
 
+# Dishes shown on the homepage. Editable later from the admin.
 FEATURED = {
     "entrecote": 0,
-    "laxfile": 1,
-    "burrata": 2,
-    "carpaccio": 3,
+    "grillad-lammracks": 1,
+    "halstrad-roding": 2,
+    "rivas-kottbullar": 3,
 }
 
 
 class Command(BaseCommand):
-    help = "Seed the Riva Bistro menu to match the reference (idempotent)."
+    help = "Seed the real Riva Bistro menu (idempotent)."
 
     def handle(self, *args, **options):
         for i, (name, slug, desc) in enumerate(CATEGORIES):
@@ -76,15 +77,14 @@ class Command(BaseCommand):
 
         for i, (cat_slug, name, slug, desc, price) in enumerate(PRODUCTS):
             category = Category.objects.get(slug=cat_slug)
-            vat = WINE_VAT if cat_slug == "viner" else FOOD_VAT
             Product.objects.update_or_create(
                 slug=slug,
                 defaults={
                     "category": category,
                     "name": name,
                     "description": desc,
-                    "base_price": ex_vat(price, vat),
-                    "vat_rate": vat,
+                    "base_price": ex_vat(price),
+                    "vat_rate": FOOD_VAT,
                     "image_url": "",
                     "is_available": True,
                     "is_featured": slug in FEATURED,
@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                "Seeded reference menu successfully "
+                "Seeded Riva menu successfully "
                 f"(pruned products={removed_products[0]}, categories={removed_categories[0]})."
             )
         )

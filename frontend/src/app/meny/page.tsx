@@ -1,34 +1,17 @@
-import Link from "next/link";
-
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
-import { FeaturedDish, FoodCard, MenuCategoryNav } from "@/components/features/menu";
+import { FoodCard, MenuCategoryNav } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
-import { Button } from "@/components/ui/button";
-import { fetchCategories, fetchProducts, type Category, type Product } from "@/lib/api";
+import { getMenuByCategory, MENU_CATEGORIES } from "@/data/menu";
 
 export const metadata = {
   title: "Meny",
-  description: "Utforska Riva Bistros meny — förrätter, varmrätter, pasta, sallader och mer.",
+  description:
+    "Riva Bistros meny — varmrätter, sallader, pasta, barnmeny och desserter. Alla priser inklusive moms.",
 };
 
-export default async function MenuPage() {
-  let categories: Category[] = [];
-  let products: Product[] = [];
-  try {
-    [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
-  } catch {
-    categories = [];
-    products = [];
-  }
-
-  const byCategory = categories.map((cat) => ({
-    ...cat,
-    items: products.filter((p) => p.category_slug === cat.slug),
-  }));
-
-  const varm = products.filter((p) => p.category_slug === "varmratter");
-  const featuredMain = varm.find((p) => p.slug === "entrecote") ?? varm[0];
+export default function MenuPage() {
+  const byCategory = getMenuByCategory();
 
   return (
     <>
@@ -55,14 +38,14 @@ export default async function MenuPage() {
           <div className="hidden lg:block">
             <div className="sticky top-28">
               <MenuCategoryNav
-                categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
+                categories={MENU_CATEGORIES.map((c) => ({ slug: c.slug, name: c.name }))}
               />
             </div>
           </div>
 
           <div className="min-w-0 space-y-16">
             <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
-              {categories.map((cat) => (
+              {MENU_CATEGORIES.map((cat) => (
                 <a
                   key={cat.slug}
                   href={`#${cat.slug}`}
@@ -73,30 +56,19 @@ export default async function MenuPage() {
               ))}
             </div>
 
-            {featuredMain && (
-              <div id="varmratter">
-                <SectionHeading eyebrow="Utvalt" title="Varmrätter" />
-                <FeaturedDish product={featuredMain} className="mt-10" reverse />
-                <div className="mt-8 text-right">
-                  <Button asChild variant="link">
-                    <Link href="#varmratter-grid">Visa alla →</Link>
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {byCategory.map((cat) => (
-              <section key={cat.slug} id={cat.slug === "varmratter" ? "varmratter-grid" : cat.slug}>
+              <section key={cat.slug} id={cat.slug}>
                 <SectionHeading title={cat.name} description={cat.description} />
-                {cat.items.length > 0 ? (
-                  <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {cat.items.map((item) => (
-                      <FoodCard key={item.id} product={item} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-6 text-riva-muted">Inga rätter i denna kategori just nu.</p>
-                )}
+                <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {cat.items.map((item) => (
+                    <FoodCard
+                      key={item.slug}
+                      name={item.name}
+                      description={item.description}
+                      priceIncVat={item.priceIncVat}
+                    />
+                  ))}
+                </div>
               </section>
             ))}
           </div>

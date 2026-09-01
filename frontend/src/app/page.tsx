@@ -1,49 +1,45 @@
 import Link from "next/link";
 
-import { InfoFeature } from "@/components/brand/info-feature";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { FeaturedDish, FoodCard } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { business } from "@/config/business";
-import { fetchFeatured, type Product } from "@/lib/api";
-import { Clock, MapPin, Sparkles, UtensilsCrossed } from "lucide-react";
+import { getFeaturedMenuItems, MENU_CATEGORIES } from "@/data/menu";
 
-const HERO_SLIDES = [
-  { id: "01", title: "Säsongens råvaror" },
-  { id: "02", title: "Cinematisk miljö" },
-  { id: "03", title: "Varmt värdskap" },
-];
-
-export default async function HomePage() {
-  let featured: Product[] = [];
-  try {
-    featured = await fetchFeatured();
-  } catch {
-    featured = [];
-  }
-
+export default function HomePage() {
+  const featured = getFeaturedMenuItems();
   const spread = featured.slice(0, 2);
+  const varmratter = MENU_CATEGORIES.find((c) => c.slug === "varmratter");
 
   return (
     <>
       <Hero />
-      <InfoStrip />
       <AboutSplit />
-      {spread.length > 0 && (
+      {featured.length > 0 && (
         <Section>
           <SectionHeading eyebrow="Från köket" title="Säsongens favoriter" align="center" />
           <div className="reveal mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.slice(0, 4).map((p) => (
-              <FoodCard key={p.id} product={p} />
+            {featured.map((item) => (
+              <FoodCard
+                key={item.slug}
+                name={item.name}
+                description={item.description}
+                priceIncVat={item.priceIncVat}
+              />
             ))}
           </div>
         </Section>
       )}
-      {spread.length >= 2 && (
+      {spread.length >= 1 && (
         <Section className="bg-riva-surface/50">
-          <FeaturedDish product={spread[0]} />
+          <FeaturedDish
+            name={spread[0].name}
+            categoryName={varmratter?.name}
+            description={spread[0].description}
+            priceIncVat={spread[0].priceIncVat}
+          />
         </Section>
       )}
     </>
@@ -71,16 +67,6 @@ function Hero() {
               <Link href="/boka">Boka bord</Link>
             </Button>
           </div>
-          <ol className="mt-12 flex gap-6" aria-label="Höjdpunkter">
-            {HERO_SLIDES.map((s) => (
-              <li key={s.id} className="text-xs uppercase tracking-[0.2em] text-riva-muted">
-                <span className="text-riva-gold">{s.id}</span>
-                <span className="mt-1 block normal-case tracking-normal text-riva-cream/80">
-                  {s.title}
-                </span>
-              </li>
-            ))}
-          </ol>
         </div>
         <div className="reveal order-1 md:order-2">
           <RestaurantImage
@@ -93,41 +79,6 @@ function Hero() {
         </div>
       </div>
     </section>
-  );
-}
-
-function InfoStrip() {
-  const items = [
-    {
-      icon: UtensilsCrossed,
-      label: "Mat",
-      text: "Säsongens råvaror tillagade med respekt och ett mediterrant sinne.",
-    },
-    {
-      icon: Sparkles,
-      label: "Atmosfär",
-      text: "Dämpat ljus, varma toner och en känsla av att tiden får sakta ner.",
-    },
-    {
-      icon: Clock,
-      label: "Öppettider",
-      text: business.restaurantHoursLabel,
-    },
-    {
-      icon: MapPin,
-      label: "Plats",
-      text: `${business.address.street}, ${business.address.city}`,
-    },
-  ];
-
-  return (
-    <Section className="border-y border-riva-cream/10 bg-riva-surface py-12 md:py-14">
-      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <InfoFeature key={item.label} {...item} className="reveal" />
-        ))}
-      </div>
-    </Section>
   );
 }
 
