@@ -1,3 +1,4 @@
+import { productionApiOrigins, resolvePublicApiOrigin } from "@/config/api";
 import type {
   Availability,
   AvailabilitySlot,
@@ -31,29 +32,32 @@ export type {
 };
 
 function getApiBase(): string {
-  const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   if (typeof window === "undefined") {
     const internalUrl = process.env.INTERNAL_API_URL?.replace(/\/$/, "");
+    const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
     return internalUrl ?? publicUrl ?? "http://localhost:8000";
   }
-  return publicUrl ?? "http://localhost:8000";
+  return resolvePublicApiOrigin(window.location.hostname);
 }
 
 /** Public origin the browser can always reach (for resolving media paths). */
 export function publicApiOrigin(): string {
-  return process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+  const hostname =
+    typeof window !== "undefined" ? window.location.hostname : undefined;
+  return resolvePublicApiOrigin(hostname);
 }
 
 /** Warn when the built API URL cannot work in the current browser context. */
 export function getApiMisconfigurationMessage(): string | null {
   if (typeof window === "undefined") return null;
 
-  const api = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   const host = window.location.hostname;
+  const configured = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  const api = resolvePublicApiOrigin(host);
   const isLocalHost =
     host === "localhost" || host === "127.0.0.1" || host === "backend";
 
-  if (!api) {
+  if (!configured && !productionApiOrigins[host]) {
     return "NEXT_PUBLIC_API_URL saknas. Admin kräver en publik API-URL vid build.";
   }
 

@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
         <div className="mt-8 rounded-lg border border-riva-cream/10 bg-riva-card p-8 shadow-card">
           <h1 className="font-display text-2xl text-riva-cream">Logga in</h1>
           <p className="mt-1 text-sm text-riva-muted">Administration för Riva Bistro.</p>
-          {apiWarning && (
+          {apiWarning && !error && (
             <p className="mt-4 text-sm text-riva-error" role="status">
               {apiWarning}
             </p>
