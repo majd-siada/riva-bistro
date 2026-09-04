@@ -4,23 +4,25 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from core.email import send_contact_message, send_event_inquiry
+from core.models import ContactMessage, EventInquiry
 from core.serializers import (
     ContactSerializer,
     EventInquirySerializer,
     StatusResponseSerializer,
 )
 
-FAIL_MESSAGE = "Något gick fel. Försök igen eller kontakta oss direkt."
-
 
 class ContactView(APIView):
-    """Public contact form → emails the restaurant notification inbox."""
+    """Public contact form — persisted, then emailed to the restaurant inbox."""
 
     authentication_classes: list = []
     permission_classes: list = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "inquiries"
 
     @extend_schema(
         tags=["inquiries"],
@@ -30,19 +32,22 @@ class ContactView(APIView):
     def post(self, request: Request) -> Response:
         serializer = ContactSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        sent = send_contact_message(**serializer.validated_data)
-        if not sent:
-            return Response(
-                {"detail": FAIL_MESSAGE}, status=status.HTTP_502_BAD_GATEWAY
-            )
-        return Response({"status": "sent"}, status=status.HTTP_200_OK)
+        data = serializer.validated_data
+        row = ContactMessage.objects.create(**data)
+        sent = send_contact_message(**data)
+        if sent and not row.email_sent:
+            row.email_sent = True
+            row.save(update_fields=["email_sent"])
+        return Response({"status": "received", "email_sent": sent}, status=status.HTTP_200_OK)
 
 
 class EventInquiryView(APIView):
-    """Public private-events inquiry → emails the restaurant notification inbox."""
+    """Public private-events inquiry — persisted, then emailed."""
 
     authentication_classes: list = []
     permission_classes: list = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "inquiries"
 
     @extend_schema(
         tags=["inquiries"],
@@ -52,9 +57,10 @@ class EventInquiryView(APIView):
     def post(self, request: Request) -> Response:
         serializer = EventInquirySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        sent = send_event_inquiry(**serializer.validated_data)
-        if not sent:
-            return Response(
-                {"detail": FAIL_MESSAGE}, status=status.HTTP_502_BAD_GATEWAY
-            )
-        return Response({"status": "sent"}, status=status.HTTP_200_OK)
+        data = serializer.validated_data
+        row = EventInquiry.objects.create(**data)
+        sent = send_event_inquiry(**data)
+        if sent and not row.email_sent:
+            row.email_sent = True
+            row.save(update_fields=["email_sent"])
+        return Response({"status": "received", "email_sent": sent}, status=status.HTTP_200_OK)

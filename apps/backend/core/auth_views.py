@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from core.serializers import AdminSessionSerializer, DetailResponseSerializer, LoginSerializer
@@ -29,6 +30,8 @@ class LoginView(APIView):
     # Anonymous login: authenticate manually, then establish the session.
     authentication_classes: list = []
     permission_classes: list = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     @extend_schema(
         tags=["admin"],

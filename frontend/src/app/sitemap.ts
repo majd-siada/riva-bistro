@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/meny", priority: 0.9 },
     { path: "/boka", priority: 0.9 },
     { path: "/privata-event", priority: 0.8 },
+    { path: "/galleri", priority: 0.5 },
     { path: "/om-oss", priority: 0.6 },
     { path: "/kontakt", priority: 0.6 },
   ];

@@ -22,6 +22,7 @@ import type {
   AdminSettings,
 } from "@riva-bistro/api-client";
 import { ApiError, publicApiOrigin } from "@/lib/api";
+import type { AdminContactMessage, AdminEventInquiry } from "@/lib/api";
 
 const BASE = `${publicApiOrigin()}/api/v1`;
 
@@ -211,4 +212,14 @@ export async function adminUploadProductImage(id: number, file: File) {
     body: form,
     isForm: true,
   });
+}
+
+export type { AdminContactMessage, AdminEventInquiry };
+
+export async function adminListContactMessages() {
+  return request<AdminContactMessage[]>("/admin/inquiries/contact/");
+}
+
+export async function adminListEventInquiries() {
+  return request<AdminEventInquiry[]>("/admin/inquiries/events/");
 }

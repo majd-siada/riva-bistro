@@ -2,7 +2,7 @@ import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { FoodCard, MenuCategoryNav } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
-import { getMenuByCategory, MENU_CATEGORIES } from "@/data/menu";
+import { loadPublicMenu } from "@/lib/public-menu";
 
 export const metadata = {
   title: "Meny",
@@ -10,8 +10,12 @@ export const metadata = {
     "Riva Bistros meny — varmrätter, sallader, pasta, barnmeny och desserter. Alla priser inklusive moms.",
 };
 
-export default function MenuPage() {
-  const byCategory = getMenuByCategory();
+export default async function MenuPage() {
+  const { categories, items } = await loadPublicMenu();
+  const byCategory = categories.map((category) => ({
+    ...category,
+    items: items.filter((item) => item.categorySlug === category.slug),
+  }));
 
   return (
     <>
@@ -21,7 +25,7 @@ export default function MenuPage() {
             <p className="riva-label">Mat &amp; dryck</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Meny</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Säsongens råvaror, tillagade med omsorg. Alla priser inklusive moms.
+              Säsongens råvaror, tillagade med omsorg. Alla priser inklusive moms (12 % på mat).
             </p>
           </div>
           <RestaurantImage
@@ -38,14 +42,14 @@ export default function MenuPage() {
           <div className="hidden lg:block">
             <div className="sticky top-28">
               <MenuCategoryNav
-                categories={MENU_CATEGORIES.map((c) => ({ slug: c.slug, name: c.name }))}
+                categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
               />
             </div>
           </div>
 
           <div className="min-w-0 space-y-16">
             <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
-              {MENU_CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <a
                   key={cat.slug}
                   href={`#${cat.slug}`}
@@ -66,6 +70,7 @@ export default function MenuPage() {
                       name={item.name}
                       description={item.description}
                       priceIncVat={item.priceIncVat}
+                      imageSrc={item.imageUrl}
                     />
                   ))}
                 </div>

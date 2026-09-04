@@ -40,5 +40,15 @@ PY
 echo "Applying migrations..."
 python manage.py migrate --noinput
 
+# Collect static files for WhiteNoise when not in DEBUG (gunicorn / production).
+debug_flag="$(printf '%s' "${DJANGO_DEBUG:-false}" | tr '[:upper:]' '[:lower:]')"
+case "$debug_flag" in
+  1|true|yes|on) ;;
+  *)
+    echo "Collecting static files..."
+    python manage.py collectstatic --noinput
+    ;;
+esac
+
 echo "Starting backend: $*"
 exec "$@"

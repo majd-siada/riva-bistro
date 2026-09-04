@@ -57,7 +57,9 @@ class ProductDetailView(APIView):
     @extend_schema(tags=["menu"], responses={200: ProductDetailSerializer})
     def get(self, request: Request, slug: str) -> Response:
         product = get_object_or_404(
-            Product.objects.prefetch_related("modifier_groups__options"),
+            Product.objects.filter(is_available=True).prefetch_related(
+                "modifier_groups__options"
+            ),
             slug=slug,
         )
         serializer = ProductDetailSerializer(product, context={"request": request})

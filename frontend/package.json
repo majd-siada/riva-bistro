@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "node ../scripts/hostinger-sync-next-output.mjs",
+    "postbuild": "node ./scripts/postbuild.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

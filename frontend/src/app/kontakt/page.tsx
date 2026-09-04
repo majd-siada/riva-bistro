@@ -9,6 +9,8 @@ import { ContactForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { business, fullAddress } from "@/config/business";
+import { formatDayHours } from "@/lib/hours";
+import { loadHours } from "@/lib/public-data";
 
 export const metadata: Metadata = {
   title: "Kontakt",
@@ -37,7 +39,9 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const hours = await loadHours();
+
   return (
     <>
       <section className="relative overflow-hidden bg-riva-black">
@@ -91,7 +95,18 @@ export default function ContactPage() {
             </div>
             <div>
               <h2 className="riva-label">Öppettider</h2>
-              <p className="mt-3 text-riva-muted">{business.restaurantHoursLabel}</p>
+              {hours.length > 0 ? (
+                <ul className="mt-3 space-y-1 text-sm text-riva-muted">
+                  {hours.map((h) => (
+                    <li key={h.weekday} className="flex justify-between gap-4">
+                      <span>{h.weekday_label}</span>
+                      <span className="tabular-nums">{formatDayHours(h)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-riva-muted">{business.restaurantHoursLabel}</p>
+              )}
               <p className="mt-1 text-sm text-riva-muted/80">{business.kitchenHours}</p>
             </div>
             <div>

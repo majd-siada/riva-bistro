@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
@@ -21,6 +21,7 @@ const navItems = [
   { href: "/", label: "Hem" },
   { href: "/meny", label: "Meny" },
   { href: "/om-oss", label: "Om oss" },
+  { href: "/galleri", label: "Galleri" },
   { href: "/privata-event", label: "Privat event" },
   { href: "/kontakt", label: "Kontakt" },
 ] as const;
@@ -62,16 +63,8 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="hidden items-center gap-1 text-xs uppercase tracking-[0.2em] text-riva-muted lg:flex"
-            aria-label="Språk: Svenska"
-          >
-            SV
-            <ChevronDown className="h-3 w-3 text-riva-gold" strokeWidth={1.25} />
-          </button>
-          <Button asChild variant="gold" size="sm" className="hidden sm:inline-flex">
+        <div className="flex items-center gap-2">
+          <Button asChild variant="gold" size="sm">
             <Link href="/boka">Boka bord</Link>
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>

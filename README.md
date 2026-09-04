@@ -56,13 +56,24 @@ docker compose down -v
 
 Copy `.env.example` → `.env`. Never commit `.env`.
 
+**Production cutover:** see [`docs/deployment/production-checklist.md`](docs/deployment/production-checklist.md)
+(OWNER values, Hostinger/API env, DNS, migrations, media, SMTP, post-deploy checks).
+
 Key variables:
 
 - `POSTGRES_*` — database credentials
-- `DJANGO_SECRET_KEY` / `DJANGO_DEBUG` / CORS / CSRF
+- `DJANGO_SECRET_KEY` / `DJANGO_DEBUG` / CORS / CSRF / cookie domain
 - `DATABASE_URL` — Django connection string
 - `NEXT_PUBLIC_API_URL` — browser → API
 - `INTERNAL_API_URL` — server-side Next.js → API inside Compose
+- `MEDIA_SERVE` — when `DJANGO_DEBUG=false`, serve `/media/` from Django (default true)
+
+Production notes (no Hostinger deploy from this README):
+
+- Backend image default is **gunicorn**; Compose uses `runserver` for local hot-reload.
+- WhiteNoise + `collectstatic` cover Django static files when not DEBUG.
+- Public menu prefers the catalog API; `frontend/src/data/menu.ts` is a resilience fallback only.
+- See `.env.example` production block for OWNER / HOSTINGER inputs.
 
 ## Backend commands
 

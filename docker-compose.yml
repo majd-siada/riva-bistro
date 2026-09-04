@@ -35,6 +35,8 @@ services:
     environment:
       POSTGRES_HOST: postgres
       DATABASE_URL: postgres://${POSTGRES_USER:-riva}:${POSTGRES_PASSWORD:-riva_dev_password}@postgres:5432/${POSTGRES_DB:-riva_bistro}
+    # Local hot-reload; image default is gunicorn for production.
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     ports:
       - "8000:8000"
     volumes:
@@ -70,6 +72,7 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
+      - ./scripts:/scripts:ro
       - ./frontend/packages/api-client:/app/packages/api-client:ro
       - /app/node_modules
       - /app/.next

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: "Översikt" },
   { href: "/admin/bokningar", label: "Bokningar" },
+  { href: "/admin/forfragningar", label: "Förfrågningar" },
   { href: "/admin/meny", label: "Meny" },
   { href: "/admin/oppettider", label: "Öppettider" },
   { href: "/admin/installningar", label: "Inställningar" },

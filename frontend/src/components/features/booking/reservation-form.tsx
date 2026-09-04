@@ -24,15 +24,18 @@ type ContactErrors = Partial<Record<"name" | "phone" | "email", string>>;
 
 export function ReservationForm() {
   const today = useMemo(() => toDateString(new Date()), []);
-  const maxDate = useMemo(
-    () => toDateString(new Date(Date.now() + 90 * 864e5)),
-    [],
-  );
 
   const [date, setDate] = useState("");
-  const [availability, setAvailability] = useState<Availability | null>(null);
+  const [availability, setAvailability] = useState<(Availability & { horizon_days?: number }) | null>(
+    null,
+  );
   const [loadingAvail, setLoadingAvail] = useState(false);
   const [availError, setAvailError] = useState<string | null>(null);
+
+  const maxDate = useMemo(() => {
+    const days = availability?.horizon_days ?? 90;
+    return toDateString(new Date(Date.now() + days * 864e5));
+  }, [availability?.horizon_days]);
 
   const [guests, setGuests] = useState(2);
   const [time, setTime] = useState("");
@@ -144,7 +147,7 @@ export function ReservationForm() {
         )} för ${result.party_size} gäster.${
           result.email_sent
             ? ` En bekräftelse har skickats till ${result.email}.`
-            : ""
+            : " Vi kunde inte skicka e-post just nu — spara bokningsnumret."
         }`}
         action={
           <Button
@@ -178,6 +181,7 @@ export function ReservationForm() {
         <Input
           id="res-date"
           type="date"
+          lang="sv-SE"
           min={today}
           max={maxDate}
           value={date}
@@ -250,7 +254,9 @@ export function ReservationForm() {
                 <span className="text-sm font-medium text-riva-cream">Välj tid</span>
                 {slots.length === 0 ? (
                   <p className="mt-2 text-sm text-riva-muted">
-                    Inga lediga tider den här dagen. Prova en annan dag.
+                    Inga lediga sittningar den här dagen. Det kan bero på att köket har stängt,
+                    att sista sittningen redan passerat, eller att dagen är fullbokad. Prova en
+                    annan dag eller ring oss på {business.phone}.
                   </p>
                 ) : (
                   <div
@@ -274,7 +280,7 @@ export function ReservationForm() {
                               : "cursor-not-allowed border-riva-cream/10 text-riva-muted/40 line-through")
                         }
                       >
-                        {s.time}
+                        {s.time.slice(0, 5)}
                       </button>
                     ))}
                   </div>

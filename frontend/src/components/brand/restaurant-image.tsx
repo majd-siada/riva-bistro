@@ -11,7 +11,7 @@ interface RestaurantImageProps {
   alt: string;
   className?: string;
   priority?: boolean;
-  aspectRatio?: "square" | "portrait" | "wide" | "hero";
+  aspectRatio?: "square" | "portrait" | "wide" | "hero" | "fill";
   sizes?: string;
 }
 
@@ -20,6 +20,7 @@ const aspectClasses = {
   portrait: "aspect-[4/5]",
   wide: "aspect-[16/10]",
   hero: "aspect-[4/5] md:aspect-[5/6]",
+  fill: "h-full w-full min-h-full",
 };
 
 export function RestaurantImage({

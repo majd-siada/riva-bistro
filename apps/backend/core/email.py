@@ -66,7 +66,16 @@ def send_contact_message(
         f"Ämne: {subject.strip() or '-'}\n\n"
         f"Meddelande:\n{message}\n"
     )
-    return _send(mail_subject, body, [_notification_recipient()], reply_to=email)
+    restaurant_ok = _send(
+        mail_subject, body, [_notification_recipient()], reply_to=email
+    )
+    ack = (
+        f"Hej {name},\n\n"
+        "Tack för ditt meddelande till Riva Bistro. Vi återkommer så snart vi kan.\n\n"
+        "Vänliga hälsningar\nRiva Bistro\n"
+    )
+    _send("Tack för ditt meddelande — Riva Bistro", ack, [email])
+    return restaurant_ok
 
 
 def send_event_inquiry(
@@ -89,4 +98,13 @@ def send_event_inquiry(
         f"Önskat datum: {date or '-'}\n\n"
         f"Meddelande:\n{message}\n"
     )
-    return _send(subject, body, [_notification_recipient()], reply_to=email)
+    restaurant_ok = _send(
+        subject, body, [_notification_recipient()], reply_to=email
+    )
+    ack = (
+        f"Hej {name},\n\n"
+        "Vi har tagit emot er förfrågan om privat event och återkommer så snart vi kan.\n\n"
+        "Vänliga hälsningar\nRiva Bistro\n"
+    )
+    _send("Tack för er förfrågan — Riva Bistro", ack, [email])
+    return restaurant_ok

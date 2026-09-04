@@ -17,7 +17,7 @@ export function RestaurantJsonLd() {
     name: business.name,
     url: SITE_URL,
     servesCuisine: ["Svensk", "Mediterran"],
-    telephone: business.phone,
+    telephone: business.phoneE164,
     email: business.email,
     address: {
       "@type": "PostalAddress",

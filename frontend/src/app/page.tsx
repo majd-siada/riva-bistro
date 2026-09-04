@@ -1,21 +1,29 @@
 import Link from "next/link";
 
+import { CTASection } from "@/components/brand/cta-section";
+import { HoursStrip } from "@/components/brand/hours-strip";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
+import { RestaurantInfo } from "@/components/brand/restaurant-info";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { FeaturedDish, FoodCard } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { business } from "@/config/business";
-import { getFeaturedMenuItems, MENU_CATEGORIES } from "@/data/menu";
+import { loadFeaturedItems } from "@/lib/public-menu";
+import { loadGallery, loadHours, loadNews } from "@/lib/public-data";
 
-export default function HomePage() {
-  const featured = getFeaturedMenuItems();
-  const spread = featured.slice(0, 2);
-  const varmratter = MENU_CATEGORIES.find((c) => c.slug === "varmratter");
+export default async function HomePage() {
+  const [featured, hours, news, gallery] = await Promise.all([
+    loadFeaturedItems(),
+    loadHours(),
+    loadNews(),
+    loadGallery(),
+  ]);
+  const signature = featured[0];
 
   return (
     <>
-      <Hero />
+      <Hero hours={hours} />
       <AboutSplit />
       {featured.length > 0 && (
         <Section>
@@ -27,32 +35,108 @@ export default function HomePage() {
                 name={item.name}
                 description={item.description}
                 priceIncVat={item.priceIncVat}
+                imageSrc={item.imageUrl}
               />
             ))}
           </div>
         </Section>
       )}
-      {spread.length >= 1 && (
+      {signature && (
         <Section className="bg-riva-surface/50">
-          <FeaturedDish
-            name={spread[0].name}
-            categoryName={varmratter?.name}
-            description={spread[0].description}
-            priceIncVat={spread[0].priceIncVat}
-          />
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <RestaurantImage
+              src={signature.imageUrl || "/scenes/menu-tabletop.jpg"}
+              alt={signature.name}
+              aspectRatio="wide"
+            />
+            <FeaturedDish
+              name={signature.name}
+              categoryName="Signatur"
+              description={signature.description}
+              priceIncVat={signature.priceIncVat}
+            />
+          </div>
         </Section>
       )}
+      <Section>
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="reveal">
+            <SectionHeading
+              eyebrow="Er tillställning"
+              title="Privata event"
+              description="Företagsmiddagar, firanden och slutna sällskap. Vi formar kvällen efter er."
+            />
+            <Button asChild variant="outline" className="mt-8">
+              <Link href="/privata-event">Planera ett event</Link>
+            </Button>
+          </div>
+          <RestaurantImage
+            src="/scenes/private-event.jpg"
+            alt="Privat tillställning på Riva Bistro"
+            aspectRatio="wide"
+            className="reveal"
+          />
+        </div>
+      </Section>
+      {news.length > 0 && (
+        <Section className="bg-riva-surface/40">
+          <SectionHeading eyebrow="Just nu" title="Nyheter" />
+          <ul className="mt-10 grid gap-6 md:grid-cols-2">
+            {news.map((item) => (
+              <li key={item.id} className="riva-card p-6">
+                <h3 className="font-display text-2xl text-riva-cream">{item.title}</h3>
+                <p className="mt-3 whitespace-pre-line text-sm text-riva-muted">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+      {gallery.length > 0 && (
+        <Section>
+          <SectionHeading eyebrow="Atmosfär" title="Galleri" align="center" />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {gallery.slice(0, 6).map((item) => (
+              <RestaurantImage
+                key={item.id}
+                src={item.src}
+                alt={item.alt}
+                aspectRatio="wide"
+              />
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button asChild variant="outline">
+              <Link href="/galleri">Fler bilder</Link>
+            </Button>
+          </div>
+        </Section>
+      )}
+      <Section className="bg-riva-surface/40">
+        <RestaurantInfo hours={hours} />
+      </Section>
+      <CTASection />
     </>
   );
 }
 
-function Hero() {
+function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
   return (
-    <section className="relative overflow-hidden bg-riva-black">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:gap-16 md:px-8 md:py-24">
-        <div className="reveal order-2 md:order-1">
+    <section className="relative min-h-[88vh] overflow-hidden bg-riva-black">
+      <div className="absolute inset-0">
+        <RestaurantImage
+          src="/scenes/hero-food.jpg"
+          alt="Grillad entrecôte på mörk tallrik — Riva Bistro"
+          aspectRatio="fill"
+          priority
+          className="h-full min-h-[88vh] rounded-none"
+          sizes="100vw"
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-riva-black via-riva-black/70 to-riva-black/30" />
+      <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end gap-10 px-5 pb-16 pt-28 md:px-8 md:pb-20">
+        <div className="max-w-2xl">
           <p className="riva-label">Stockholm · {business.tagline}</p>
-          <h1 className="mt-5 font-display text-5xl leading-[1.05] text-riva-cream md:text-6xl lg:text-7xl">
+          <h1 className="mt-5 font-display text-5xl leading-[1.05] text-riva-cream md:text-7xl">
             Goda smaker, äkta upplevelser
           </h1>
           <p className="mt-6 max-w-md text-pretty leading-relaxed text-riva-muted">
@@ -61,22 +145,14 @@ function Hero() {
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="gold">
-              <Link href="/meny">Se vår meny</Link>
+              <Link href="/boka">Boka bord</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/boka">Boka bord</Link>
+              <Link href="/meny">Se vår meny</Link>
             </Button>
           </div>
         </div>
-        <div className="reveal order-1 md:order-2">
-          <RestaurantImage
-            src="/scenes/hero-food.jpg"
-            alt="Grillad entrecôte på mörk tallrik med varm studioljus — Riva Bistro"
-            aspectRatio="hero"
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        </div>
+        <HoursStrip hours={hours} />
       </div>
     </section>
   );

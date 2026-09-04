@@ -3,23 +3,11 @@ import Link from "next/link";
 import { GoldDivider } from "@/components/brand/gold-divider";
 import { Logo } from "@/components/brand/logo";
 import { business, fullAddress } from "@/config/business";
-import { fetchHours, type OpeningHour } from "@/lib/api";
-
-function fmt(t: string | null | undefined): string {
-  if (!t) return "";
-  return t.slice(0, 5);
-}
-
-async function getHours(): Promise<OpeningHour[]> {
-  try {
-    return await fetchHours();
-  } catch {
-    return [];
-  }
-}
+import { loadHours } from "@/lib/public-data";
+import { formatDayHours } from "@/lib/hours";
 
 export async function Footer() {
-  const hours = await getHours();
+  const hours = await loadHours();
 
   return (
     <footer className="border-t border-riva-cream/10 bg-riva-black">
@@ -39,6 +27,7 @@ export async function Footer() {
             {[
               { href: "/meny", label: "Meny" },
               { href: "/om-oss", label: "Om oss" },
+              { href: "/galleri", label: "Galleri" },
               { href: "/privata-event", label: "Privat event" },
               { href: "/boka", label: "Boka bord" },
               { href: "/kontakt", label: "Kontakt" },
@@ -79,11 +68,7 @@ export async function Footer() {
               {hours.map((h) => (
                 <li key={h.weekday} className="flex justify-between gap-4">
                   <span>{h.weekday_label}</span>
-                  <span className="tabular-nums">
-                    {h.is_closed || !h.opens_at
-                      ? "Stängt"
-                      : `${fmt(h.opens_at)}–${fmt(h.closes_at)}`}
-                  </span>
+                  <span className="tabular-nums">{formatDayHours(h)}</span>
                 </li>
               ))}
             </ul>

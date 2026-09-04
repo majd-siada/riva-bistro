@@ -20,10 +20,7 @@ def test_health_endpoint_ok() -> None:
 
 
 @pytest.mark.django_db
-def test_openapi_schema_available() -> None:
+def test_openapi_schema_requires_staff() -> None:
     client = APIClient()
     response = client.get("/api/v1/schema/", HTTP_ACCEPT="application/json")
-
-    assert response.status_code == status.HTTP_200_OK
-    assert "openapi" in response.json()
-    assert response.json()["info"]["title"] == "Riva Bistro API"
+    assert response.status_code == status.HTTP_403_FORBIDDEN

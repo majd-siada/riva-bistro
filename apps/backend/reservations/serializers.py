@@ -90,6 +90,7 @@ class AvailabilitySerializer(serializers.Serializer):
     enabled = serializers.BooleanField()
     closed = serializers.BooleanField()
     max_party_size = serializers.IntegerField()
+    horizon_days = serializers.IntegerField(required=False)
     slots = AvailabilitySlotSerializer(many=True)
 
 

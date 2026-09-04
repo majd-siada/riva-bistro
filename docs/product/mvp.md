@@ -36,7 +36,7 @@ Public language: **Swedish**. Visual identity: black, ivory, subtle gold; cinema
 
 - Auth / roles (admin session)
 - Menu, hours, reservation settings management
-- Gallery and news — not yet implemented
+- Gallery + news models/APIs + public homepage/galleri surfaces (admin via Django admin / content APIs; Next admin has inquiries inbox)
 
 > Online ordering and the commerce dashboard (cart, checkout, order tracking, inventory, sales) are out of scope and have been removed.
 

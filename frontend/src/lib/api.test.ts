@@ -17,4 +17,9 @@ describe("resolveImageUrl", () => {
     expect(resolved.endsWith("/media/menu/dish.webp")).toBe(true);
     expect(resolved.startsWith("http")).toBe(true);
   });
+
+  it("leaves Next.js public asset paths unchanged", () => {
+    expect(resolveImageUrl("/scenes/hero-food.jpg")).toBe("/scenes/hero-food.jpg");
+    expect(resolveImageUrl("/menu/entrecote.jpg")).toBe("/menu/entrecote.jpg");
+  });
 });

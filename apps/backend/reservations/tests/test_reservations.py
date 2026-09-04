@@ -252,3 +252,12 @@ def test_production_guard_allows_when_ready(api, settings):
         format="json",
     )
     assert resp.status_code == 201
+
+
+def test_generate_slots_when_buffer_eats_window():
+    from datetime import time as time_cls
+
+    from reservations.availability import generate_slots
+
+    slots = generate_slots(time_cls(18, 0), time_cls(19, 0), 30, 180)
+    assert slots == [time_cls(18, 0)]

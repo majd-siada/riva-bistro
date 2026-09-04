@@ -10,6 +10,12 @@ from rest_framework.views import APIView
 
 from catalog.admin_serializers import AdminCategorySerializer, AdminProductSerializer
 from catalog.models import Category, Product
+from core.images import (
+    ALLOWED_IMAGE_EXTENSIONS,
+    ALLOWED_IMAGE_TYPES,
+    MAX_IMAGE_BYTES,
+    sniff_image_kind,
+)
 
 
 class AdminCategoryListCreateView(generics.ListCreateAPIView):
@@ -46,9 +52,9 @@ class AdminProductImageView(APIView):
     permission_classes = [IsAdminUser]
     parser_classes = [MultiPartParser, FormParser]
 
-    ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
-    ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-    MAX_BYTES = 5 * 1024 * 1024
+    ALLOWED_TYPES = ALLOWED_IMAGE_TYPES
+    ALLOWED_EXTENSIONS = ALLOWED_IMAGE_EXTENSIONS
+    MAX_BYTES = MAX_IMAGE_BYTES
 
     @extend_schema(
         tags=["admin"],
@@ -72,11 +78,14 @@ class AdminProductImageView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         name = (image.name or "").lower()
-        if not any(name.endswith(ext) for ext in self.ALLOWED_EXTENSIONS) or (
-            image.content_type and image.content_type not in self.ALLOWED_TYPES
-        ):
+        if not any(name.endswith(ext) for ext in self.ALLOWED_EXTENSIONS):
             return Response(
                 {"detail": "Bilden måste vara JPG, PNG eller WebP."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if sniff_image_kind(image) is None:
+            return Response(
+                {"detail": "Filen är inte en giltig JPG, PNG eller WebP."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if image.size and image.size > self.MAX_BYTES:

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { CookieNotice } from "@/components/brand/cookie-notice";
 import { AppShell } from "@/components/layout/app-shell";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -76,6 +77,7 @@ export default function RootLayout({
           {children}
         </AppShell>
         <RestaurantJsonLd />
+        <CookieNotice />
         <Toaster />
       </body>
     </html>

@@ -48,11 +48,15 @@ def generate_slots(
     last = datetime.combine(base, closes_at) - timedelta(minutes=buffer_minutes)
     step = timedelta(minutes=max(interval_minutes, 5))
     slots: list[time] = []
+    # If the seating buffer is larger than the opening window, still offer
+    # the opening time so the guest is not shown an empty open day.
+    if last < start:
+        return [opens_at]
     cursor = start
     while cursor <= last:
         slots.append(cursor.time())
         cursor += step
-    return slots
+    return slots or [opens_at]
 
 
 def booked_guests(target: date_cls, slot: time) -> int:
@@ -81,6 +85,7 @@ def compute_availability(target: date_cls) -> dict:
         "enabled": enabled,
         "closed": False,
         "max_party_size": config.max_party_size,
+        "horizon_days": config.booking_horizon_days,
         "slots": [],
     }
 

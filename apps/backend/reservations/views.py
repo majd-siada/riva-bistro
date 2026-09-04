@@ -6,6 +6,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from core.email import send_reservation_confirmation
@@ -26,8 +27,32 @@ class HoursView(APIView):
 
     @extend_schema(tags=["hours"], responses={200: OpeningHoursSerializer(many=True)})
     def get(self, request: Request) -> Response:
-        hours = OpeningHours.objects.all()
-        return Response(OpeningHoursSerializer(hours, many=True).data)
+        WEEKDAY_LABELS = {
+            0: "Måndag",
+            1: "Tisdag",
+            2: "Onsdag",
+            3: "Torsdag",
+            4: "Fredag",
+            5: "Lördag",
+            6: "Söndag",
+        }
+        existing = {row.weekday: row for row in OpeningHours.objects.all()}
+        payload = []
+        for weekday in range(7):
+            row = existing.get(weekday)
+            if row:
+                payload.append(OpeningHoursSerializer(row).data)
+            else:
+                payload.append(
+                    {
+                        "weekday": weekday,
+                        "weekday_label": WEEKDAY_LABELS[weekday],
+                        "opens_at": None,
+                        "closes_at": None,
+                        "is_closed": True,
+                    }
+                )
+        return Response(payload)
 
 
 class AvailabilityView(APIView):
@@ -70,6 +95,8 @@ class ReservationCreateView(APIView):
 
     authentication_classes: list = []
     permission_classes: list = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "reservations"
 
     @extend_schema(
         tags=["reservations"],

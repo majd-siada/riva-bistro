@@ -35,7 +35,12 @@ function getApiBase(): string {
   if (typeof window === "undefined") {
     const internalUrl = process.env.INTERNAL_API_URL?.replace(/\/$/, "");
     const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
-    return internalUrl ?? publicUrl ?? "http://localhost:8000";
+    if (internalUrl) return internalUrl;
+    if (publicUrl && !publicUrl.includes("localhost") && !publicUrl.includes("127.0.0.1")) {
+      return publicUrl;
+    }
+    if (process.env.NODE_ENV === "production") return "https://api.rivabistro.se";
+    return publicUrl ?? "http://localhost:8000";
   }
   return resolvePublicApiOrigin(window.location.hostname);
 }
@@ -95,11 +100,17 @@ export async function checkApiHealth(): Promise<{ ok: true } | { ok: false; mess
   }
 }
 
-/** Resolve a possibly-relative media path (e.g. /media/x.webp) to an absolute URL. */
+/**
+ * Resolve image URLs for the browser.
+ * - Absolute http(s) URLs pass through.
+ * - `/media/...` paths are served by Django → prepend public API origin.
+ * - Other relative paths (`/scenes/`, `/menu/`) stay same-origin (Next.js public/).
+ */
 export function resolveImageUrl(url: string): string {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${publicApiOrigin()}${url}`;
+  if (url.startsWith("/media/")) return `${publicApiOrigin()}${url}`;
+  return url;
 }
 
 export class ApiError extends Error {
@@ -149,7 +160,7 @@ export async function fetchCategories(): Promise<Category[]> {
 
 export async function fetchProducts(category?: string): Promise<Product[]> {
   const q = category ? `?category=${encodeURIComponent(category)}` : "";
-  return apiFetch(`/menu/products${q}`);
+  return apiFetch(`/menu/products/${q}`);
 }
 
 export async function fetchFeatured(): Promise<Product[]> {
@@ -190,4 +201,52 @@ export async function sendEventInquiry(
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+export type NewsItem = {
+  id: number;
+  title: string;
+  slug: string;
+  body: string;
+  published_at: string | null;
+};
+
+export type GalleryItem = {
+  id: number;
+  title: string;
+  alt: string;
+  src: string;
+  sort_order: number;
+};
+
+export type AdminContactMessage = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  email_sent: boolean;
+  created_at: string;
+};
+
+export type AdminEventInquiry = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  event_type: string;
+  guests: string;
+  date: string;
+  message: string;
+  email_sent: boolean;
+  created_at: string;
+};
+
+export async function fetchNews(): Promise<NewsItem[]> {
+  return apiFetch("/news/", undefined, { revalidate: 120 });
+}
+
+export async function fetchGallery(): Promise<GalleryItem[]> {
+  return apiFetch("/gallery/", undefined, { revalidate: 300 });
 }

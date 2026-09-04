@@ -27,6 +27,8 @@ async function exists(filePath) {
 async function resolveStandaloneLayout(standaloneDir) {
   const flatServer = path.join(standaloneDir, "server.js");
   const nestedServer = path.join(standaloneDir, "frontend", "server.js");
+  // Docker web image: WORKDIR /app + outputFileTracingRoot parent → standalone/app/
+  const appNestedServer = path.join(standaloneDir, "app", "server.js");
 
   if (await exists(nestedServer)) {
     return {
@@ -35,6 +37,17 @@ async function resolveStandaloneLayout(standaloneDir) {
       staticDst: path.join(standaloneDir, "frontend", ".next", "static"),
       publicDst: path.join(standaloneDir, "frontend", "public"),
       nodeModulesDir: path.join(standaloneDir, "node_modules"),
+      entryShim: flatServer,
+    };
+  }
+
+  if (await exists(appNestedServer)) {
+    return {
+      layout: "app-nested",
+      serverPath: appNestedServer,
+      staticDst: path.join(standaloneDir, "app", ".next", "static"),
+      publicDst: path.join(standaloneDir, "app", "public"),
+      nodeModulesDir: path.join(standaloneDir, "app", "node_modules"),
       entryShim: flatServer,
     };
   }
@@ -84,8 +97,10 @@ async function finalizeStandalone(appDir, outputDir) {
     );
   }
 
-  if (layout.entryShim && layout.layout === "nested") {
-    await writeFile(layout.entryShim, "require('./frontend/server.js');\n", "utf8");
+  if (layout.entryShim && (layout.layout === "nested" || layout.layout === "app-nested")) {
+    const requirePath =
+      layout.layout === "app-nested" ? "./app/server.js" : "./frontend/server.js";
+    await writeFile(layout.entryShim, `require('${requirePath}');\n`, "utf8");
     console.log(`hostinger-sync: wrote standalone entry shim -> ${layout.entryShim}`);
   }
 
@@ -95,25 +110,33 @@ async function finalizeStandalone(appDir, outputDir) {
 }
 
 async function main() {
-  if (!(await exists(frontendOutput))) {
-    if (await exists(rootOutput)) {
-      console.log("hostinger-sync: finalizing standalone at repository root .next");
-      await finalizeStandalone(frontendDir, rootOutput);
-      return;
-    }
+  const cwdOutput = path.join(process.cwd(), ".next");
 
-    console.error(
-      `hostinger-sync: no Next.js output at ${frontendOutput} or ${rootOutput}`,
-    );
-    process.exit(1);
+  if (await exists(frontendOutput)) {
+    await finalizeStandalone(frontendDir, frontendOutput);
+    await cp(frontendOutput, rootOutput, { recursive: true, force: true });
+    console.log(`hostinger-sync: copied ${frontendOutput} -> ${rootOutput}`);
+    await finalizeStandalone(frontendDir, rootOutput);
+    return;
   }
 
-  await finalizeStandalone(frontendDir, frontendOutput);
+  if (await exists(rootOutput)) {
+    console.log("hostinger-sync: finalizing standalone at repository root .next");
+    await finalizeStandalone(frontendDir, rootOutput);
+    return;
+  }
 
-  await cp(frontendOutput, rootOutput, { recursive: true, force: true });
-  console.log(`hostinger-sync: copied ${frontendOutput} -> ${rootOutput}`);
+  // Docker / tooling: `next build` ran with cwd = frontend app root.
+  if (await exists(cwdOutput)) {
+    console.log(`hostinger-sync: finalizing standalone from cwd ${process.cwd()}`);
+    await finalizeStandalone(process.cwd(), cwdOutput);
+    return;
+  }
 
-  await finalizeStandalone(frontendDir, rootOutput);
+  console.error(
+    `hostinger-sync: no Next.js output at ${frontendOutput}, ${rootOutput}, or ${cwdOutput}`,
+  );
+  process.exit(1);
 }
 
 main().catch((error) => {

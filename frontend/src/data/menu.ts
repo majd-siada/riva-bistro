@@ -1,6 +1,11 @@
 /**
- * Original Riva Bistro menu (source: apps/backend seed_menu.py @ bcd372d).
- * Static display copy — prices are inkl. moms.
+ * Fallback public menu if the catalog API is unreachable or empty.
+ *
+ * Kept intentionally for resilience: production prefers Django catalog
+ * (admin CMS → GET /api/v1/menu/). This static copy is only used when the
+ * API fails so the site still shows dishes instead of an empty menu.
+ * Prices inkl. moms (12 %). Do not treat this as the source of truth once
+ * the catalog is seeded in production.
  */
 
 export interface MenuCategory {

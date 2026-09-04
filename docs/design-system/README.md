@@ -1,81 +1,46 @@
 # RIVA BISTRO Design System
 
-Production-ready visual identity and component library for the Riva Bistro restaurant website and table-booking flow.
+Visual identity for the Riva Bistro restaurant website and table-booking flow.
 
 ## Brand Tokens
 
-Source of truth: [`frontend/packages/design-tokens/tokens.json`](../../frontend/packages/design-tokens/tokens.json)
+Source of truth in code: [`frontend/src/app/globals.css`](../../frontend/src/app/globals.css)
+
+Mirror for design tools: [`frontend/packages/design-tokens/tokens.json`](../../frontend/packages/design-tokens/tokens.json)
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--riva-charcoal-deep` | `#0F1418` | Dark surfaces |
-| `--riva-ivory` | `#F4F0E6` | Primary text |
-| `--riva-gold` | `#BFA06A` | Accents (restrained) |
-| `--riva-teal` | `#5E8B8B` | CTAs, links, success |
-| `--riva-error` | `#C45C5C` | Errors |
-| `--riva-success` | `#5E8B6E` | Confirmation |
-
-CSS implementation: [`frontend/src/app/globals.css`](../../frontend/src/app/globals.css)
+| `--riva-black` | `#050404` | Page background |
+| `--riva-surface` | `#0d0b0a` | Alternate sections |
+| `--riva-card` | `#120f0e` | Cards, forms |
+| `--riva-cream` | `#f5f2e8` | Primary text |
+| `--riva-muted` | `#ada89c` | Secondary text |
+| `--riva-gold` | `#b8853d` | Accents and primary CTAs |
+| `--riva-error` | `#c45c5c` | Errors |
+| `--riva-success` | `#5e8b6e` | Confirmation |
 
 ## Typography
 
-- **Display:** Cormorant Garamond — editorial headings (H1–H4)
-- **UI:** Source Sans 3 — body, labels, buttons, prices (tabular nums)
+- **Display:** Playfair Display — headings
+- **UI:** DM Sans — body, labels, buttons, prices (tabular nums)
 
 ## Components
 
-All components live in `frontend/src/components/ui/`:
+`frontend/src/components/ui/` — Button (gold primary), Input, Card, Badge, Sheet, Dialog, Toast, Skeleton, StateMessage.
 
-| Component | Variants |
-|-----------|----------|
-| Button | default (teal), secondary, gold, outline, ghost, link, destructive, loading |
-| Input / Textarea | default, error |
-| Card | product, content |
-| Badge | available, soldOut, vat |
-| Tabs | category navigation |
-| Dialog / Sheet | modals, mobile navigation |
-| Toast (Sonner) | confirmations, errors |
-| Skeleton | loading states |
-| StateMessage | empty, error, success, loading |
-
-Menu & brand: `PriceDisplay`, `ProductImage`, `ProductCard`, `ProductDetail`, `ReservationForm`, `WaveDivider`
-
-## Responsive Breakpoints
-
-| Name | Width |
-|------|-------|
-| Mobile | 375px+ |
-| Tablet | 768px+ |
-| Desktop | 1280px+ |
-| Wide | 1440px+ |
-
-Mobile-first layout. Slide-in sheet for navigation on mobile.
+Brand: `HoursStrip`, `CTASection`, `RestaurantInfo`, `RestaurantImage`, `Logo`, `SectionHeading`.
 
 ## Pricing
 
-All customer-facing prices show **inkl. moms** (25% VAT). The dish detail page also shows the ex-VAT price and VAT amount for reference.
+Customer-facing food prices are **inkl. moms at 12%** (Swedish restaurant VAT). Display via `formatPrice`.
 
 ## Accessibility
 
-- WCAG AA contrast on charcoal/teal/ivory pairings
-- Gold focus rings on all interactive elements
-- `prefers-reduced-motion` disables animations
-- Keyboard navigation for modals, tabs, and mobile navigation
-
-## Figma Handoff
-
-Figma MCP authentication is required to create the Figma file. Code Connect mapping stub: [`frontend/src/components/ui/button.figma.ts`](../../frontend/src/components/ui/button.figma.ts)
-
-Import tokens from `frontend/packages/design-tokens/tokens.json` when building the Figma variable collections.
+- Gold focus rings
+- `prefers-reduced-motion`
+- Skip link to `#main-content`
+- `lang="sv"`
 
 ## Pages
 
-`/` (hem), `/meny`, `/meny/[slug]`, `/boka`, `/om-oss`, `/kontakt`
-
-Online ordering (cart, checkout, order tracking, account) and the commerce admin dashboard have been removed from scope — the site is a restaurant website with table booking only.
-
-## API
-
-Backend menu domain: `apps/backend/catalog/` (public menu endpoints under `/api/v1/menu/`).
-
-Seed menu: `python manage.py seed_menu`
+`/`, `/meny`, `/boka`, `/om-oss`, `/galleri`, `/privata-event`, `/kontakt`, `/admin/*`
