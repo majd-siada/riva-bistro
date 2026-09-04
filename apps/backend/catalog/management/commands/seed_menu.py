@@ -17,6 +17,7 @@ def ex_vat(inc: int) -> Decimal:
 
 
 CATEGORIES = [
+    ("Förrätter", "forratter", "Små rätter som väcker aptiten."),
     ("Varmrätter", "varmratter", "Husets varma rätter, tillagade med omsorg."),
     ("Sallader", "sallader", "Fräscha sallader med säsongens råvaror."),
     ("Pasta", "pasta", "Italienskt hantverk, à la Riva."),
@@ -26,6 +27,29 @@ CATEGORIES = [
 
 # (category_slug, name, slug, description, price_inc_vat)
 PRODUCTS = [
+    (
+        "forratter",
+        "Toast skagen Mediterranio",
+        "toast-skagen-mediterranio",
+        "Handskalade räkor, örtmajonnäs, löjrom och rostat bröd, Kökets rekommendation",
+        95,
+    ),
+    (
+        "forratter",
+        "Vitlöksgratinerade blå musslor",
+        "vitloksgratinerade-bla-musslor",
+        "Blåmusslor, vitlökssmör, örter och bröd",
+        90,
+    ),
+    ("forratter", "Råraka", "raraka", "Klassisk tillbehör", 105),
+    (
+        "forratter",
+        "Ost & Chark för två",
+        "ost-chark-for-tva",
+        "Urval av lagrade ostar och charkuterier, tillbehör",
+        245,
+    ),
+    ("forratter", "Vitlöksbröd", "vitloksbrod", "", 49),
     ("varmratter", "Entrecôte", "entrecote", "Grillad entrecôte med tillbehör.", 305),
     ("varmratter", "Grillad lammracks", "grillad-lammracks", "Grillad lammracks, säsongens tillbehör.", 315),
     ("varmratter", "Rivas köttbullar", "rivas-kottbullar", "Husets köttbullar med gräddsås och lingon.", 185),

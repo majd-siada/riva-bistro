@@ -23,6 +23,7 @@ export interface MenuItem {
 }
 
 export const MENU_CATEGORIES: MenuCategory[] = [
+  { name: "Förrätter", slug: "forratter", description: "Små rätter som väcker aptiten." },
   { name: "Varmrätter", slug: "varmratter", description: "Husets varma rätter, tillagade med omsorg." },
   { name: "Sallader", slug: "sallader", description: "Fräscha sallader med säsongens råvaror." },
   { name: "Pasta", slug: "pasta", description: "Italienskt hantverk, à la Riva." },
@@ -31,6 +32,30 @@ export const MENU_CATEGORIES: MenuCategory[] = [
 ];
 
 export const MENU_ITEMS: MenuItem[] = [
+  {
+    categorySlug: "forratter",
+    name: "Toast skagen Mediterranio",
+    slug: "toast-skagen-mediterranio",
+    description:
+      "Handskalade räkor, örtmajonnäs, löjrom och rostat bröd, Kökets rekommendation",
+    priceIncVat: 95,
+  },
+  {
+    categorySlug: "forratter",
+    name: "Vitlöksgratinerade blå musslor",
+    slug: "vitloksgratinerade-bla-musslor",
+    description: "Blåmusslor, vitlökssmör, örter och bröd",
+    priceIncVat: 90,
+  },
+  { categorySlug: "forratter", name: "Råraka", slug: "raraka", description: "Klassisk tillbehör", priceIncVat: 105 },
+  {
+    categorySlug: "forratter",
+    name: "Ost & Chark för två",
+    slug: "ost-chark-for-tva",
+    description: "Urval av lagrade ostar och charkuterier, tillbehör",
+    priceIncVat: 245,
+  },
+  { categorySlug: "forratter", name: "Vitlöksbröd", slug: "vitloksbrod", description: "", priceIncVat: 49 },
   { categorySlug: "varmratter", name: "Entrecôte", slug: "entrecote", description: "Grillad entrecôte med tillbehör.", priceIncVat: 305 },
   { categorySlug: "varmratter", name: "Grillad lammracks", slug: "grillad-lammracks", description: "Grillad lammracks, säsongens tillbehör.", priceIncVat: 315 },
   { categorySlug: "varmratter", name: "Rivas köttbullar", slug: "rivas-kottbullar", description: "Husets köttbullar med gräddsås och lingon.", priceIncVat: 185 },
