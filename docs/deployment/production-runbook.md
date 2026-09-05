@@ -155,9 +155,17 @@ In the browser: home, meny, boka, admin login path. Media under `/media/` should
 
 Expected while `production_ready=false` (even with real hours configured):
 
-- `GET /api/v1/hours/` → weekdays with owner-confirmed opens/closes
-- `GET /api/v1/reservations/availability/?date=...` → `enabled: false` (slots only once ready)
+- `GET /api/v1/hours/` → weekdays with owner-confirmed opens/closes (not all-null stubs)
+- `GET /api/v1/reservations/availability/?date=...` on an **open** day →
+  `closed: false`, `enabled: false`, slots listed from OpeningHours
+  (`closed` = restaurant shut; `enabled` = online booking allowed — keep distinct)
+- `GET .../availability/` on a **closed** day → `closed: true`, `enabled: false`, `slots: []`
 - `POST /api/v1/reservations/` → **503** with `code: not_enabled` when not production-ready (with `DJANGO_DEBUG=false`)
+
+If `/api/v1/hours/` still returns seven `is_closed: true` / null opens/closes rows,
+OpeningHours were **not** applied to the API database — availability will correctly
+report `closed: true` for every day until `seed_reservations` succeeds against that DB.
+The public website may still show official hours via a frontend fallback; trust the API.
 
 ### Seed safety (do not overwrite owner hours)
 
@@ -187,10 +195,12 @@ Overwrite everything only with explicit owner approval:
 #   python manage.py seed_reservations --force-hours
 ```
 
-Verify afterward:
+Verify afterward (Sunday must show 10:30–21:00, not null/closed):
 
 ```bash
 curl -fsS https://api.rivabistro.se/api/v1/hours/
+curl -fsS "https://api.rivabistro.se/api/v1/reservations/availability/?date=2026-09-06&party_size=2"
+# Expect: closed=false, enabled=false, slots from 10:30… while production_ready is false
 ```
 
 ### Admin checks (no credentials in this doc)

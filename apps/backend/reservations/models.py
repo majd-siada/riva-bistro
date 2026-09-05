@@ -31,7 +31,7 @@ class OpeningHours(models.Model):
 
     def __str__(self) -> str:
         label = dict(WEEKDAYS)[self.weekday]
-        if self.is_closed or not self.opens_at or not self.closes_at:
+        if self.is_closed or self.opens_at is None or self.closes_at is None:
             return f"{label}: stängt"
         return f"{label}: {self.opens_at:%H:%M}–{self.closes_at:%H:%M}"
 

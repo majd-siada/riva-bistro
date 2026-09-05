@@ -79,7 +79,7 @@ class Command(BaseCommand):
             skipped += 1
 
         # Ensure settings singleton exists; do not change production_ready.
-        ReservationSettings.load()
+        settings_obj = ReservationSettings.load()
 
         if all_placeholders and not force:
             self.stdout.write(
@@ -95,3 +95,16 @@ class Command(BaseCommand):
                     f"preserved={skipped}."
                 )
             )
+
+        # Always dump the resulting week so operators can verify the live DB
+        # (avoids mistaking frontend fallback hours for seeded API data).
+        self.stdout.write("Current OpeningHours in database:")
+        for row in OpeningHours.objects.order_by("weekday"):
+            if row.is_closed or row.opens_at is None or row.closes_at is None:
+                detail = "CLOSED (null times)" if row.opens_at is None else "CLOSED"
+            else:
+                detail = f"{row.opens_at:%H:%M}–{row.closes_at:%H:%M}"
+            self.stdout.write(f"  weekday={row.weekday} {row.get_weekday_display()}: {detail}")
+        self.stdout.write(
+            f"production_ready={settings_obj.production_ready} (unchanged by this command)."
+        )

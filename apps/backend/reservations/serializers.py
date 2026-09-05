@@ -99,8 +99,19 @@ class AvailabilitySlotSerializer(serializers.Serializer):
 
 class AvailabilitySerializer(serializers.Serializer):
     date = serializers.CharField()
-    enabled = serializers.BooleanField()
-    closed = serializers.BooleanField()
+    enabled = serializers.BooleanField(
+        help_text=(
+            "Online booking allowed. False when production_ready is False "
+            "(and DEBUG is off). Independent of restaurant open/closed."
+        )
+    )
+    closed = serializers.BooleanField(
+        help_text=(
+            "Restaurant closed for this calendar date (opening hours, special "
+            "closure, or date outside the bookable window). Must not be set "
+            "merely because online booking is disabled."
+        )
+    )
     max_party_size = serializers.IntegerField()
     horizon_days = serializers.IntegerField(required=False)
     slots = AvailabilitySlotSerializer(many=True)

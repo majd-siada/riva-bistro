@@ -19,6 +19,9 @@ def instant_booking_enabled(config: ReservationSettings | None = None) -> bool:
     """Instant confirmation is only allowed when we are confident the capacity
     is real: always in DEBUG (dev placeholder), and in production only once
     staff have explicitly flipped ``production_ready`` on.
+
+    This gate drives AvailabilityResponse.enabled only. It must never set
+    closed=True — that field means the restaurant is shut for the date.
     """
     if settings.DEBUG:
         return True
@@ -27,14 +30,19 @@ def instant_booking_enabled(config: ReservationSettings | None = None) -> bool:
 
 
 def opening_for_date(target: date_cls) -> tuple[bool, time | None, time | None]:
-    """Return (is_open, opens_at, closes_at) for a given date."""
+    """Return (is_open, opens_at, closes_at) for a calendar date.
+
+    Weekday uses Python/Django convention: Monday=0 … Sunday=6
+    (``date.weekday()``), matching ``OpeningHours.weekday``.
+    Uses explicit ``is None`` checks so midnight closes (00:00) stay valid.
+    """
     if SpecialClosure.objects.filter(date=target).exists():
         return False, None, None
     try:
         hours = OpeningHours.objects.get(weekday=target.weekday())
     except OpeningHours.DoesNotExist:
         return False, None, None
-    if hours.is_closed or not hours.opens_at or not hours.closes_at:
+    if hours.is_closed or hours.opens_at is None or hours.closes_at is None:
         return False, None, None
     return True, hours.opens_at, hours.closes_at
 
@@ -85,6 +93,18 @@ def _slot_is_bookable(target: date_cls, slot: time, config: ReservationSettings)
 
 
 def compute_availability(target: date_cls) -> dict:
+    """Build the public availability payload for a calendar date.
+
+    Semantics (keep distinct):
+    - closed=True  → restaurant not open that calendar day (or date out of range)
+    - enabled=False → online booking disabled (e.g. production_ready=False);
+      the restaurant may still be open (closed=False) with slots listed
+    - enabled=True and closed=False → bookable slots when capacity remains
+
+    ``target`` is a naive calendar date from the query string (YYYY-MM-DD).
+    It is not timezone-shifted; Europe/Stockholm applies only to ``today``
+    and same-day lead-time checks.
+    """
     config = ReservationSettings.load()
     enabled = instant_booking_enabled(config)
 

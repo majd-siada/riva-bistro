@@ -47,12 +47,22 @@ Staff manage status from the admin (`/admin/bokningar`).
 
 ## Availability inputs
 
-- Regular / seasonal opening hours
+- Regular / seasonal opening hours (`OpeningHours`, weekday Monday=0 … Sunday=6)
 - Special closures (override hours)
 - Restaurant capacity
 - Party size
 - Existing non-cancelled reservations
 - Configurable booking rules (lead time, slot length, max party size)
+
+Availability response fields (keep distinct):
+
+| Field | Meaning |
+|-------|---------|
+| `closed` | Restaurant not open that calendar day (hours / closure / out of horizon) |
+| `enabled` | Online booking allowed (`production_ready` when `DEBUG` is off) |
+
+`production_ready=false` must yield `enabled=false` without forcing `closed=true`
+on an open day.
 
 Business logic lives in a **service/domain layer**, not serializers or React components.
 

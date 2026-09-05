@@ -189,6 +189,8 @@ def test_production_guard_blocks_when_not_ready(api, settings):
         f"/api/v1/reservations/availability/?date={target.isoformat()}"
     )
     assert availability.json()["enabled"] is False
+    assert availability.json()["closed"] is False
+    assert len(availability.json()["slots"]) > 0
 
     resp = api.post(
         "/api/v1/reservations/",
@@ -743,3 +745,194 @@ def test_friday_midnight_close_includes_late_evening_slots(api):
     assert "23:00" in times
     assert "00:00" not in times
     assert "10:30" not in times
+
+
+@pytest.mark.django_db
+def test_sunday_2026_09_06_open_with_official_hours(api, settings):
+    """Regression: Sunday 2026-09-06 is weekday 6, open 10:30–21:00.
+
+    production_ready=False must yield enabled=False without closed=True.
+    """
+    from unittest.mock import patch
+
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    settings.DEBUG = False
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    sunday = date(2026, 9, 6)
+    assert sunday.weekday() == 6
+    opens, closes, closed = OFFICIAL_OPENING_HOURS[6]
+    assert closed is False
+    assert opens == time(10, 30)
+    assert closes == time(21, 0)
+
+    hours_api = api.get("/api/v1/hours/")
+    sunday_row = next(r for r in hours_api.json() if r["weekday"] == 6)
+    assert sunday_row["is_closed"] is False
+    assert sunday_row["opens_at"].startswith("10:30")
+    assert sunday_row["closes_at"].startswith("21:00")
+
+    with patch("reservations.availability.timezone.localdate", return_value=date(2026, 9, 5)):
+        avail = api.get(
+            "/api/v1/reservations/availability/?date=2026-09-06&party_size=2"
+        )
+    assert avail.status_code == 200
+    body = avail.json()
+    assert body["date"] == "2026-09-06"
+    assert body["closed"] is False
+    assert body["enabled"] is False
+    times = [s["time"] for s in body["slots"]]
+    assert "10:30" in times
+    assert "20:00" in times or "20:30" in times
+    assert "21:00" not in times
+
+
+@pytest.mark.django_db
+def test_open_day_production_ready_false_is_not_restaurant_closed(api, settings):
+    """Bookings disabled ≠ restaurant closed."""
+    settings.DEBUG = False
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    target = _next_weekday(0)  # Monday — always open in official schedule
+    resp = api.get(f"/api/v1/reservations/availability/?date={target.isoformat()}")
+    body = resp.json()
+    assert body["closed"] is False
+    assert body["enabled"] is False
+    assert len(body["slots"]) > 0
+
+    create = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna-guard@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert create.status_code == 503
+    assert create.json()["code"] == "not_enabled"
+
+
+@pytest.mark.django_db
+def test_genuine_closed_weekday_reports_closed_true(api, settings):
+    """An intentional closed weekday must still return closed=true."""
+    settings.DEBUG = False
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    OpeningHours.objects.filter(weekday=2).update(
+        opens_at=None, closes_at=None, is_closed=True
+    )
+    target = _next_weekday(2)
+    body = api.get(
+        f"/api/v1/reservations/availability/?date={target.isoformat()}"
+    ).json()
+    assert body["closed"] is True
+    assert body["enabled"] is False
+    assert body["slots"] == []
+
+
+@pytest.mark.django_db
+def test_availability_reads_same_opening_hours_as_hours_api(api, settings):
+    """Hours endpoint and availability must share OpeningHours rows."""
+    from datetime import datetime
+    from unittest.mock import patch
+    from zoneinfo import ZoneInfo
+
+    settings.DEBUG = False
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    hours_rows = {r["weekday"]: r for r in api.get("/api/v1/hours/").json()}
+    # Pin calendar "today" and clock so same-day lead-time does not empty slots.
+    pinned = date(2026, 9, 1)
+    morning = datetime(2026, 9, 1, 8, 0, tzinfo=ZoneInfo("Europe/Stockholm"))
+    with (
+        patch("reservations.availability.timezone.localdate", return_value=pinned),
+        patch("reservations.availability.timezone.localtime", return_value=morning),
+    ):
+        for weekday in range(7):
+            target = pinned
+            while target.weekday() != weekday:
+                target += timedelta(days=1)
+            avail = api.get(
+                f"/api/v1/reservations/availability/?date={target.isoformat()}"
+            ).json()
+            row = hours_rows[weekday]
+            if row["is_closed"] or row["opens_at"] is None:
+                assert avail["closed"] is True
+                assert avail["slots"] == []
+            else:
+                assert avail["closed"] is False
+                assert avail["enabled"] is False
+                assert avail["slots"][0]["time"] == row["opens_at"][:5]
+
+
+@pytest.mark.django_db
+def test_date_query_not_timezone_shifted_to_wrong_weekday(api, settings):
+    """ISO date query is a calendar date; it is not converted via timezone."""
+    from unittest.mock import patch
+
+    from reservations.availability import opening_for_date
+
+    settings.DEBUG = False
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    sunday = date(2026, 9, 6)
+    assert sunday.weekday() == 6
+
+    is_open, opens_at, closes_at = opening_for_date(sunday)
+    assert is_open is True
+    assert opens_at == time(10, 30)
+    assert closes_at == time(21, 0)
+
+    # Even if "now" is interpreted in UTC, the requested YYYY-MM-DD stays Sunday.
+    with patch(
+        "reservations.availability.timezone.localdate",
+        return_value=date(2026, 9, 5),
+    ):
+        body = api.get(
+            "/api/v1/reservations/availability/?date=2026-09-06&party_size=2"
+        ).json()
+    assert body["date"] == "2026-09-06"
+    assert body["closed"] is False
+    assert body["enabled"] is False
+    assert body["slots"][0]["time"] == "10:30"
+
+@pytest.mark.django_db
+def test_placeholder_hours_report_closed_not_merely_disabled(api, settings):
+    """Uninitialized OpeningHours → restaurant closed, not only booking-off."""
+    settings.DEBUG = False
+    OpeningHours.objects.all().delete()
+    for weekday in range(7):
+        OpeningHours.objects.create(
+            weekday=weekday, opens_at=None, closes_at=None, is_closed=True
+        )
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+
+    target = _next_weekday(6)  # Sunday
+    body = api.get(
+        f"/api/v1/reservations/availability/?date={target.isoformat()}"
+    ).json()
+    assert body["closed"] is True
+    assert body["enabled"] is False
+    assert body["slots"] == []
