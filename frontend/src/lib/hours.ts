@@ -27,7 +27,8 @@ export function todayHoursLabel(hours: OpeningHour[]): string {
 export function compactHoursLabel(hours: OpeningHour[]): string {
   if (!hours.length) return business.restaurantHoursLabel;
   const open = hours.filter((h) => !h.is_closed && h.opens_at);
-  if (!open.length) return "Stängt";
+  // Uninitialized API stubs (all closed) should not render as permanently closed.
+  if (!open.length) return business.restaurantHoursLabel;
   const same = open.every(
     (h) => h.opens_at === open[0].opens_at && h.closes_at === open[0].closes_at,
   );

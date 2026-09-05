@@ -7,12 +7,22 @@ import {
   type NewsItem,
   type OpeningHour,
 } from "@/lib/api";
+import {
+  isUninitializedHours,
+  officialHoursAsOpeningHours,
+} from "@/config/opening-hours";
 
 export async function loadHours(): Promise<OpeningHour[]> {
   try {
-    return await fetchHours();
+    const hours = await fetchHours();
+    // Production may return seven synthetic "closed" stubs before seed/Admin
+    // fills real times. Fall back to the official schedule for public display.
+    if (isUninitializedHours(hours)) {
+      return officialHoursAsOpeningHours();
+    }
+    return hours;
   } catch {
-    return [];
+    return officialHoursAsOpeningHours();
   }
 }
 
