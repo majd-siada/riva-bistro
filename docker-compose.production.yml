@@ -1,0 +1,39 @@
+# Production backend only. Do NOT use docker-compose.yml for production
+# (that file includes local Postgres and overrides the image CMD to runserver).
+#
+# Expects host PostgreSQL via DATABASE_URL in .env.
+# Nginx terminates TLS and proxies to 127.0.0.1:8000.
+#
+# Usage (on the VPS, from the repo root):
+#   docker compose -f docker-compose.production.yml up -d --build
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    container_name: riva-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+      # Prefer DATABASE_URL from .env (host Postgres). Do not invent credentials here.
+    # Image CMD is gunicorn — do not override with runserver.
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - riva_media_data:/app/media
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/')\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+volumes:
+  riva_media_data:

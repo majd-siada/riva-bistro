@@ -24,3 +24,22 @@ def test_openapi_schema_requires_staff() -> None:
     client = APIClient()
     response = client.get("/api/v1/schema/", HTTP_ACCEPT="application/json")
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_health_endpoint_degraded_when_database_unavailable(monkeypatch) -> None:
+    from django.db import connection
+    from django.db.utils import OperationalError
+
+    def boom() -> None:
+        raise OperationalError("simulated outage")
+
+    monkeypatch.setattr(connection, "ensure_connection", boom)
+
+    client = APIClient()
+    response = client.get(reverse("health"))
+
+    assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
+    body = response.json()
+    assert body["status"] == "degraded"
+    assert body["database"] == "unavailable"

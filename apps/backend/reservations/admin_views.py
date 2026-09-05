@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date as date_cls
 
 from django.db.models import Q, Sum
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
@@ -174,7 +175,7 @@ class AdminReservationOverviewView(APIView):
 
     @extend_schema(tags=["admin"], responses={200: AdminOverviewSerializer})
     def get(self, request: Request) -> Response:
-        today = date_cls.today()
+        today = timezone.localdate()
         todays = Reservation.objects.filter(
             date=today, status__in=Reservation.ACTIVE_STATUSES
         )

@@ -261,3 +261,64 @@ def test_generate_slots_when_buffer_eats_window():
 
     slots = generate_slots(time_cls(18, 0), time_cls(19, 0), 30, 180)
     assert slots == [time_cls(18, 0)]
+
+
+@pytest.mark.django_db
+def test_weekday_closed_availability_and_create(api):
+    """A weekday marked is_closed must report closed and reject create."""
+    _open_all_week()
+    target = _target_date(days=3)
+    OpeningHours.objects.update_or_create(
+        weekday=target.weekday(),
+        defaults={"opens_at": None, "closes_at": None, "is_closed": True},
+    )
+
+    availability = api.get(
+        f"/api/v1/reservations/availability/?date={target.isoformat()}"
+    )
+    assert availability.status_code == 200
+    assert availability.json()["closed"] is True
+
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 409
+    assert resp.json()["code"] == "closed"
+
+
+@pytest.mark.django_db
+def test_booking_horizon_rejects_far_future(api):
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.booking_horizon_days = 7
+    config.save()
+    far = _target_date(days=30)
+
+    availability = api.get(
+        f"/api/v1/reservations/availability/?date={far.isoformat()}"
+    )
+    assert availability.json()["closed"] is True
+
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": far.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code in (400, 409)
+    assert resp.json()["code"] in {"past", "closed"}

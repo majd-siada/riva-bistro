@@ -39,7 +39,31 @@ else:
     raise ImproperlyConfigured(
         "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is false."
     )
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,backend")
+_LOCAL_HOST_DEFAULT = "localhost,127.0.0.1,backend"
+_CORS_DEFAULT = (
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:3001,http://127.0.0.1:3001"
+)
+
+
+def _is_localhost_only(hosts: list[str]) -> bool:
+    if not hosts:
+        return True
+    local_markers = ("localhost", "127.0.0.1", "backend", "0.0.0.0", "::1")
+    return all(
+        any(marker in host.lower() for marker in local_markers) for host in hosts
+    )
+
+
+if DEBUG or _running_tests:
+    ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", _LOCAL_HOST_DEFAULT)
+else:
+    ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "")
+    if not ALLOWED_HOSTS or _is_localhost_only(ALLOWED_HOSTS):
+        raise ImproperlyConfigured(
+            "DJANGO_ALLOWED_HOSTS must list the public API host(s) when "
+            "DJANGO_DEBUG is false (e.g. api.rivabistro.se)."
+        )
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -106,7 +130,7 @@ def _database_from_url(url: str) -> dict:
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
     DATABASES = {"default": _database_from_url(DATABASE_URL)}
-else:
+elif DEBUG or _running_tests:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -117,6 +141,10 @@ else:
             "PORT": os.getenv("POSTGRES_PORT", "5432"),
         }
     }
+else:
+    raise ImproperlyConfigured(
+        "DATABASE_URL must be set when DJANGO_DEBUG is false."
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -150,14 +178,25 @@ MEDIA_SERVE = env_bool("MEDIA_SERVE", default=True)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-_CORS_DEFAULT = (
-    "http://localhost:3000,http://127.0.0.1:3000,"
-    "http://localhost:3001,http://127.0.0.1:3001"
-)
-CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", _CORS_DEFAULT)
+if DEBUG or _running_tests:
+    CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", _CORS_DEFAULT)
+    CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", _CORS_DEFAULT)
+else:
+    CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", "")
+    CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
+    if not CORS_ALLOWED_ORIGINS or _is_localhost_only(CORS_ALLOWED_ORIGINS):
+        raise ImproperlyConfigured(
+            "DJANGO_CORS_ALLOWED_ORIGINS must list the public frontend origin(s) "
+            "when DJANGO_DEBUG is false."
+        )
+    if not CSRF_TRUSTED_ORIGINS or _is_localhost_only(CSRF_TRUSTED_ORIGINS):
+        raise ImproperlyConfigured(
+            "DJANGO_CSRF_TRUSTED_ORIGINS must list trusted HTTPS origins when "
+            "DJANGO_DEBUG is false."
+        )
+
 # Staff admin UI calls the API cross-origin with the session cookie.
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", _CORS_DEFAULT)
 
 if DEBUG:
     # Local dev often runs Next on alternate ports (e.g. 3001 when 3000 is busy).
@@ -197,6 +236,8 @@ REST_FRAMEWORK = {
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_HTTPONLY = True
+# Admin SPA reads csrftoken via document.cookie (must remain readable by JS).
+CSRF_COOKIE_HTTPONLY = False
 _cookie_samesite = os.getenv("DJANGO_COOKIE_SAMESITE", "Lax").strip()
 if _cookie_samesite.lower() == "none":
     SESSION_COOKIE_SAMESITE = "None"
@@ -245,6 +286,10 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
+    # TLS terminates at Nginx; do not enable SECURE_SSL_REDIRECT (proxy loops).
+    SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_REFERRER_POLICY = "same-origin"
     # Cross-site admin (rivabistro.se → api.rivabistro.se) needs SameSite=None.
     if SESSION_COOKIE_SAMESITE == "None":
         SESSION_COOKIE_SECURE = True

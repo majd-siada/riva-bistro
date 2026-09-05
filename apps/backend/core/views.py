@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from django.db import connection
-from django.db.utils import OperationalError
+from django.db import DatabaseError, connection
+from django.db.utils import InterfaceError, OperationalError
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.request import Request
@@ -58,7 +58,7 @@ class HealthView(APIView):
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
                 cursor.fetchone()
-        except OperationalError as exc:
+        except (OperationalError, InterfaceError, DatabaseError) as exc:
             payload = {
                 "status": "degraded",
                 "service": "riva-bistro-backend",

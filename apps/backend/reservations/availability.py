@@ -89,9 +89,8 @@ def compute_availability(target: date_cls) -> dict:
         "slots": [],
     }
 
-    if target < date_cls.today() or target > date_cls.today() + timedelta(
-        days=config.booking_horizon_days
-    ):
+    today = timezone.localdate()
+    if target < today or target > today + timedelta(days=config.booking_horizon_days):
         result["closed"] = True
         return result
 

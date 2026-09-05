@@ -126,7 +126,10 @@ export function ReservationForm() {
         err instanceof ApiError ? err.message : "Något gick fel. Försök igen.";
       setServerError(message);
       // The slot may have filled up — refresh availability so the UI is honest.
-      if (err instanceof ApiError && (err.code === "full" || err.code === "closed")) {
+      if (
+        err instanceof ApiError &&
+        (err.code === "full" || err.code === "closed" || err.code === "not_enabled")
+      ) {
         fetchAvailability(date).then(setAvailability).catch(() => {});
         setTime("");
       }

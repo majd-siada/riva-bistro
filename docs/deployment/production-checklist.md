@@ -233,3 +233,6 @@ docker compose up --build
 ```
 
 See root [`.env.example`](../../.env.example) for local defaults vs the production block above.
+
+
+See also: [production-runbook.md](./production-runbook.md) for deploy / rollback / verification commands.
