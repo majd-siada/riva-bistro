@@ -183,6 +183,32 @@ Expected while `production_ready=false` (even with real hours configured):
 - `GET .../availability/` on a **closed** day → `closed: true`, `enabled: false`, `slots: []`
 - `POST /api/v1/reservations/` → **503** with `code: not_enabled` when not production-ready (with `DJANGO_DEBUG=false`)
 
+### Staff notifications (Telegram + email)
+
+After a reservation row is **committed**, the API best-effort sends:
+
+1. Telegram message to `TELEGRAM_CHAT_ID` via `@RivaB_bot` (`TELEGRAM_BOT_TOKEN`)
+2. Staff email to `RESTAURANT_NOTIFICATION_EMAIL` (Hostinger Mail API if configured, else Django SMTP)
+
+Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified` avoid duplicate alerts on idempotent retries.
+
+Configure on the VPS `.env` (never commit real secrets):
+
+```bash
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+HOSTINGER_MAIL_API_TOKEN=          # optional
+HOSTINGER_MAIL_MAILBOX_RESOURCE_ID= # optional
+RESTAURANT_NOTIFICATION_EMAIL=
+```
+
+Discover chat id after messaging the bot:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py telegram_discover_chat
+```
+
 If `/api/v1/hours/` still returns seven `is_closed: true` / null opens/closes rows,
 OpeningHours were **not** applied to the API database — availability will correctly
 report `closed: true` for every day until `seed_reservations` succeeds against that DB.

@@ -270,6 +270,17 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "Riva Bistro <no-reply@riva
 # real delivery stays off until this is configured.
 RESTAURANT_NOTIFICATION_EMAIL = os.getenv("RESTAURANT_NOTIFICATION_EMAIL", "")
 
+# --- Staff reservation notifications (Telegram + optional Hostinger Mail API) ---
+# Never hardcode tokens. Leave blank to disable that channel.
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+# Hostinger Mail API (pip: hostinger_mail_api). Bearer token + mailbox resource id
+# from Hostinger. Staff alerts fall back to Django EMAIL_* if these are unset.
+HOSTINGER_MAIL_API_TOKEN = os.getenv("HOSTINGER_MAIL_API_TOKEN", "").strip()
+HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = os.getenv(
+    "HOSTINGER_MAIL_MAILBOX_RESOURCE_ID", ""
+).strip()
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Riva Bistro API",
     "DESCRIPTION": "OpenAPI contract for Riva Bistro — menu and reservations.",

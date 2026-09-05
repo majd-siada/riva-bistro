@@ -6,6 +6,9 @@ psycopg[binary]>=3.2,<4.0
 python-dotenv>=1.0,<2.0
 gunicorn>=23.0,<24.0
 whitenoise>=6.8,<7.0
+# Hostinger managed-mailbox send API (staff reservation alerts). Optional at
+# runtime if unset; staff email then uses Django SMTP/console instead.
+hostinger_mail_api>=1.18,<2.0
 
 # Testing / quality
 pytest>=8.3,<9.0

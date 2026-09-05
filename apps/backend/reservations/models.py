@@ -104,6 +104,10 @@ class Reservation(models.Model):
         max_length=20, choices=Status.choices, default=Status.CONFIRMED
     )
     confirmation_email_sent = models.BooleanField(default=False)
+    # Staff notification flags — set only after a successful post-commit send.
+    # Prevents duplicate Telegram/email alerts on idempotent create retries.
+    telegram_notified = models.BooleanField(default=False)
+    staff_email_notified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

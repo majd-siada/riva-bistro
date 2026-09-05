@@ -10,6 +10,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from core.email import send_reservation_confirmation
+from core.notifications import schedule_reservation_notifications
 from reservations.availability import compute_availability
 from reservations.booking import BookingError, create_reservation
 from reservations.models import OpeningHours
@@ -116,13 +117,14 @@ class ReservationCreateView(APIView):
                 status=exc.http_status,
             )
 
-        # Confirmation email is best-effort: the booking is already confirmed in
-        # the database, so a mail failure must not turn a real success into an
-        # error. We record whether it actually went out.
+        # Booking is already committed. Guest confirmation + staff Telegram/email
+        # are best-effort and must never roll back or fail the HTTP success.
         email_sent = send_reservation_confirmation(reservation)
         if email_sent and not reservation.confirmation_email_sent:
             reservation.confirmation_email_sent = True
             reservation.save(update_fields=["confirmation_email_sent"])
+
+        schedule_reservation_notifications(reservation)
 
         body = ReservationSerializer(reservation).data
         body["email_sent"] = email_sent

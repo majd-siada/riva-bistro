@@ -157,11 +157,41 @@ DEFAULT_FROM_EMAIL=Riva Bistro <no-reply@rivabistro.se>
 RESTAURANT_NOTIFICATION_EMAIL=<staff inbox>
 ```
 
-| Flow | Needs SMTP + from | Needs `RESTAURANT_NOTIFICATION_EMAIL` | Persist if email fails |
-|------|-------------------|----------------------------------------|-------------------------|
-| Booking guest confirmation | Yes | No | Reservation still created; `email_sent` / flag may be false |
+| Flow | Needs SMTP / Mail API | Needs `RESTAURANT_NOTIFICATION_EMAIL` | Persist if notify fails |
+|------|----------------------|----------------------------------------|-------------------------|
+| Booking guest confirmation | Django `EMAIL_*` | No | Reservation still created |
+| Booking staff Telegram | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | No | Reservation still created |
+| Booking staff email | Hostinger Mail API **or** Django SMTP | Yes | Reservation still created |
 | Contact form → restaurant | Yes | Yes | Message still saved; `email_sent=false` |
 | Private event → restaurant | Yes | Yes | Inquiry still saved; `email_sent=false` |
+
+### Telegram (`@RivaB_bot`)
+
+```bash
+TELEGRAM_BOT_TOKEN=<from BotFather — never commit>
+TELEGRAM_CHAT_ID=<numeric chat id>
+```
+
+Owner must start/message the bot once, then on the API host:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py telegram_discover_chat
+```
+
+Put the printed chat id into `TELEGRAM_CHAT_ID`. Never log or commit the bot token.
+
+### Hostinger Mail API (optional staff reservation email)
+
+Verified package: `hostinger_mail_api` (Bearer auth → `https://api.mail.hostinger.com`).
+
+```bash
+HOSTINGER_MAIL_API_TOKEN=<Hostinger bearer token — never commit>
+HOSTINGER_MAIL_MAILBOX_RESOURCE_ID=<mailbox resource id>
+RESTAURANT_NOTIFICATION_EMAIL=<staff inbox>
+```
+
+If Hostinger vars are unset, staff reservation email uses the existing Django `EMAIL_*` SMTP/console backend. Guest confirmation email is unchanged (Django only).
 
 ---
 
