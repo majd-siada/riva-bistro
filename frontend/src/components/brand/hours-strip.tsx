@@ -21,7 +21,9 @@ export function HoursStrip({
     >
       <InfoChip icon={Clock} label="Öppettider" value={todayHoursLabel(hours)} />
       <InfoChip icon={MapPin} label="Adress" value={fullAddress()} href={business.mapUrl} />
-      <InfoChip icon={Phone} label="Telefon" value={business.phone} href={business.phoneHref} />
+      {business.phone ? (
+        <InfoChip icon={Phone} label="Telefon" value={business.phone} href={business.phoneHref} />
+      ) : null}
     </div>
   );
 }

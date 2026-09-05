@@ -10,11 +10,13 @@ export function RestaurantInfo({ hours }: { hours: OpeningHour[] }) {
         <h2 className="mt-3 font-display text-3xl text-riva-cream">Besök oss</h2>
         <address className="mt-6 space-y-2 not-italic text-riva-muted">
           <p>{fullAddress()}</p>
-          <p>
-            <a href={business.phoneHref} className="hover:text-riva-cream">
-              {business.phone}
-            </a>
-          </p>
+          {business.phone ? (
+            <p>
+              <a href={business.phoneHref} className="hover:text-riva-cream">
+                {business.phone}
+              </a>
+            </p>
+          ) : null}
           <p>
             <a href={`mailto:${business.email}`} className="hover:text-riva-cream">
               {business.email}

@@ -45,11 +45,13 @@ export async function Footer() {
           <h2 className="riva-label">Besök oss</h2>
           <address className="mt-4 space-y-2.5 text-sm not-italic text-riva-muted">
             <p>{fullAddress()}</p>
-            <p>
-              <a href={business.phoneHref} className="transition-riva hover:text-riva-cream">
-                {business.phone}
-              </a>
-            </p>
+            {business.phone ? (
+              <p>
+                <a href={business.phoneHref} className="transition-riva hover:text-riva-cream">
+                  {business.phone}
+                </a>
+              </p>
+            ) : null}
             <p>
               <a
                 href={`mailto:${business.email}`}

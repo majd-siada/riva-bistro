@@ -216,7 +216,11 @@ export function ReservationForm() {
             <StateMessage
               variant="empty"
               title="Onlinebokning är inte aktiverad"
-              description={`Ring oss gärna på ${business.phone} så hjälper vi dig med din bokning.`}
+              description={
+                business.phone
+                  ? `Ring oss gärna på ${business.phone} så hjälper vi dig med din bokning.`
+                  : `Mejla oss gärna på ${business.email} så hjälper vi dig med din bokning.`
+              }
             />
           ) : availability && availability.closed ? (
             <StateMessage
@@ -264,7 +268,11 @@ export function ReservationForm() {
                   <p className="mt-2 text-sm text-riva-muted">
                     Inga lediga sittningar den här dagen. Det kan bero på att köket har stängt,
                     att sista sittningen redan passerat, eller att dagen är fullbokad. Prova en
-                    annan dag eller ring oss på {business.phone}.
+                    annan dag
+                    {business.phone
+                      ? ` eller ring oss på ${business.phone}`
+                      : ` eller mejla oss på ${business.email}`}
+                    .
                   </p>
                 ) : (
                   <div

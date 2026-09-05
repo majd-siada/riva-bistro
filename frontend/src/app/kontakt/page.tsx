@@ -74,16 +74,18 @@ export default async function ContactPage() {
             </div>
             <div>
               <h2 className="riva-label">Kontakt</h2>
-              <p className="mt-3">
-                <a
-                  href={business.phoneHref}
-                  className="inline-flex items-center gap-2 text-riva-cream hover:text-riva-gold"
-                >
-                  <Phone className="h-4 w-4 text-riva-gold" strokeWidth={1.25} />
-                  {business.phone}
-                </a>
-              </p>
-              <p className="mt-2">
+              {business.phone ? (
+                <p className="mt-3">
+                  <a
+                    href={business.phoneHref}
+                    className="inline-flex items-center gap-2 text-riva-cream hover:text-riva-gold"
+                  >
+                    <Phone className="h-4 w-4 text-riva-gold" strokeWidth={1.25} />
+                    {business.phone}
+                  </a>
+                </p>
+              ) : null}
+              <p className={business.phone ? "mt-2" : "mt-3"}>
                 <a
                   href={`mailto:${business.email}`}
                   className="inline-flex items-center gap-2 text-riva-cream hover:text-riva-gold"
