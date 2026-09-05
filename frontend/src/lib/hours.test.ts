@@ -19,7 +19,7 @@ describe("hours helpers", () => {
     ).toBe("Stängt");
   });
 
-  it("formats midnight close as 00", () => {
+  it("formats Friday midnight close as 00:00", () => {
     expect(
       formatDayHours({
         weekday: 4,
@@ -28,6 +28,30 @@ describe("hours helpers", () => {
         closes_at: "00:00:00",
         is_closed: false,
       }),
-    ).toBe("11:30–00");
+    ).toBe("11:30–00:00");
+  });
+
+  it("formats Mon–Thu and Sunday as 10:30–21:00", () => {
+    expect(
+      formatDayHours({
+        weekday: 0,
+        weekday_label: "Måndag",
+        opens_at: "10:30:00",
+        closes_at: "21:00:00",
+        is_closed: false,
+      }),
+    ).toBe("10:30–21:00");
+  });
+
+  it("formats Saturday as 10:30–23:00", () => {
+    expect(
+      formatDayHours({
+        weekday: 5,
+        weekday_label: "Lördag",
+        opens_at: "10:30:00",
+        closes_at: "23:00:00",
+        is_closed: false,
+      }),
+    ).toBe("10:30–23:00");
   });
 });

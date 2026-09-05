@@ -14,8 +14,16 @@ Architecture (unchanged):
 
 Reservations stay **disabled** until an operator intentionally sets
 `production_ready=true` in admin **after** confirming capacity settings.
-Owner-confirmed weekly hours (Google Business listing for Hornsbergs Strand 57)
-are seeded by `python manage.py seed_reservations` and always leave
+Official weekly hours (single source: `apps/backend/reservations/official_hours.py`):
+
+| Day | Hours |
+|-----|-------|
+| Mon–Thu | 10:30–21:00 |
+| Friday | 11:30–00:00 (midnight end-of-day) |
+| Saturday | 10:30–23:00 |
+| Sunday | 10:30–21:00 |
+
+`seed_reservations` fills missing/blank weekdays from that module and always leaves
 `production_ready=false`. Do not invent hours or flip that flag from this runbook.
 
 ---
@@ -154,22 +162,24 @@ Expected while `production_ready=false` (even with real hours configured):
 ### Seed safety (do not overwrite owner hours)
 
 ```bash
-# Safe: creates missing weekday rows only; never flips production_ready
+# Safe: creates missing weekdays + fills blank stubs (null opens/closes).
+# Never flips production_ready. Never overwrites rows that already have times.
 docker compose -f docker-compose.production.yml exec backend \
   python manage.py seed_reservations
 
-# DANGEROUS on production: overwrites opening hours
+# Overwrites ALL weekdays with the official schedule from official_hours.py.
+# Use only when applying the restaurant's official hours over empty/wrong stubs.
 # docker compose -f docker-compose.production.yml exec backend \
 #   python manage.py seed_reservations --force-hours
 ```
 
-Do **not** run `--force-hours` on production after the restaurant owner has set hours in Admin.
+Do **not** run `--force-hours` on production after the restaurant owner has customized
+hours in Admin to something other than the official schedule.
 
 If `GET /api/v1/hours/` returns every weekday `is_closed: true` with null times, online
-availability cannot offer slots. That usually means OpeningHours rows are missing (or
-empty stubs). **BUSINESS INPUT REQUIRED:** confirm the correct week in Admin → Öppettider.
-Only if the table is empty (no owner edits), `seed_reservations` without `--force-hours`
-is safe to create the owner-confirmed Google listing week.
+availability cannot offer slots. Prefer `seed_reservations` (no flag) first — it fills
+missing/blank rows with the official schedule. Use `--force-hours` only if rows exist
+with incorrect non-null times and the owner confirms the official schedule should replace them.
 
 ### Admin checks (no credentials in this doc)
 
