@@ -118,6 +118,12 @@ With `DJANGO_DEBUG=false`, session and CSRF cookies are **`Secure=True`** automa
 
 PostgreSQL required. Provide production `DATABASE_URL` (HOSTINGER / OWNER).
 
+Production `DATABASE_URL` typically uses hostname `host.docker.internal` (host Postgres
+on the VPS, reached from the backend container). `docker-compose.production.yml` must
+include `extra_hosts: ["host.docker.internal:host-gateway"]` under `backend:` — without
+it, the container cannot resolve the DB host. Do not change credentials or Postgres
+config to work around a missing mapping.
+
 Migrations in repo (apply in dependency order via `migrate`):
 
 | App | Migration |

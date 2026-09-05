@@ -36,6 +36,27 @@ Official weekly hours (single source: `apps/backend/reservations/official_hours.
 
 Use **`docker-compose.production.yml` only** on the VPS. Never deploy with the root `docker-compose.yml` (local Postgres + `runserver` override).
 
+Host PostgreSQL is reached via `DATABASE_URL` using hostname `host.docker.internal`.
+`docker-compose.production.yml` **must** keep this under `backend:` so DNS resolves
+inside the container (Postgres listens on the Docker bridge gateway on the VPS):
+
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+```
+
+Without that mapping, migrate/seed/gunicorn fail with
+`psycopg.OperationalError: failed to resolve host 'host.docker.internal'`.
+Do not change `DATABASE_URL`, Postgres credentials, or Postgres config to “fix”
+a missing `extra_hosts` entry — restore the compose mapping instead.
+
+Verify after edit / before deploy:
+
+```bash
+docker compose -f docker-compose.production.yml config | grep -A2 extra_hosts
+# expect: host.docker.internal:host-gateway
+```
+
 ---
 
 ## Build / deploy (API host)
@@ -50,7 +71,7 @@ docker compose -f docker-compose.production.yml up -d
 
 The image entrypoint:
 
-1. Waits for PostgreSQL (`DATABASE_URL` preferred)
+1. Waits for PostgreSQL (`DATABASE_URL` preferred; host via `host.docker.internal`)
 2. Runs `migrate --noinput`
 3. Runs `collectstatic --noinput` when `DJANGO_DEBUG` is not true
 4. Starts **gunicorn** (image CMD — not `runserver`)

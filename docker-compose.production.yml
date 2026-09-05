@@ -1,7 +1,10 @@
 # Production backend only. Do NOT use docker-compose.yml for production
 # (that file includes local Postgres and overrides the image CMD to runserver).
 #
-# Expects host PostgreSQL via DATABASE_URL in .env.
+# Expects host PostgreSQL via DATABASE_URL in .env
+# (typically postgres://…@host.docker.internal:5432/…).
+# extra_hosts maps host.docker.internal → the Docker bridge gateway so the
+# backend container can reach Postgres on the VPS host. Do not remove it.
 # Nginx terminates TLS and proxies to 127.0.0.1:8000.
 #
 # Usage (on the VPS, from the repo root):
@@ -20,6 +23,8 @@ services:
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
       # Prefer DATABASE_URL from .env (host Postgres). Do not invent credentials here.
     # Image CMD is gunicorn — do not override with runserver.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
