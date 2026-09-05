@@ -28,15 +28,18 @@ class Command(BaseCommand):
         if not token:
             raise CommandError(
                 "TELEGRAM_BOT_TOKEN is not set. Add it to the environment "
-                "(never commit the real value), then re-run this command."
+                "(never commit the real value), then re-run this command.\n"
+                "Then open Telegram, start @RivaB_bot, send any message, "
+                "and run this command again to print the chat id."
             )
 
-        # Verify bot identity first (username only).
+        # Verify bot identity first (username only — never print the token).
         me_url = f"https://api.telegram.org/bot{token}/getMe"
         try:
             with urllib.request.urlopen(me_url, timeout=8) as response:
                 me = json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as exc:
+            # Use type name only — exception strings can embed the request URL/token.
             raise CommandError(f"Telegram getMe failed: {type(exc).__name__}") from None
 
         if not me.get("ok"):
@@ -44,6 +47,9 @@ class Command(BaseCommand):
 
         username = (me.get("result") or {}).get("username") or "(unknown)"
         self.stdout.write(self.style.SUCCESS(f"Bot verified: @{username}"))
+        self.stdout.write(
+            "If this is not @RivaB_bot, the TELEGRAM_BOT_TOKEN belongs to a different bot."
+        )
 
         updates_url = f"https://api.telegram.org/bot{token}/getUpdates?limit=20"
         try:

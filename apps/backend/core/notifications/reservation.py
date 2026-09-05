@@ -77,48 +77,60 @@ def format_reservation_email(reservation) -> tuple[str, str, str]:
     return subject, text, html
 
 
+def _claim_notification(reservation_id: int, flag_field: str) -> bool:
+    """Atomically claim a notification channel. Returns True if this caller owns it.
+
+    Using UPDATE … WHERE flag=False prevents duplicate sends when two post-commit
+    callbacks (or an idempotent create retry racing a late callback) run together.
+    """
+    from reservations.models import Reservation
+
+    claimed = Reservation.objects.filter(pk=reservation_id, **{flag_field: False}).update(
+        **{flag_field: True}
+    )
+    return claimed == 1
+
+
+def _release_notification(reservation_id: int, flag_field: str) -> None:
+    """Allow a later retry if the provider send failed after a successful claim."""
+    from reservations.models import Reservation
+
+    Reservation.objects.filter(pk=reservation_id).update(**{flag_field: False})
+
+
 def notify_reservation_created(reservation) -> dict[str, bool]:
     """Send Telegram + staff email after DB commit. Never raises.
 
-    Skips channels already marked sent (retry / idempotent create path).
+    Skips channels already claimed/sent (retry / idempotent create path).
     """
     results = {"telegram": False, "email": False}
-    try:
-        reservation.refresh_from_db(
-            fields=["telegram_notified", "staff_email_notified", "ref"]
-        )
-    except Exception:  # noqa: BLE001
-        logger.exception("Could not refresh reservation before notify")
-        return results
+    reservation_id = reservation.pk
+    ref = getattr(reservation, "ref", reservation_id)
 
-    update_fields: list[str] = []
-
-    if not reservation.telegram_notified:
+    if _claim_notification(reservation_id, "telegram_notified"):
         try:
             ok = send_telegram_message(format_reservation_telegram(reservation))
             results["telegram"] = ok
-            if ok:
-                reservation.telegram_notified = True
-                update_fields.append("telegram_notified")
+            if not ok:
+                _release_notification(reservation_id, "telegram_notified")
         except Exception:  # noqa: BLE001
-            logger.exception("Telegram notification raised for ref=%s", reservation.ref)
+            logger.exception("Telegram notification raised for ref=%s", ref)
+            _release_notification(reservation_id, "telegram_notified")
+    else:
+        logger.info("Telegram notify skipped (already claimed) ref=%s", ref)
 
-    if not reservation.staff_email_notified:
+    if _claim_notification(reservation_id, "staff_email_notified"):
         try:
             subject, text, html = format_reservation_email(reservation)
             ok = send_staff_reservation_email(subject=subject, text=text, html=html)
             results["email"] = ok
-            if ok:
-                reservation.staff_email_notified = True
-                update_fields.append("staff_email_notified")
+            if not ok:
+                _release_notification(reservation_id, "staff_email_notified")
         except Exception:  # noqa: BLE001
-            logger.exception("Staff email notification raised for ref=%s", reservation.ref)
-
-    if update_fields:
-        try:
-            reservation.save(update_fields=update_fields)
-        except Exception:  # noqa: BLE001
-            logger.exception("Failed to persist notification flags for ref=%s", reservation.ref)
+            logger.exception("Staff email notification raised for ref=%s", ref)
+            _release_notification(reservation_id, "staff_email_notified")
+    else:
+        logger.info("Staff email notify skipped (already claimed) ref=%s", ref)
 
     return results
 

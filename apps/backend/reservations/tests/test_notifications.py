@@ -182,9 +182,12 @@ def test_notification_modules_have_no_hardcoded_credentials():
         if path.name == "telegram.py":
             assert "TELEGRAM_BOT_TOKEN" in text
             assert "TELEGRAM_CHAT_ID" in text
+            # Must not call logger.exception (URL embeds token).
+            assert "logger.exception(" not in text
         if path.name == "staff_email.py":
             assert "HOSTINGER_MAIL_API_TOKEN" in text
             assert "HOSTINGER_MAIL_MAILBOX_RESOURCE_ID" in text
+            assert "Configuration(access_token=" in text
 
 
 @pytest.mark.django_db
@@ -211,6 +214,73 @@ def test_idempotent_retry_does_not_double_notify(
     assert Reservation.objects.count() == 1
     assert telegram.call_count == 1
     assert email.call_count == 1
+
+
+@pytest.mark.django_db
+def test_duplicate_notify_call_claims_once():
+    """Atomic claim prevents duplicate provider sends on double post-commit."""
+    from core.notifications.reservation import notify_reservation_created
+
+    _open_all_week()
+    row = Reservation.objects.create(
+        name="Clara",
+        phone="0701112233",
+        email="clara@example.com",
+        party_size=2,
+        date=date.today() + timedelta(days=3),
+        time=time(13, 0),
+        status=Reservation.Status.CONFIRMED,
+    )
+    with (
+        patch(
+            "core.notifications.reservation.send_telegram_message",
+            return_value=True,
+        ) as telegram,
+        patch(
+            "core.notifications.reservation.send_staff_reservation_email",
+            return_value=True,
+        ) as email,
+    ):
+        first = notify_reservation_created(row)
+        second = notify_reservation_created(row)
+    assert first == {"telegram": True, "email": True}
+    assert second == {"telegram": False, "email": False}
+    assert telegram.call_count == 1
+    assert email.call_count == 1
+    row.refresh_from_db()
+    assert row.telegram_notified is True
+    assert row.staff_email_notified is True
+
+
+@pytest.mark.django_db
+def test_failed_send_releases_claim_for_retry():
+    from core.notifications.reservation import notify_reservation_created
+
+    _open_all_week()
+    row = Reservation.objects.create(
+        name="Diana",
+        phone="0702223344",
+        email="diana@example.com",
+        party_size=2,
+        date=date.today() + timedelta(days=4),
+        time=time(14, 0),
+        status=Reservation.Status.CONFIRMED,
+    )
+    with (
+        patch(
+            "core.notifications.reservation.send_telegram_message",
+            return_value=False,
+        ),
+        patch(
+            "core.notifications.reservation.send_staff_reservation_email",
+            return_value=False,
+        ),
+    ):
+        result = notify_reservation_created(row)
+    assert result == {"telegram": False, "email": False}
+    row.refresh_from_db()
+    assert row.telegram_notified is False
+    assert row.staff_email_notified is False
 
 
 def test_telegram_and_email_format_include_required_fields():
@@ -246,3 +316,23 @@ def test_telegram_and_email_format_include_required_fields():
     assert "RB-TEST01" in subject
     assert "Bertil" in body and "Bertil" in html
     assert "Fönsterbord" in body
+
+
+def test_telegram_errors_do_not_log_token(settings, caplog):
+    import logging
+
+    from core.notifications import telegram as telegram_mod
+
+    settings.TELEGRAM_BOT_TOKEN = "123456:SECRET-TOKEN-VALUE"
+    settings.TELEGRAM_CHAT_ID = "999"
+    with (
+        patch(
+            "core.notifications.telegram.urllib.request.urlopen",
+            side_effect=telegram_mod.urllib.error.URLError("timed out"),
+        ),
+        caplog.at_level(logging.ERROR, logger="riva.notifications.telegram"),
+    ):
+        assert telegram_mod.send_telegram_message("hello") is False
+    joined = " ".join(r.getMessage() for r in caplog.records)
+    assert "SECRET-TOKEN-VALUE" not in joined
+    assert "123456:" not in joined

@@ -35,6 +35,11 @@ def telegram_configured() -> bool:
     return bool(_bot_token() and _chat_id())
 
 
+def _safe_http_error(exc: BaseException) -> str:
+    """Loggable error label that never includes request URLs (token is in the path)."""
+    return type(exc).__name__
+
+
 def verify_bot() -> dict | None:
     """Call getMe. Returns the bot identity dict on success, else None.
 
@@ -48,8 +53,9 @@ def verify_bot() -> dict | None:
     try:
         with urllib.request.urlopen(url, timeout=REQUEST_TIMEOUT_SECONDS) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
-        logger.exception("Telegram getMe failed")
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as exc:
+        # Do not logger.exception — the URL embeds the bot token.
+        logger.error("Telegram getMe failed: %s", _safe_http_error(exc))
         return None
     if not payload.get("ok"):
         logger.warning("Telegram getMe returned not-ok")
@@ -85,8 +91,9 @@ def send_telegram_message(text: str, *, parse_mode: str | None = None) -> bool:
     try:
         with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError):
-        logger.exception("Telegram sendMessage failed")
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as exc:
+        # Do not logger.exception — the URL embeds the bot token.
+        logger.error("Telegram sendMessage failed: %s", _safe_http_error(exc))
         return False
 
     if not payload.get("ok"):
