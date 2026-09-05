@@ -161,25 +161,37 @@ Expected while `production_ready=false` (even with real hours configured):
 
 ### Seed safety (do not overwrite owner hours)
 
+When Production has seven uninitialized placeholder rows
+(`is_closed=true`, `opens_at=null`, `closes_at=null` for every weekday),
+run this **once** to apply the official schedule. No `--force-hours` needed:
+
 ```bash
-# Safe: creates missing weekdays + fills blank stubs (null opens/closes).
-# Never flips production_ready. Never overwrites rows that already have times.
 docker compose -f docker-compose.production.yml exec backend \
   python manage.py seed_reservations
+```
 
-# Overwrites ALL weekdays with the official schedule from official_hours.py.
-# Use only when applying the restaurant's official hours over empty/wrong stubs.
+Behaviour:
+
+- **All seven placeholders** → update to official hours (Mon–Thu 10:30–21:00,
+  Fri 11:30–00:00, Sat 10:30–23:00, Sun 10:30–21:00)
+- **Missing weekdays** → create official hours for those days only
+- **Configured times** → preserved
+- **Intentional closed day** (closed/null next to real hours) → preserved
+- **`production_ready`** → never changed
+
+Overwrite everything only with explicit owner approval:
+
+```bash
+# DANGEROUS after custom Admin edits — do not use on production casually
 # docker compose -f docker-compose.production.yml exec backend \
 #   python manage.py seed_reservations --force-hours
 ```
 
-Do **not** run `--force-hours` on production after the restaurant owner has customized
-hours in Admin to something other than the official schedule.
+Verify afterward:
 
-If `GET /api/v1/hours/` returns every weekday `is_closed: true` with null times, online
-availability cannot offer slots. Prefer `seed_reservations` (no flag) first — it fills
-missing/blank rows with the official schedule. Use `--force-hours` only if rows exist
-with incorrect non-null times and the owner confirms the official schedule should replace them.
+```bash
+curl -fsS https://api.rivabistro.se/api/v1/hours/
+```
 
 ### Admin checks (no credentials in this doc)
 

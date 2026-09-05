@@ -517,7 +517,115 @@ def test_seed_reservations_preserves_existing_hours():
     monday = OpeningHours.objects.get(weekday=0)
     assert monday.opens_at == time(9, 0)
     assert monday.closes_at == time(17, 0)
-    assert ReservationSettings.load().production_ready is False
+
+
+@pytest.mark.django_db
+def test_seed_initializes_all_placeholder_rows_to_official_hours():
+    """Production-like state: seven closed/null stubs → official schedule, no --force."""
+    from django.core.management import call_command
+
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    OpeningHours.objects.all().delete()
+    for weekday in range(7):
+        OpeningHours.objects.create(
+            weekday=weekday,
+            opens_at=None,
+            closes_at=None,
+            is_closed=True,
+        )
+
+    config = ReservationSettings.load()
+    config.production_ready = True
+    config.save()
+
+    call_command("seed_reservations")
+
+    assert OpeningHours.objects.count() == 7
+    for weekday, (opens, closes, closed) in OFFICIAL_OPENING_HOURS.items():
+        row = OpeningHours.objects.get(weekday=weekday)
+        assert row.opens_at == opens
+        assert row.closes_at == closes
+        assert row.is_closed is closed
+
+    # Must not flip production_ready.
+    assert ReservationSettings.load().production_ready is True
+
+    friday = OpeningHours.objects.get(weekday=4)
+    assert friday.opens_at == time(11, 30)
+    assert friday.closes_at == time(0, 0)
+    assert friday.is_closed is False
+
+
+@pytest.mark.django_db
+def test_seed_preserves_intentional_closed_day_when_week_is_configured():
+    """A closed/null day next to real hours is intentional — do not overwrite."""
+    from django.core.management import call_command
+
+    OpeningHours.objects.all().delete()
+    OpeningHours.objects.create(
+        weekday=0,
+        opens_at=time(10, 30),
+        closes_at=time(21, 0),
+        is_closed=False,
+    )
+    OpeningHours.objects.create(
+        weekday=1,
+        opens_at=None,
+        closes_at=None,
+        is_closed=True,
+    )
+
+    call_command("seed_reservations")
+
+    monday = OpeningHours.objects.get(weekday=0)
+    assert monday.opens_at == time(10, 30)
+    assert monday.closes_at == time(21, 0)
+    assert monday.is_closed is False
+
+    tuesday = OpeningHours.objects.get(weekday=1)
+    assert tuesday.opens_at is None
+    assert tuesday.closes_at is None
+    assert tuesday.is_closed is True
+
+    # Missing weekdays are created from the official schedule.
+    assert OpeningHours.objects.filter(weekday=2).exists()
+
+
+@pytest.mark.django_db
+def test_seed_does_not_modify_production_ready():
+    from django.core.management import call_command
+
+    config = ReservationSettings.load()
+    config.production_ready = True
+    config.save()
+    call_command("seed_reservations")
+    assert ReservationSettings.load().production_ready is True
+
+
+@pytest.mark.django_db
+def test_seed_force_hours_overwrites_with_official_schedule():
+    from django.core.management import call_command
+
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    OpeningHours.objects.update_or_create(
+        weekday=5,
+        defaults={"opens_at": time(8, 0), "closes_at": time(16, 0), "is_closed": False},
+    )
+    call_command("seed_reservations", force_hours=True)
+    saturday = OpeningHours.objects.get(weekday=5)
+    opens, closes, closed = OFFICIAL_OPENING_HOURS[5]
+    assert saturday.opens_at == opens
+    assert saturday.closes_at == closes
+    assert saturday.is_closed is closed
+
+
+def _next_weekday(weekday: int, min_days: int = 2) -> date:
+    d = date.today() + timedelta(days=min_days)
+    while d.weekday() != weekday:
+        d += timedelta(days=1)
+    return d
 
 
 def _apply_official_hours():
@@ -531,13 +639,6 @@ def _apply_official_hours():
     config = ReservationSettings.load()
     config.production_ready = True
     config.save()
-
-
-def _next_weekday(weekday: int, min_days: int = 2) -> date:
-    d = date.today() + timedelta(days=min_days)
-    while d.weekday() != weekday:
-        d += timedelta(days=1)
-    return d
 
 
 @pytest.mark.django_db
@@ -642,40 +743,3 @@ def test_friday_midnight_close_includes_late_evening_slots(api):
     assert "23:00" in times
     assert "00:00" not in times
     assert "10:30" not in times
-
-
-@pytest.mark.django_db
-def test_seed_fills_blank_stubs_with_official_hours():
-    from django.core.management import call_command
-
-    from reservations.official_hours import OFFICIAL_OPENING_HOURS
-
-    OpeningHours.objects.update_or_create(
-        weekday=0,
-        defaults={"opens_at": None, "closes_at": None, "is_closed": True},
-    )
-    call_command("seed_reservations")
-    monday = OpeningHours.objects.get(weekday=0)
-    opens, closes, closed = OFFICIAL_OPENING_HOURS[0]
-    assert monday.opens_at == opens
-    assert monday.closes_at == closes
-    assert monday.is_closed is closed
-
-
-@pytest.mark.django_db
-def test_seed_force_hours_overwrites_with_official_schedule():
-    from django.core.management import call_command
-
-    from reservations.official_hours import OFFICIAL_OPENING_HOURS
-
-    OpeningHours.objects.update_or_create(
-        weekday=5,
-        defaults={"opens_at": time(8, 0), "closes_at": time(16, 0), "is_closed": False},
-    )
-    call_command("seed_reservations", "--force-hours")
-    saturday = OpeningHours.objects.get(weekday=5)
-    opens, closes, closed = OFFICIAL_OPENING_HOURS[5]
-    assert saturday.opens_at == opens
-    assert saturday.closes_at == closes
-    assert saturday.is_closed is closed
-    assert ReservationSettings.load().production_ready is False

@@ -9,6 +9,7 @@ Slot generation treats closes_at <= opens_at as overnight (see availability.gene
 from __future__ import annotations
 
 from datetime import time
+from typing import Protocol
 
 # weekday → (opens_at, closes_at, is_closed)
 # 0=Monday … 6=Sunday (Python/Django weekday convention)
@@ -36,6 +37,22 @@ WEEKDAY_NAMES_SV = {
     5: "Lördag",
     6: "Söndag",
 }
+
+
+class _HoursLike(Protocol):
+    opens_at: time | None
+    closes_at: time | None
+    is_closed: bool
+
+
+def is_uninitialized_placeholder(row: _HoursLike) -> bool:
+    """True for synthetic/placeholder rows: closed with no open/close times.
+
+    Production may contain seven such rows before real hours are applied.
+    An intentional closed day looks the same on a single row — distinguish by
+    checking whether the *whole week* is placeholders (see seed_reservations).
+    """
+    return bool(row.is_closed) and row.opens_at is None and row.closes_at is None
 
 
 def official_hours_as_api_rows() -> list[dict]:
