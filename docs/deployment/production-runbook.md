@@ -145,19 +145,49 @@ In the browser: home, meny, boka, admin login path. Media under `/media/` should
 
 ## Reservation verification (must stay gated)
 
-Expected while `production_ready=false` (even with real hours seeded):
+Expected while `production_ready=false` (even with real hours configured):
 
 - `GET /api/v1/hours/` → weekdays with owner-confirmed opens/closes
-- `GET /api/v1/reservations/availability/?date=...` → `enabled: false` (and slots only once ready)
+- `GET /api/v1/reservations/availability/?date=...` → `enabled: false` (slots only once ready)
 - `POST /api/v1/reservations/` → **503** with `code: not_enabled` when not production-ready (with `DJANGO_DEBUG=false`)
 
-**Human / business steps before enabling bookings:**
+### Seed safety (do not overwrite owner hours)
 
-1. Confirm hours + special closures in Admin → Öppettider (seed already loads the Google listing week)
+```bash
+# Safe: creates missing weekday rows only; never flips production_ready
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py seed_reservations
+
+# DANGEROUS on production: overwrites opening hours
+# docker compose -f docker-compose.production.yml exec backend \
+#   python manage.py seed_reservations --force-hours
+```
+
+Do **not** run `--force-hours` on production after the restaurant owner has set hours in Admin.
+
+If `GET /api/v1/hours/` returns every weekday `is_closed: true` with null times, online
+availability cannot offer slots. That usually means OpeningHours rows are missing (or
+empty stubs). **BUSINESS INPUT REQUIRED:** confirm the correct week in Admin → Öppettider.
+Only if the table is empty (no owner edits), `seed_reservations` without `--force-hours`
+is safe to create the owner-confirmed Google listing week.
+
+### Admin checks (no credentials in this doc)
+
+In Django Admin the owner should be able to:
+
+- list / filter / search reservations by date, status, customer
+- open a reservation and see date, time, party size, contact fields
+- change status when needed (`confirmed` / `seated` / `cancelled` / `no_show`)
+- manage opening hours and special closures
+- view `ReservationSettings` (capacity, horizon, `production_ready`)
+
+**Human / business steps before enabling bookings (BUSINESS INPUT REQUIRED):**
+
+1. Confirm hours + special closures in Admin → Öppettider
 2. Confirm capacity / lead time / horizon in Admin → Inställningar
 3. Only then set **`production_ready = true`**
 
-Do not enable bookings from deploy scripts.
+Do not enable bookings from deploy scripts. Do not reset admin passwords from this runbook.
 
 ---
 

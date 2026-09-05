@@ -145,8 +145,27 @@ async function apiFetch<T>(
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    const detail =
+    let detail =
       (body && (body.detail || body.message)) || "Något gick fel. Försök igen.";
+    // Surface first DRF field error when detail is absent (e.g. email/phone).
+    if (
+      body &&
+      typeof body === "object" &&
+      !body.detail &&
+      !body.message &&
+      !body.code
+    ) {
+      for (const value of Object.values(body as Record<string, unknown>)) {
+        if (Array.isArray(value) && typeof value[0] === "string") {
+          detail = value[0];
+          break;
+        }
+        if (typeof value === "string") {
+          detail = value;
+          break;
+        }
+      }
+    }
     const code = (body && body.code) || "error";
     throw new ApiError(detail, res.status, code);
   }

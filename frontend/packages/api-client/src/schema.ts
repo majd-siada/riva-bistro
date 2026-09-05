@@ -487,6 +487,8 @@ export interface components {
             enabled: boolean;
             closed: boolean;
             max_party_size: number;
+            /** Booking horizon in days (inclusive). */
+            horizon_days?: number;
             slots: components["schemas"]["AvailabilitySlot"][];
         };
         AvailabilitySlot: {

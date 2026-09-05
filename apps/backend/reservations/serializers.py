@@ -11,8 +11,8 @@ from reservations.models import (
 
 
 class ReservationCreateSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=120)
-    phone = serializers.CharField(max_length=40)
+    name = serializers.CharField(max_length=120, trim_whitespace=True)
+    phone = serializers.CharField(max_length=40, trim_whitespace=True)
     email = serializers.EmailField()
     party_size = serializers.IntegerField(min_value=1, max_value=100)
     date = serializers.DateField()
@@ -20,6 +20,18 @@ class ReservationCreateSerializer(serializers.Serializer):
     special_request = serializers.CharField(
         max_length=1000, allow_blank=True, required=False, default=""
     )
+
+    def validate_name(self, value: str) -> str:
+        if len(value.strip()) < 2:
+            raise serializers.ValidationError("Ange ditt namn.")
+        return value.strip()
+
+    def validate_phone(self, value: str) -> str:
+        # Deterministic sanity check only — do not invent country-specific rules.
+        digits = "".join(ch for ch in value if ch.isdigit())
+        if len(digits) < 7:
+            raise serializers.ValidationError("Ange ett giltigt telefonnummer.")
+        return value.strip()
 
 
 class ReservationSerializer(serializers.ModelSerializer):
