@@ -26,8 +26,9 @@ While `verified: false` (current):
 **Already applied from owner Google listing (keep verified=false until phone/email/social confirmed):**
 
 - Address: Hornsbergs Strand 57, 112 16 Stockholm
-- Weekly hours via `seed_reservations` + `restaurantHoursLabel` fallback
-  (Mån–Tor 10:30–21, Fre 11:30–00, Lör 10:30–23, Sön 10:30–21)
+- Official weekly hours via `official_hours.py` / `seed_reservations` +
+  `restaurantHoursLabel` fallback:
+  Mon–Thu 10:30–21:00, Fri 11:30–00:00, Sat 10:30–23:00, Sun 10:30–21:00
 
 Still required before `verified: true`:
 

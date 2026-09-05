@@ -518,3 +518,164 @@ def test_seed_reservations_preserves_existing_hours():
     assert monday.opens_at == time(9, 0)
     assert monday.closes_at == time(17, 0)
     assert ReservationSettings.load().production_ready is False
+
+
+def _apply_official_hours():
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    for weekday, (opens, closes, closed) in OFFICIAL_OPENING_HOURS.items():
+        OpeningHours.objects.update_or_create(
+            weekday=weekday,
+            defaults={"opens_at": opens, "closes_at": closes, "is_closed": closed},
+        )
+    config = ReservationSettings.load()
+    config.production_ready = True
+    config.save()
+
+
+def _next_weekday(weekday: int, min_days: int = 2) -> date:
+    d = date.today() + timedelta(days=min_days)
+    while d.weekday() != weekday:
+        d += timedelta(days=1)
+    return d
+
+
+@pytest.mark.django_db
+def test_hours_endpoint_returns_official_schedule(api):
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    _apply_official_hours()
+    resp = api.get("/api/v1/hours/")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body) == 7
+    by_day = {row["weekday"]: row for row in body}
+    for weekday, (opens, closes, closed) in OFFICIAL_OPENING_HOURS.items():
+        row = by_day[weekday]
+        assert row["is_closed"] is closed
+        assert row["opens_at"] == opens.strftime("%H:%M:%S")
+        assert row["closes_at"] == closes.strftime("%H:%M:%S")
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "weekday,opens,closes,outside",
+    [
+        (0, time(10, 30), time(21, 0), time(9, 0)),  # Monday
+        (1, time(10, 30), time(21, 0), time(9, 0)),  # Tuesday
+        (2, time(10, 30), time(21, 0), time(9, 0)),  # Wednesday
+        (3, time(10, 30), time(21, 0), time(9, 0)),  # Thursday
+        (4, time(11, 30), time(0, 0), time(10, 0)),  # Friday (midnight close)
+        (5, time(10, 30), time(23, 0), time(9, 0)),  # Saturday
+        (6, time(10, 30), time(21, 0), time(9, 0)),  # Sunday
+    ],
+)
+def test_official_hours_availability_and_boundaries(api, weekday, opens, closes, outside):
+    """Each official weekday: first slot = open, close not bookable, outside absent."""
+    from reservations.availability import generate_slots
+
+    _apply_official_hours()
+    config = ReservationSettings.load()
+    buffer = config.last_seating_buffer_minutes
+    interval = config.slot_interval_minutes
+
+    expected_slots = generate_slots(opens, closes, interval, buffer)
+    assert expected_slots[0] == opens
+    assert closes not in expected_slots
+    assert outside not in expected_slots
+
+    target = _next_weekday(weekday)
+    avail = api.get(f"/api/v1/reservations/availability/?date={target.isoformat()}")
+    assert avail.status_code == 200
+    body = avail.json()
+    assert body["closed"] is False
+    slot_times = [s["time"] for s in body["slots"]]
+    assert opens.strftime("%H:%M") in slot_times
+    assert closes.strftime("%H:%M") not in slot_times
+    assert outside.strftime("%H:%M") not in slot_times
+
+
+@pytest.mark.django_db
+def test_official_hours_create_accepts_open_rejects_outside(api):
+    """Single create-path check (avoids throttling from per-weekday POSTs)."""
+    _apply_official_hours()
+    target = _next_weekday(0)  # Monday
+    ok = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0701234567",
+            "email": "anna-hours@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "10:30",
+        },
+        format="json",
+    )
+    assert ok.status_code == 201
+
+    before = Reservation.objects.count()
+    bad = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Bertil",
+            "phone": "0707654321",
+            "email": "bertil-hours@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "09:00",
+        },
+        format="json",
+    )
+    assert bad.status_code in (400, 409)
+    assert bad.json()["code"] in {"invalid_slot", "closed"}
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_friday_midnight_close_includes_late_evening_slots(api):
+    _apply_official_hours()
+    friday = _next_weekday(4)
+    avail = api.get(f"/api/v1/reservations/availability/?date={friday.isoformat()}")
+    times = [s["time"] for s in avail.json()["slots"]]
+    assert "11:30" in times
+    assert "23:00" in times
+    assert "00:00" not in times
+    assert "10:30" not in times
+
+
+@pytest.mark.django_db
+def test_seed_fills_blank_stubs_with_official_hours():
+    from django.core.management import call_command
+
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    OpeningHours.objects.update_or_create(
+        weekday=0,
+        defaults={"opens_at": None, "closes_at": None, "is_closed": True},
+    )
+    call_command("seed_reservations")
+    monday = OpeningHours.objects.get(weekday=0)
+    opens, closes, closed = OFFICIAL_OPENING_HOURS[0]
+    assert monday.opens_at == opens
+    assert monday.closes_at == closes
+    assert monday.is_closed is closed
+
+
+@pytest.mark.django_db
+def test_seed_force_hours_overwrites_with_official_schedule():
+    from django.core.management import call_command
+
+    from reservations.official_hours import OFFICIAL_OPENING_HOURS
+
+    OpeningHours.objects.update_or_create(
+        weekday=5,
+        defaults={"opens_at": time(8, 0), "closes_at": time(16, 0), "is_closed": False},
+    )
+    call_command("seed_reservations", "--force-hours")
+    saturday = OpeningHours.objects.get(weekday=5)
+    opens, closes, closed = OFFICIAL_OPENING_HOURS[5]
+    assert saturday.opens_at == opens
+    assert saturday.closes_at == closes
+    assert saturday.is_closed is closed
+    assert ReservationSettings.load().production_ready is False

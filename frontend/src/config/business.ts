@@ -8,15 +8,18 @@
  * - verified=false → NAP may still render in the UI; Restaurant JSON-LD is omitted.
  * - verified=true  → JSON-LD publishes; only set after OWNER confirms real values.
  *
- * Address + restaurant hours below match the owner-provided Google Business
- * listing (Hornsbergs Strand 57). Phone / email / social / kitchen hours are
- * still placeholders — keep verified=false until those are confirmed.
+ * Address matches the owner-provided Google Business listing
+ * (Hornsbergs Strand 57). Phone / email / social / kitchen hours are still
+ * placeholders — keep verified=false until those are confirmed.
  *
- * Prefer Admin → Öppettider (or `seed_reservations`) as the live hours API
- * source of truth; labels here are display fallbacks only.
+ * Opening hours: prefer Admin → Öppettider / GET /api/v1/hours/ at runtime.
+ * `restaurantHoursLabel` is a static fallback from `opening-hours.ts`
+ * (must match `apps/backend/reservations/official_hours.py`).
  *
  * Cutover checklist: docs/deployment/production-checklist.md section A.
  */
+import { OFFICIAL_HOURS_LABEL } from "@/config/opening-hours";
+
 export const business = {
   name: "Riva Bistro",
   verified: false,
@@ -34,8 +37,7 @@ export const business = {
   email: "info@rivabistro.se",
   /** Leave empty until the owner confirms kitchen last-order times. */
   kitchenHours: "",
-  restaurantHoursLabel:
-    "Mån–Tor 10:30–21, Fre 11:30–00, Lör 10:30–23, Sön 10:30–21",
+  restaurantHoursLabel: OFFICIAL_HOURS_LABEL,
   mapUrl:
     "https://www.google.com/maps/search/?api=1&query=Hornsbergs+Strand+57+112+16+Stockholm",
   social: {
