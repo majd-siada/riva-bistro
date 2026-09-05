@@ -140,7 +140,7 @@ function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
             Goda smaker, äkta upplevelser
           </h1>
           <p className="mt-6 max-w-md text-pretty leading-relaxed text-riva-muted">
-            Svensk gastronomi i en stillsam, cinematisk miljö vid Strandvägen. Vi dukar
+            Svensk gastronomi i en stillsam, cinematisk miljö på Kungsholmen. Vi dukar
             för långa middagar och minnesvärda kvällar.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">

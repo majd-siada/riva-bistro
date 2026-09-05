@@ -20,21 +20,24 @@ Update only after the restaurant confirms real facts. **Do not invent values.**
 
 While `verified: false` (current):
 
-- Site may still **display** placeholder NAP/hours in UI.
+- Site may still **display** NAP/hours in UI.
 - **Restaurant JSON-LD is not emitted** (`RestaurantJsonLd` returns `null`).
 
-When the owner supplies confirmed values, update in this file:
+**Already applied from owner Google listing (keep verified=false until phone/email/social confirmed):**
 
-1. `address.street`, `address.postalCode`, `address.city`
-2. `phone`, `phoneHref`, `phoneE164`
-3. `email`
-4. `restaurantHoursLabel` (fallback label if API hours fail)
-5. `kitchenHours` (or remove from UI if not used)
-6. `mapUrl`
-7. `social.instagram`, `social.facebook` (or clear if unused)
-8. Set **`verified: true`** only after the above are confirmed
+- Address: Hornsbergs Strand 57, 112 16 Stockholm
+- Weekly hours via `seed_reservations` + `restaurantHoursLabel` fallback
+  (Mån–Tor 10:30–21, Fre 11:30–00, Lör 10:30–23, Sön 10:30–21)
 
-Also configure **opening hours / closures** in Admin → Öppettider (source of truth for booking + display via API).
+Still required before `verified: true`:
+
+1. `phone`, `phoneHref`, `phoneE164`
+2. `email`
+3. `kitchenHours` (optional — leave empty if unused)
+4. `social.instagram`, `social.facebook` (or clear if unused)
+5. Set **`verified: true`** only after the above are confirmed
+
+Live hours API source of truth: Admin → Öppettider (or re-run `python manage.py seed_reservations`).
 
 ### Booking capacity (Admin → Inställningar)
 

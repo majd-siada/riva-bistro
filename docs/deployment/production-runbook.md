@@ -12,7 +12,11 @@ Architecture (unchanged):
 | `https://rivabistro.se` | Hostinger Node | Next.js |
 | `https://api.rivabistro.se` | Ubuntu VPS | Docker + gunicorn + Nginx + Let's Encrypt + host PostgreSQL |
 
-Reservations stay **disabled** until an operator intentionally sets real opening hours **and** `production_ready=true` in admin. Do not invent hours or flip that flag from this runbook.
+Reservations stay **disabled** until an operator intentionally sets
+`production_ready=true` in admin **after** confirming capacity settings.
+Owner-confirmed weekly hours (Google Business listing for Hornsbergs Strand 57)
+are seeded by `python manage.py seed_reservations` and always leave
+`production_ready=false`. Do not invent hours or flip that flag from this runbook.
 
 ---
 
@@ -141,16 +145,16 @@ In the browser: home, meny, boka, admin login path. Media under `/media/` should
 
 ## Reservation verification (must stay gated)
 
-Expected while hours are closed and/or `production_ready=false`:
+Expected while `production_ready=false` (even with real hours seeded):
 
-- `GET /api/v1/hours/` → weekdays present; closed days OK
-- `GET /api/v1/reservations/availability/?date=...` → `enabled: false` and/or `closed: true`, **no invented slots**
+- `GET /api/v1/hours/` → weekdays with owner-confirmed opens/closes
+- `GET /api/v1/reservations/availability/?date=...` → `enabled: false` (and slots only once ready)
 - `POST /api/v1/reservations/` → **503** with `code: not_enabled` when not production-ready (with `DJANGO_DEBUG=false`)
 
 **Human / business steps before enabling bookings:**
 
-1. Enter real opening hours + special closures in Admin → Öppettider  
-2. Confirm capacity / lead time / horizon in Admin → Inställningar  
+1. Confirm hours + special closures in Admin → Öppettider (seed already loads the Google listing week)
+2. Confirm capacity / lead time / horizon in Admin → Inställningar
 3. Only then set **`production_ready = true`**
 
 Do not enable bookings from deploy scripts.

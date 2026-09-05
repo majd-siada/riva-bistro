@@ -263,6 +263,19 @@ def test_generate_slots_when_buffer_eats_window():
     assert slots == [time_cls(18, 0)]
 
 
+def test_generate_slots_overnight_friday_midnight_close():
+    """Friday 11:30–00:00 must produce evening slots (not collapse to open only)."""
+    from datetime import time as time_cls
+
+    from reservations.availability import generate_slots
+
+    slots = generate_slots(time_cls(11, 30), time_cls(0, 0), 30, 60)
+    assert slots[0] == time_cls(11, 30)
+    assert time_cls(22, 0) in slots
+    assert time_cls(23, 0) in slots
+    assert time_cls(0, 0) not in slots
+
+
 @pytest.mark.django_db
 def test_weekday_closed_availability_and_create(api):
     """A weekday marked is_closed must report closed and reject create."""

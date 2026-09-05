@@ -15,8 +15,8 @@ export async function Footer() {
         <div>
           <Logo />
           <p className="mt-6 max-w-xs text-sm leading-relaxed text-riva-muted">
-            {business.tagline}. Svensk gastronomi i en stillsam, cinematisk miljö vid
-            Strandvägen.
+            {business.tagline}. Svensk gastronomi i en stillsam, cinematisk miljö på
+            Kungsholmen.
           </p>
           <GoldDivider className="mt-6 max-w-[80px] opacity-40" variant="short" />
         </div>
@@ -75,14 +75,16 @@ export async function Footer() {
           ) : (
             <p className="mt-4 text-sm text-riva-muted">{business.restaurantHoursLabel}</p>
           )}
-          <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
+          {business.kitchenHours ? (
+            <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
+          ) : null}
         </div>
       </div>
 
       <div className="border-t border-riva-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-riva-muted md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} Riva Bistro</p>
-          <p>Strandvägen · Stockholm</p>
+          <p>Hornsbergs Strand · Stockholm</p>
         </div>
       </div>
     </footer>
