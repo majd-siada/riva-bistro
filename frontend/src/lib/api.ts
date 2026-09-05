@@ -34,13 +34,9 @@ export type {
 function getApiBase(): string {
   if (typeof window === "undefined") {
     const internalUrl = process.env.INTERNAL_API_URL?.replace(/\/$/, "");
-    const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
     if (internalUrl) return internalUrl;
-    if (publicUrl && !publicUrl.includes("localhost") && !publicUrl.includes("127.0.0.1")) {
-      return publicUrl;
-    }
-    if (process.env.NODE_ENV === "production") return "https://api.rivabistro.se";
-    return publicUrl ?? "http://localhost:8000";
+    // Prefer the same production-safe resolution used for media / browser.
+    return resolvePublicApiOrigin();
   }
   return resolvePublicApiOrigin(window.location.hostname);
 }
@@ -62,7 +58,15 @@ export function getApiMisconfigurationMessage(): string | null {
   const isLocalHost =
     host === "localhost" || host === "127.0.0.1" || host === "backend";
 
-  if (!configured && !productionApiOrigins[host]) {
+  if (
+    configured &&
+    (configured.includes("localhost") || configured.includes("127.0.0.1")) &&
+    !isLocalHost
+  ) {
+    return "NEXT_PUBLIC_API_URL pekar på localhost i en produktionsbuild. Bygg om med https://api.rivabistro.se.";
+  }
+
+  if (!configured && !productionApiOrigins[host] && !isLocalHost) {
     return "NEXT_PUBLIC_API_URL saknas. Admin kräver en publik API-URL vid build.";
   }
 
@@ -141,8 +145,27 @@ async function apiFetch<T>(
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    const detail =
+    let detail =
       (body && (body.detail || body.message)) || "Något gick fel. Försök igen.";
+    // Surface first DRF field error when detail is absent (e.g. email/phone).
+    if (
+      body &&
+      typeof body === "object" &&
+      !body.detail &&
+      !body.message &&
+      !body.code
+    ) {
+      for (const value of Object.values(body as Record<string, unknown>)) {
+        if (Array.isArray(value) && typeof value[0] === "string") {
+          detail = value[0];
+          break;
+        }
+        if (typeof value === "string") {
+          detail = value;
+          break;
+        }
+      }
+    }
     const code = (body && body.code) || "error";
     throw new ApiError(detail, res.status, code);
   }

@@ -35,7 +35,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Var finns ni?",
-    answer: `Vi finns på ${fullAddress()}, nära Strandvägen i Stockholm. Använd kartan nedan för vägbeskrivning.`,
+    answer: `Vi finns på ${fullAddress()} på Kungsholmen i Stockholm. Använd kartan nedan för vägbeskrivning.`,
   },
 ];
 
@@ -107,7 +107,9 @@ export default async function ContactPage() {
               ) : (
                 <p className="mt-3 text-riva-muted">{business.restaurantHoursLabel}</p>
               )}
-              <p className="mt-1 text-sm text-riva-muted/80">{business.kitchenHours}</p>
+              {business.kitchenHours ? (
+                <p className="mt-1 text-sm text-riva-muted/80">{business.kitchenHours}</p>
+              ) : null}
             </div>
             <div>
               <h2 className="riva-label">Följ oss</h2>
@@ -139,8 +141,8 @@ export default async function ContactPage() {
         <SectionHeading title="Hitta hit" align="center" className="mx-auto" />
         <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-lg border border-riva-cream/10">
           <iframe
-            title="Karta till Riva Bistro på Strandvägen 5, Stockholm"
-            src="https://maps.google.com/maps?q=Strandv%C3%A4gen+5+114+51+Stockholm&output=embed"
+            title="Karta till Riva Bistro på Hornsbergs Strand 57, Stockholm"
+            src="https://maps.google.com/maps?q=Hornsbergs+Strand+57+112+16+Stockholm&output=embed"
             className="aspect-[16/9] w-full border-0 bg-riva-card"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

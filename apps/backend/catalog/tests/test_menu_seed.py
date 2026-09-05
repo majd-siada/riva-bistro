@@ -84,3 +84,24 @@ def test_seed_menu_ex_vat_roundtrip_matches_listed_inc_prices():
             continue
         pricing = price_from_ex_vat(ex_vat(price_inc), Decimal("0.12"))
         assert Decimal(pricing["price_inc_vat"]) == Decimal(price_inc).quantize(Decimal("0.01"))
+
+
+@pytest.mark.django_db
+def test_featured_menu_endpoint_returns_featured_products_only():
+    call_command("seed_menu")
+    client = APIClient()
+
+    product = Product.objects.filter(is_available=True).first()
+    assert product is not None
+    Product.objects.update(is_featured=False)
+    product.is_featured = True
+    product.featured_order = 1
+    product.save(update_fields=["is_featured", "featured_order"])
+
+    response = client.get("/api/v1/menu/featured/")
+    assert response.status_code == 200
+    payload = response.json()
+    assert isinstance(payload, list)
+    assert len(payload) >= 1
+    assert all(item.get("is_featured") is True for item in payload)
+    assert product.slug in {item["slug"] for item in payload}

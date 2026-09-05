@@ -87,7 +87,7 @@ def create_reservation(*, name, phone, email, party_size, date, time, special_re
     with connection.cursor() as cursor:
         cursor.execute("SELECT pg_advisory_xact_lock(%s)", [_slot_lock_key(date, time)])
 
-    today = date_cls.today()
+    today = timezone.localdate()
     if date < today or date > today + timedelta(days=config.booking_horizon_days):
         raise PastDate() if date < today else SlotClosed()
 

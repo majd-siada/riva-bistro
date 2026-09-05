@@ -99,13 +99,13 @@ def test_capacity_is_enforced(api):
         "time": "12:00",
     }
     first = api.post(
-        "/api/v1/reservations/", {**base, "name": "A", "party_size": 4}, format="json"
+        "/api/v1/reservations/", {**base, "name": "Anna", "party_size": 4}, format="json"
     )
     assert first.status_code == 201
     # Slot is now full; a further guest must be rejected at the backend.
     second = api.post(
         "/api/v1/reservations/",
-        {**base, "name": "B", "email": "b@example.com", "party_size": 1},
+        {**base, "name": "Bertil", "email": "b@example.com", "party_size": 1},
         format="json",
     )
     assert second.status_code == 409
@@ -123,7 +123,7 @@ def test_party_size_limit(api):
         "/api/v1/reservations/",
         {
             "name": "Big",
-            "phone": "07",
+            "phone": "0700000000",
             "email": "big@example.com",
             "party_size": 20,
             "date": target.isoformat(),
@@ -143,8 +143,8 @@ def test_invalid_slot_rejected(api):
     resp = api.post(
         "/api/v1/reservations/",
         {
-            "name": "X",
-            "phone": "07",
+            "name": "Xena",
+            "phone": "0700000000",
             "email": "x@example.com",
             "party_size": 2,
             "date": target.isoformat(),
@@ -194,7 +194,7 @@ def test_production_guard_blocks_when_not_ready(api, settings):
         "/api/v1/reservations/",
         {
             "name": "Anna",
-            "phone": "07",
+            "phone": "0700000000",
             "email": "anna@example.com",
             "party_size": 2,
             "date": target.isoformat(),
@@ -220,7 +220,7 @@ def test_public_booking_ignores_csrf_even_with_authenticated_session():
         "/api/v1/reservations/",
         {
             "name": "Johan",
-            "phone": "07",
+            "phone": "0700000000",
             "email": "johan@example.com",
             "party_size": 2,
             "date": target.isoformat(),
@@ -243,7 +243,7 @@ def test_production_guard_allows_when_ready(api, settings):
         "/api/v1/reservations/",
         {
             "name": "Anna",
-            "phone": "07",
+            "phone": "0700000000",
             "email": "anna@example.com",
             "party_size": 2,
             "date": target.isoformat(),
@@ -261,3 +261,260 @@ def test_generate_slots_when_buffer_eats_window():
 
     slots = generate_slots(time_cls(18, 0), time_cls(19, 0), 30, 180)
     assert slots == [time_cls(18, 0)]
+
+
+def test_generate_slots_overnight_friday_midnight_close():
+    """Friday 11:30–00:00 must produce evening slots (not collapse to open only)."""
+    from datetime import time as time_cls
+
+    from reservations.availability import generate_slots
+
+    slots = generate_slots(time_cls(11, 30), time_cls(0, 0), 30, 60)
+    assert slots[0] == time_cls(11, 30)
+    assert time_cls(22, 0) in slots
+    assert time_cls(23, 0) in slots
+    assert time_cls(0, 0) not in slots
+
+
+@pytest.mark.django_db
+def test_weekday_closed_availability_and_create(api):
+    """A weekday marked is_closed must report closed and reject create."""
+    _open_all_week()
+    target = _target_date(days=3)
+    OpeningHours.objects.update_or_create(
+        weekday=target.weekday(),
+        defaults={"opens_at": None, "closes_at": None, "is_closed": True},
+    )
+
+    availability = api.get(
+        f"/api/v1/reservations/availability/?date={target.isoformat()}"
+    )
+    assert availability.status_code == 200
+    assert availability.json()["closed"] is True
+
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 409
+    assert resp.json()["code"] == "closed"
+
+
+@pytest.mark.django_db
+def test_booking_horizon_rejects_far_future(api):
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.booking_horizon_days = 7
+    config.save()
+    far = _target_date(days=30)
+
+    availability = api.get(
+        f"/api/v1/reservations/availability/?date={far.isoformat()}"
+    )
+    assert availability.json()["closed"] is True
+
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": far.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code in (400, 409)
+    assert resp.json()["code"] in {"past", "closed"}
+
+
+@pytest.mark.django_db
+def test_hours_endpoint_returns_seven_days(api):
+    _open_all_week()
+    resp = api.get("/api/v1/hours/")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body) == 7
+    assert {row["weekday"] for row in body} == set(range(7))
+
+
+@pytest.mark.django_db
+def test_availability_requires_date(api):
+    resp = api.get("/api/v1/reservations/availability/")
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_availability_rejects_malformed_date(api):
+    resp = api.get("/api/v1/reservations/availability/?date=not-a-date")
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_create_missing_fields_creates_no_row(api):
+    _open_all_week()
+    before = Reservation.objects.count()
+    resp = api.post("/api/v1/reservations/", {"name": "Anna"}, format="json")
+    assert resp.status_code == 400
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_create_invalid_email_creates_no_row(api):
+    _open_all_week()
+    target = _target_date()
+    before = Reservation.objects.count()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "not-an-email",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_create_short_phone_rejected(api):
+    _open_all_week()
+    target = _target_date()
+    before = Reservation.objects.count()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "12",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_create_past_date_rejected(api):
+    _open_all_week()
+    past = (date.today() - timedelta(days=1)).isoformat()
+    before = Reservation.objects.count()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": past,
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert resp.json()["code"] == "past"
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_create_on_special_closure_rejected(api):
+    _open_all_week()
+    target = _target_date()
+    SpecialClosure.objects.create(date=target, reason="Privat fest")
+    before = Reservation.objects.count()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 409
+    assert resp.json()["code"] == "closed"
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_create_at_max_party_size_accepted(api):
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.max_party_size = 8
+    config.max_guests_per_slot = 20
+    config.save()
+    target = _target_date()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 8,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 201
+    assert resp.json()["party_size"] == 8
+
+
+@pytest.mark.django_db
+def test_production_guard_leaves_no_row(api, settings):
+    settings.DEBUG = False
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+    target = _target_date()
+    before = Reservation.objects.count()
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Anna",
+            "phone": "0700000000",
+            "email": "anna@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 503
+    assert resp.json()["code"] == "not_enabled"
+    assert Reservation.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_seed_reservations_preserves_existing_hours():
+    from django.core.management import call_command
+
+    OpeningHours.objects.update_or_create(
+        weekday=0,
+        defaults={"opens_at": time(9, 0), "closes_at": time(17, 0), "is_closed": False},
+    )
+    call_command("seed_reservations")
+    monday = OpeningHours.objects.get(weekday=0)
+    assert monday.opens_at == time(9, 0)
+    assert monday.closes_at == time(17, 0)
+    assert ReservationSettings.load().production_ready is False

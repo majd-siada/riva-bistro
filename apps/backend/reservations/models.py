@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import secrets
-from datetime import date as date_cls
 
 from django.db import models
+from django.utils import timezone
 
 WEEKDAYS = [
     (0, "Måndag"),
@@ -138,4 +138,4 @@ class Reservation(models.Model):
 
     @property
     def is_past(self) -> bool:
-        return self.date < date_cls.today()
+        return self.date < timezone.localdate()

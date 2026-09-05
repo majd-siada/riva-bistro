@@ -37,7 +37,9 @@ export function RestaurantInfo({ hours }: { hours: OpeningHour[] }) {
         ) : (
           <p className="mt-6 text-riva-muted">{business.restaurantHoursLabel}</p>
         )}
-        <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
+        {business.kitchenHours ? (
+          <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
+        ) : null}
       </div>
     </div>
   );

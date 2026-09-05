@@ -8,9 +8,11 @@
  * - verified=false → NAP may still render in the UI; Restaurant JSON-LD is omitted.
  * - verified=true  → JSON-LD publishes; only set after OWNER confirms real values.
  *
- * When the owner supplies real values, update this file (street, postalCode, city,
- * phone / phoneHref / phoneE164, email, restaurantHoursLabel, kitchenHours, mapUrl,
- * social), then set verified=true. Prefer Admin → Öppettider as the live hours API
+ * Address + restaurant hours below match the owner-provided Google Business
+ * listing (Hornsbergs Strand 57). Phone / email / social / kitchen hours are
+ * still placeholders — keep verified=false until those are confirmed.
+ *
+ * Prefer Admin → Öppettider (or `seed_reservations`) as the live hours API
  * source of truth; labels here are display fallbacks only.
  *
  * Cutover checklist: docs/deployment/production-checklist.md section A.
@@ -21,8 +23,8 @@ export const business = {
   tagline: "Goda smaker, äkta upplevelser",
   city: "Stockholm",
   address: {
-    street: "Strandvägen 5",
-    postalCode: "114 51",
+    street: "Hornsbergs Strand 57",
+    postalCode: "112 16",
     city: "Stockholm",
     country: "SE",
   },
@@ -30,10 +32,12 @@ export const business = {
   phoneHref: "tel:+4681234567",
   phoneE164: "+4681234567",
   email: "info@rivabistro.se",
-  kitchenHours: "Kökets öppettider Mån–Sön 12:00–22:00",
-  restaurantHoursLabel: "Mån–Fre 16–23, Lör–Sön 12–23",
+  /** Leave empty until the owner confirms kitchen last-order times. */
+  kitchenHours: "",
+  restaurantHoursLabel:
+    "Mån–Tor 10:30–21, Fre 11:30–00, Lör 10:30–23, Sön 10:30–21",
   mapUrl:
-    "https://www.google.com/maps/search/?api=1&query=Strandvägen+5+114+51+Stockholm",
+    "https://www.google.com/maps/search/?api=1&query=Hornsbergs+Strand+57+112+16+Stockholm",
   social: {
     instagram: "https://instagram.com/rivabistro",
     facebook: "https://facebook.com/rivabistro",

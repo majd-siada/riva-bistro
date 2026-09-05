@@ -35,7 +35,11 @@ export function validateReservation(
 
   if (!values.time) errors.time = "Välj en tid";
   if (!values.partySize) errors.partySize = "Ange antal gäster";
-  if (!values.name.trim()) errors.name = "Ange ditt namn";
+  if (!values.name.trim()) {
+    errors.name = "Ange ditt namn";
+  } else if (values.name.trim().length < 2) {
+    errors.name = "Ange ditt namn";
+  }
 
   if (!values.email.trim()) {
     errors.email = "Ange din e-post";
@@ -43,7 +47,11 @@ export function validateReservation(
     errors.email = "Ogiltig e-postadress";
   }
 
-  if (!values.phone.trim()) errors.phone = "Ange ett telefonnummer";
+  if (!values.phone.trim()) {
+    errors.phone = "Ange ett telefonnummer";
+  } else if (values.phone.replace(/\D/g, "").length < 7) {
+    errors.phone = "Ange ett giltigt telefonnummer";
+  }
 
   return errors;
 }

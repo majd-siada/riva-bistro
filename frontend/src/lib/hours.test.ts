@@ -10,12 +10,24 @@ describe("hours helpers", () => {
   it("labels closed days", () => {
     expect(
       formatDayHours({
-        weekday: 0 as const,
+        weekday: 0,
         weekday_label: "Måndag",
         opens_at: null,
         closes_at: null,
         is_closed: true,
       }),
     ).toBe("Stängt");
+  });
+
+  it("formats midnight close as 00", () => {
+    expect(
+      formatDayHours({
+        weekday: 4,
+        weekday_label: "Fredag",
+        opens_at: "11:30:00",
+        closes_at: "00:00:00",
+        is_closed: false,
+      }),
+    ).toBe("11:30–00");
   });
 });

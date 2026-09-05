@@ -8,7 +8,10 @@ export function fmtClock(t: string | null | undefined): string {
 
 export function formatDayHours(h: OpeningHour): string {
   if (h.is_closed || !h.opens_at) return "Stängt";
-  return `${fmtClock(h.opens_at)}–${fmtClock(h.closes_at)}`;
+  const closes = fmtClock(h.closes_at);
+  // Google-style midnight close: show "00" rather than "00:00".
+  const closesLabel = closes === "00:00" ? "00" : closes;
+  return `${fmtClock(h.opens_at)}–${closesLabel}`;
 }
 
 export function todayHours(hours: OpeningHour[]): OpeningHour | undefined {

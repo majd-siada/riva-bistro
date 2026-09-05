@@ -940,6 +940,8 @@ components:
           type: boolean
         max_party_size:
           type: integer
+        horizon_days:
+          type: integer
         slots:
           type: array
           items:

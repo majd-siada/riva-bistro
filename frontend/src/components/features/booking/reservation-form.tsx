@@ -91,8 +91,11 @@ export function ReservationForm() {
 
   const validateContact = (): boolean => {
     const next: ContactErrors = {};
-    if (!contact.name.trim()) next.name = "Ange ditt namn";
+    const name = contact.name.trim();
+    const phoneDigits = contact.phone.replace(/\D/g, "");
+    if (name.length < 2) next.name = "Ange ditt namn";
     if (!contact.phone.trim()) next.phone = "Ange ett telefonnummer";
+    else if (phoneDigits.length < 7) next.phone = "Ange ett giltigt telefonnummer";
     if (!contact.email.trim()) next.email = "Ange din e-post";
     else if (!isValidEmail(contact.email)) next.email = "Ogiltig e-postadress";
     setErrors(next);
@@ -126,7 +129,12 @@ export function ReservationForm() {
         err instanceof ApiError ? err.message : "Något gick fel. Försök igen.";
       setServerError(message);
       // The slot may have filled up — refresh availability so the UI is honest.
-      if (err instanceof ApiError && (err.code === "full" || err.code === "closed")) {
+      if (
+        err instanceof ApiError &&
+        ["full", "closed", "not_enabled", "past", "invalid_slot", "invalid_party"].includes(
+          err.code,
+        )
+      ) {
         fetchAvailability(date).then(setAvailability).catch(() => {});
         setTime("");
       }

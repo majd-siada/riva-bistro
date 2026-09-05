@@ -72,6 +72,14 @@ describe("validateReservation", () => {
     );
     expect(errors.email).toBeDefined();
   });
+
+  it("rejects a phone number with too few digits", () => {
+    const errors = validateReservation(
+      { ...validReservation, phone: "123" },
+      today,
+    );
+    expect(errors.phone).toBeDefined();
+  });
 });
 
 describe("validateContact", () => {

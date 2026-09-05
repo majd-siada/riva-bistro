@@ -42,10 +42,18 @@ def opening_for_date(target: date_cls) -> tuple[bool, time | None, time | None]:
 def generate_slots(
     opens_at: time, closes_at: time, interval_minutes: int, buffer_minutes: int
 ) -> list[time]:
-    """Slots from opening until the last seating (close minus buffer)."""
+    """Slots from opening until the last seating (close minus buffer).
+
+    Closing at 00:00 (midnight) is treated as end-of-day overnight for the
+    same weekday (e.g. Friday 11:30–00:00), not as "closed at midnight start".
+    """
     base = date_cls(2000, 1, 1)
     start = datetime.combine(base, opens_at)
-    last = datetime.combine(base, closes_at) - timedelta(minutes=buffer_minutes)
+    end = datetime.combine(base, closes_at)
+    # Midnight close (and any closes_at <= opens_at) spans into the next calendar day.
+    if closes_at <= opens_at:
+        end += timedelta(days=1)
+    last = end - timedelta(minutes=buffer_minutes)
     step = timedelta(minutes=max(interval_minutes, 5))
     slots: list[time] = []
     # If the seating buffer is larger than the opening window, still offer
@@ -89,9 +97,8 @@ def compute_availability(target: date_cls) -> dict:
         "slots": [],
     }
 
-    if target < date_cls.today() or target > date_cls.today() + timedelta(
-        days=config.booking_horizon_days
-    ):
+    today = timezone.localdate()
+    if target < today or target > today + timedelta(days=config.booking_horizon_days):
         result["closed"] = True
         return result
 
