@@ -280,7 +280,10 @@ if _sentry_dsn:
             integrations=[DjangoIntegration()],
             traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0")),
             send_default_pii=False,
-            environment=os.getenv("SENTRY_ENVIRONMENT", "production" if not DEBUG else "development"),
+            environment=os.getenv(
+                "SENTRY_ENVIRONMENT",
+                "production" if not DEBUG else "development",
+            ),
         )
     except ImportError:
         pass

@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.notifications import notify_reservation_created
-
 from reservations.models import (
     OpeningHours,
     Reservation,

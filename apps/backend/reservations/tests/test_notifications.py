@@ -111,8 +111,9 @@ def test_create_response_includes_live_notification_results(api, settings):
 
 @pytest.mark.django_db
 def test_resend_reservation_notifications_command_retries_unsent():
-    from django.core.management import call_command
     from io import StringIO
+
+    from django.core.management import call_command
 
     _open_all_week()
     row = Reservation.objects.create(
@@ -155,8 +156,9 @@ def test_resend_reservation_notifications_command_retries_unsent():
 
 @pytest.mark.django_db
 def test_resend_unsent_skips_fully_notified_rows():
-    from django.core.management import call_command
     from io import StringIO
+
+    from django.core.management import call_command
 
     _open_all_week()
     Reservation.objects.create(
