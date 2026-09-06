@@ -121,6 +121,30 @@ def test_seed_menu_sections_is_idempotent_and_preserves_admin_order(seeded_menu)
 
 
 @pytest.mark.django_db
+def test_seed_menu_sections_upgrades_placeholder_dagens_lunch_name(seeded_menu):
+    lunch = Category.objects.get(slug="dagens-lunch")
+    lunch.name = "Dagens lunch v.??"
+    lunch.save(update_fields=["name", "updated_at"])
+
+    call_command("seed_menu_sections")
+
+    lunch.refresh_from_db()
+    assert lunch.name == "Dagens lunch"
+
+
+@pytest.mark.django_db
+def test_seed_menu_sections_does_not_overwrite_custom_dagens_lunch_name(seeded_menu):
+    lunch = Category.objects.get(slug="dagens-lunch")
+    lunch.name = "Dagens lunch v.36"
+    lunch.save(update_fields=["name", "updated_at"])
+
+    call_command("seed_menu_sections")
+
+    lunch.refresh_from_db()
+    assert lunch.name == "Dagens lunch v.36"
+
+
+@pytest.mark.django_db
 def test_seed_menu_does_not_prune_top_level_sections(seeded_menu):
     before = set(
         Category.objects.filter(slug__in=SECTION_SLUGS).values_list("slug", flat=True)

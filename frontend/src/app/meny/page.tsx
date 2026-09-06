@@ -9,7 +9,7 @@ import {
   childCategories,
   itemsForCategory,
   loadPublicMenu,
-  topLevelCategories,
+  visibleTopLevelSections,
 } from "@/lib/public-menu";
 
 export const metadata = {
@@ -20,16 +20,16 @@ export const metadata = {
 
 export default async function MenuPage() {
   const { categories, items } = await loadPublicMenu();
-  const sections = topLevelCategories(categories);
+  const sections = visibleTopLevelSections(categories, items);
 
   const navCategories = sections.flatMap((section) => {
     if (section.slug === "rivas-meny") {
+      const courses = childCategories(categories, section.slug).filter(
+        (c) => itemsForCategory(items, c.slug).length > 0,
+      );
       return [
         { slug: section.slug, name: section.name },
-        ...childCategories(categories, section.slug).map((c) => ({
-          slug: c.slug,
-          name: c.name,
-        })),
+        ...courses.map((c) => ({ slug: c.slug, name: c.name })),
       ];
     }
     return [{ slug: section.slug, name: section.name }];
@@ -81,10 +81,12 @@ export default async function MenuPage() {
                 MENU_SECTION_REGISTRY[section.slug] ?? MenuSection;
               const subsections =
                 section.slug === "rivas-meny"
-                  ? childCategories(categories, section.slug).map((sub) => ({
-                      category: sub,
-                      items: itemsForCategory(items, sub.slug),
-                    }))
+                  ? childCategories(categories, section.slug)
+                      .map((sub) => ({
+                        category: sub,
+                        items: itemsForCategory(items, sub.slug),
+                      }))
+                      .filter((sub) => sub.items.length > 0)
                   : undefined;
               const directItems =
                 section.slug === "rivas-meny"

@@ -26,6 +26,8 @@ describe("fallback menu hierarchy", () => {
       "dryck",
     ]);
     expect(tops.map((c) => c.sortOrder)).toEqual([10, 20, 30, 40, 50, 60]);
+    expect(tops[0].name).toBe("Dagens lunch");
+    expect(tops[0].name).not.toContain("?");
   });
 
   it("nests course categories under rivas-meny", () => {

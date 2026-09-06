@@ -13,14 +13,20 @@ from django.core.management.base import BaseCommand
 from catalog.models import Category
 
 # (sort_order, slug, name) — gaps allow future inserts without renumbering.
+# Week number for dagens lunch is set in Admin (do not invent v.NN here).
 TOP_LEVEL_SECTIONS = [
-    (10, "dagens-lunch", "Dagens lunch v.??"),
+    (10, "dagens-lunch", "Dagens lunch"),
     (20, "rivas-meny", "RIVAS MENY"),
     (30, "take-away", "TAKE AWAY"),
     (40, "stora-sallskapsmeny", "STORA SÄLLSKAPSMENY"),
     (50, "snacks-drinkar", "SNACKS & DRINKAR"),
     (60, "dryck", "DRYCK"),
 ]
+
+# Names from earlier seeds that should be upgraded once (not admin edits).
+LEGACY_SECTION_NAMES = {
+    "dagens-lunch": ("Dagens lunch v.??",),
+}
 
 # Existing course-type categories that belong under RIVAS MENY.
 RIVAS_MENY_CHILDREN = (
@@ -41,8 +47,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         created_sections = 0
+        upgraded_names = 0
         for sort_order, slug, name in TOP_LEVEL_SECTIONS:
-            _, created = Category.objects.get_or_create(
+            obj, created = Category.objects.get_or_create(
                 slug=slug,
                 defaults={
                     "name": name,
@@ -56,7 +63,16 @@ class Command(BaseCommand):
                 created_sections += 1
                 self.stdout.write(f"Created section {slug} (sort_order={sort_order})")
             else:
-                self.stdout.write(f"Section {slug} already exists — leaving name/order intact")
+                legacy = LEGACY_SECTION_NAMES.get(slug, ())
+                if obj.name in legacy and obj.name != name:
+                    obj.name = name
+                    obj.save(update_fields=["name", "updated_at"])
+                    upgraded_names += 1
+                    self.stdout.write(f"Upgraded section name {slug} → {name!r}")
+                else:
+                    self.stdout.write(
+                        f"Section {slug} already exists — leaving name/order intact"
+                    )
 
         rivas = Category.objects.filter(slug="rivas-meny").first()
         if rivas is None:
@@ -84,6 +100,8 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Menu sections ready (created={created_sections}, linked={linked})."
+                f"Menu sections ready "
+                f"(created={created_sections}, upgraded_names={upgraded_names}, "
+                f"linked={linked})."
             )
         )

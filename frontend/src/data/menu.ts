@@ -32,7 +32,7 @@ export interface MenuItem {
 export const MENU_CATEGORIES: MenuCategory[] = [
   // Top-level sections (sort_order gaps match backend seed)
   {
-    name: "Dagens lunch v.??",
+    name: "Dagens lunch",
     slug: "dagens-lunch",
     description: "",
     sortOrder: 10,
