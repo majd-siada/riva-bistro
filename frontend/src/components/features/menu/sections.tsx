@@ -7,6 +7,8 @@ export type MenuSectionProps = {
   items: PublicItem[];
   /** Optional nested course categories (used by RIVAS MENY). */
   subsections?: Array<{ category: PublicCategory; items: PublicItem[] }>;
+  /** Single-panel meny browser: drop the heavy stacked-page top border. */
+  isolated?: boolean;
 };
 
 function EmptyState({ label }: { label: string }) {
@@ -35,12 +37,16 @@ function ItemGrid({ items }: { items: PublicItem[] }) {
 }
 
 /** Generic top-level section: heading + direct items (no nested courses). */
-export function MenuSection({ category, items }: MenuSectionProps) {
+export function MenuSection({ category, items, isolated = false }: MenuSectionProps) {
   return (
     <section
       id={category.slug}
       aria-labelledby={`${category.slug}-heading`}
-      className="scroll-mt-28 border-t border-riva-gold/15 pt-14"
+      className={
+        isolated
+          ? "scroll-mt-28"
+          : "scroll-mt-28 border-t border-riva-gold/15 pt-14"
+      }
     >
       <SectionHeading
         title={category.name}
@@ -79,6 +85,7 @@ export function DryckSection(props: MenuSectionProps) {
 export function RivasMenySection({
   category,
   subsections = [],
+  isolated = false,
 }: MenuSectionProps) {
   const hasAnyItems = subsections.some((s) => s.items.length > 0);
 
@@ -86,7 +93,11 @@ export function RivasMenySection({
     <section
       id={category.slug}
       aria-labelledby={`${category.slug}-heading`}
-      className="scroll-mt-28 border-t border-riva-gold/15 pt-14"
+      className={
+        isolated
+          ? "scroll-mt-28"
+          : "scroll-mt-28 border-t border-riva-gold/15 pt-14"
+      }
     >
       <div className="rounded-2xl border border-riva-gold/25 bg-riva-card/40 px-5 py-8 md:px-8 md:py-10">
         <SectionHeading

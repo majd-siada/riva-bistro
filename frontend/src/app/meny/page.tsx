@@ -1,16 +1,10 @@
 import { RestaurantImage } from "@/components/brand/restaurant-image";
-import { MenuCategoryNav } from "@/components/features/menu";
-import {
-  MENU_SECTION_REGISTRY,
-  MenuSection,
-} from "@/components/features/menu/sections";
+import { MenuBrowser } from "@/components/features/menu/menu-browser";
 import { Section } from "@/components/layout/section";
 import {
   buildMenuNav,
-  childCategories,
-  itemsForCategory,
+  buildMenuPanels,
   loadPublicMenu,
-  topLevelCategories,
 } from "@/lib/public-menu";
 
 export const metadata = {
@@ -19,14 +13,17 @@ export const metadata = {
     "Riva Bistros meny — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
 };
 
-/** Prefer a complete HTML document so RIVAS MENY is not split across streamed chunks. */
 export const dynamic = "force-static";
 export const revalidate = 60;
 
 export default async function MenuPage() {
   const { categories, items } = await loadPublicMenu();
-  const sections = topLevelCategories(categories);
-  const navCategories = buildMenuNav(categories);
+  const nav = buildMenuNav(categories);
+  const panels = buildMenuPanels(categories, items);
+  const defaultSlug =
+    panels.find((p) => p.slug === "rivas-meny")?.slug ??
+    panels[0]?.slug ??
+    "dagens-lunch";
 
   return (
     <>
@@ -48,54 +45,8 @@ export default async function MenuPage() {
         </div>
       </section>
 
-      {/* as="div" avoids nested <section> with each meny block (cleaner isolation). */}
       <Section as="div">
-        <div className="grid gap-12 lg:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
-          <div className="hidden lg:block">
-            <div className="sticky top-28">
-              <MenuCategoryNav categories={navCategories} />
-            </div>
-          </div>
-
-          <div className="min-w-0 space-y-4 md:space-y-6">
-            <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
-              {navCategories.map((cat) => (
-                <a
-                  key={cat.slug}
-                  href={`#${cat.slug}`}
-                  className="shrink-0 rounded-full border border-riva-gold/30 px-4 py-2 text-sm text-riva-cream"
-                >
-                  {cat.name}
-                </a>
-              ))}
-            </div>
-
-            {sections.map((section) => {
-              const SectionComponent =
-                MENU_SECTION_REGISTRY[section.slug] ?? MenuSection;
-              const subsections =
-                section.slug === "rivas-meny"
-                  ? childCategories(categories, section.slug).map((sub) => ({
-                      category: sub,
-                      items: itemsForCategory(items, sub.slug),
-                    }))
-                  : undefined;
-              const directItems =
-                section.slug === "rivas-meny"
-                  ? []
-                  : itemsForCategory(items, section.slug);
-
-              return (
-                <SectionComponent
-                  key={section.slug}
-                  category={section}
-                  items={directItems}
-                  subsections={subsections}
-                />
-              );
-            })}
-          </div>
-        </div>
+        <MenuBrowser nav={nav} panels={panels} defaultSlug={defaultSlug} />
       </Section>
     </>
   );

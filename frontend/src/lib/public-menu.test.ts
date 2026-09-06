@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { MENU_CATEGORIES } from "@/data/menu";
+import { MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu";
 import {
   MENU_SECTION_SLUGS,
   RIVAS_MENY_COURSE_SLUGS,
   buildMenuNav,
+  buildMenuPanels,
   catalogHasMenuSections,
   isolateMenuHierarchy,
   topLevelCategories,
@@ -41,5 +42,30 @@ describe("isolateMenuHierarchy", () => {
     const rivas = nav.find((n) => n.slug === "rivas-meny");
     expect(rivas?.children?.map((c) => c.slug)).toEqual([...RIVAS_MENY_COURSE_SLUGS]);
     expect(nav.find((n) => n.slug === "take-away")?.children).toBeUndefined();
+  });
+});
+
+describe("buildMenuPanels", () => {
+  it("creates one panel per top-level section plus one per RIVAS course", () => {
+    const categories = isolateMenuHierarchy(MENU_CATEGORIES);
+    const panels = buildMenuPanels(categories, MENU_ITEMS);
+    const slugs = panels.map((p) => p.slug);
+
+    expect(slugs).toEqual([
+      ...MENU_SECTION_SLUGS.slice(0, 2),
+      ...RIVAS_MENY_COURSE_SLUGS,
+      ...MENU_SECTION_SLUGS.slice(2),
+    ]);
+
+    const lunch = panels.find((p) => p.slug === "dagens-lunch");
+    const rivas = panels.find((p) => p.slug === "rivas-meny");
+    const starters = panels.find((p) => p.slug === "forratter");
+
+    expect(lunch?.subsections).toBeUndefined();
+    expect(rivas?.subsections?.map((s) => s.category.slug)).toEqual([
+      ...RIVAS_MENY_COURSE_SLUGS,
+    ]);
+    expect(starters?.items.length).toBeGreaterThan(0);
+    expect(starters?.subsections).toBeUndefined();
   });
 });

@@ -8,53 +8,101 @@ import type { MenuNavEntry } from "@/lib/public-menu";
 interface MenuCategoryNavProps {
   categories: MenuNavEntry[];
   activeSlug?: string;
+  onSelect?: (slug: string) => void;
   className?: string;
 }
 
-export function MenuCategoryNav({ categories, activeSlug, className }: MenuCategoryNavProps) {
+export function MenuCategoryNav({
+  categories,
+  activeSlug,
+  onSelect,
+  className,
+}: MenuCategoryNavProps) {
   return (
     <nav className={cn("space-y-6", className)} aria-label="Menykategorier">
       <div>
         <p className="riva-label mb-4">Kategorier</p>
         <ul className="space-y-1">
-          {categories.map((cat) => (
-            <li key={cat.slug}>
-              <a
-                href={`#${cat.slug}`}
-                className={cn(
-                  "block rounded-md px-3 py-2 text-sm transition-riva",
-                  activeSlug === cat.slug
-                    ? "bg-riva-gold/15 text-riva-gold"
-                    : "text-riva-muted hover:bg-riva-card hover:text-riva-cream",
-                )}
-              >
-                {cat.name}
-              </a>
-              {cat.children?.length ? (
-                <ul className="mt-1 space-y-0.5 border-l border-riva-gold/20 py-1 pl-3">
-                  {cat.children.map((child) => (
-                    <li key={child.slug}>
-                      <a
-                        href={`#${child.slug}`}
-                        className={cn(
-                          "block rounded-md px-3 py-1.5 text-sm transition-riva",
-                          activeSlug === child.slug
-                            ? "bg-riva-gold/10 text-riva-gold"
-                            : "text-riva-muted/90 hover:bg-riva-card hover:text-riva-cream",
-                        )}
-                      >
-                        {child.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </li>
-          ))}
+          {categories.map((cat) => {
+            const childActive = cat.children?.some((c) => c.slug === activeSlug);
+            const parentActive = activeSlug === cat.slug || Boolean(childActive);
+
+            return (
+              <li key={cat.slug}>
+                <NavButton
+                  slug={cat.slug}
+                  name={cat.name}
+                  active={activeSlug === cat.slug}
+                  emphasized={parentActive}
+                  onSelect={onSelect}
+                />
+                {cat.children?.length ? (
+                  <ul className="mt-1 space-y-0.5 border-l border-riva-gold/20 py-1 pl-3">
+                    {cat.children.map((child) => (
+                      <li key={child.slug}>
+                        <NavButton
+                          slug={child.slug}
+                          name={child.name}
+                          active={activeSlug === child.slug}
+                          onSelect={onSelect}
+                          compact
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </div>
       <AllergyBox />
     </nav>
+  );
+}
+
+function NavButton({
+  slug,
+  name,
+  active,
+  emphasized,
+  compact,
+  onSelect,
+}: {
+  slug: string;
+  name: string;
+  active?: boolean;
+  emphasized?: boolean;
+  compact?: boolean;
+  onSelect?: (slug: string) => void;
+}) {
+  const className = cn(
+    "block w-full rounded-md text-left transition-riva",
+    compact ? "px-3 py-1.5 text-sm" : "px-3 py-2 text-sm",
+    active
+      ? "bg-riva-gold/15 text-riva-gold"
+      : emphasized
+        ? "text-riva-cream"
+        : "text-riva-muted hover:bg-riva-card hover:text-riva-cream",
+  );
+
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(slug)}
+        className={className}
+        aria-current={active ? "true" : undefined}
+      >
+        {name}
+      </button>
+    );
+  }
+
+  return (
+    <a href={`#${slug}`} className={className} aria-current={active ? "true" : undefined}>
+      {name}
+    </a>
   );
 }
 

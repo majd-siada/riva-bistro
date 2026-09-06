@@ -253,3 +253,49 @@ export function buildMenuNav(
     };
   });
 }
+
+export type MenuPanelData = {
+  slug: string;
+  category: PublicCategory;
+  items: PublicItem[];
+  subsections?: Array<{ category: PublicCategory; items: PublicItem[] }>;
+};
+
+/**
+ * One panel per top-level section, plus one panel per RIVAS MENY course so the
+ * browser can show a single category at a time.
+ */
+export function buildMenuPanels(
+  categories: PublicCategory[],
+  items: PublicItem[],
+): MenuPanelData[] {
+  const panels: MenuPanelData[] = [];
+  for (const section of topLevelCategories(categories)) {
+    if (section.slug === "rivas-meny") {
+      const courses = childCategories(categories, "rivas-meny");
+      panels.push({
+        slug: "rivas-meny",
+        category: section,
+        items: [],
+        subsections: courses.map((sub) => ({
+          category: sub,
+          items: itemsForCategory(items, sub.slug),
+        })),
+      });
+      for (const course of courses) {
+        panels.push({
+          slug: course.slug,
+          category: course,
+          items: itemsForCategory(items, course.slug),
+        });
+      }
+    } else {
+      panels.push({
+        slug: section.slug,
+        category: section,
+        items: itemsForCategory(items, section.slug),
+      });
+    }
+  }
+  return panels;
+}
