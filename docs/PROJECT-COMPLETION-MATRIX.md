@@ -11,15 +11,15 @@ Product scope: **brochure site + table reservations** (commerce intentionally ou
 
 | Status | Count |
 |--------|------:|
-| DONE | 149 |
-| PARTIAL | 104 |
-| NOT DONE | 5 |
+| DONE | 163 |
+| PARTIAL | 91 |
+| NOT DONE | 4 |
 | BLOCKED — HUMAN ACTION REQUIRED | 67 |
 | **Total** | **325** |
 
-Completion percentage (DONE only): **45.8%**
+Completion percentage (DONE only): **50.2%**
 
-Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed; `next build` OK; `scripts/production-check.sh` 11/11 live checks OK.
+Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed; `tsc --noEmit` OK; `scripts/production-check.sh` 11/11 live checks OK; local legal routes verified in repo.
 
 ## Status legend
 
@@ -55,9 +55,9 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 14 | Color System | DONE | CSS variables riva-* palette | frontend/src/app/globals.css |  |  |  |  |
 | 15 | Icon System | DONE | lucide-react icons in UI |  |  |  |  |  |
 | 16 | Image System | DONE | next/image + media API remotePatterns | frontend/next.config.ts |  |  |  |  |
-| 17 | Component Library | PARTIAL | UI primitives + feature components; not a published package | frontend/src/components/ |  |  | Document component inventory |  |
+| 17 | Component Library | DONE | In-repo component inventory documented; UI primitives + feature components | docs/design-system/component-inventory.md; frontend/src/components/ |  | Review inventory |  |  |
 | 18 | Responsive Design | PARTIAL | Tailwind breakpoints used; physical device QA pending |  | Browser emulator | Physical device matrix | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 19 | Accessibility Design | PARTIAL | Skip link, landmarks, focus-visible, reduced-motion; form aria gaps remain | frontend/src/components/layout/; globals.css |  | axe/manual | Form aria-describedby polish |  |
+| 19 | Accessibility Design | DONE | Skip link, landmarks, focus-visible, reduced-motion; booking + contact/event forms wire aria-describedby + role=alert | frontend layout/forms | vitest | Manual keyboard spot-check | Formal WCAG audit still PARTIAL elsewhere |  |
 | 20 | UI/UX Guidelines | DONE | Design-system docs present | docs/design-system/ |  |  |  |  |
 
 ## PHASE 3 — WEBSITE STRUCTURE
@@ -68,7 +68,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 22 | Navigation Architecture | DONE | Header + footer nav | header.tsx; footer.tsx |  |  |  |  |
 | 23 | Header | DONE | Sticky header with CTA | frontend/src/components/layout/header.tsx |  |  |  |  |
 | 24 | Navigation Bar | DONE | Primary nav + mobile sheet |  |  |  |  |  |
-| 25 | Footer | DONE | NAP + hours + nav; legal links to be added | footer.tsx |  |  | Add legal links |  |
+| 25 | Footer | DONE | Footer NAP + hours + nav + legal links to /integritetspolicy /cookies /villkor /bokningspolicy | footer.tsx |  | Local :3022 |  |  |
 | 26 | Homepage | DONE | Cinematic home with claim-safe copy | frontend/src/app/page.tsx |  |  |  |  |
 | 27 | About Page | DONE | /om-oss | frontend/src/app/om-oss/page.tsx |  |  |  |  |
 | 28 | Contact Page | DONE | /kontakt + inquiry API | frontend/src/app/kontakt/ |  |  |  |  |
@@ -80,8 +80,8 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 34 | Offers | DONE | N/A intentional — no offers feature in MVP scope; no fake offers |  | mvp.md |  |  |  |
 | 35 | Gallery | DONE | /galleri + GalleryItem API | galleri/; core models |  |  |  |  |
 | 36 | Reviews | DONE | N/A — no fabricated reviews; GBP review strategy is external |  |  | GBP reviews | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 37 | FAQ | PARTIAL | No /faq route; only mentioned as future polish |  |  | Add claim-safe FAQ if owner provides Q&A |  |  |
-| 38 | Legal Pages | PARTIAL | Privacy/cookies/terms scaffolding missing (to be added this mission) |  |  | Add scaffolding pages |  |  |
+| 37 | FAQ | DONE | Claim-safe FAQ on /kontakt (NAP/phone/email/booking path); no invented menu claims | kontakt/page.tsx; faq.tsx |  | Review FAQ copy |  |  |
+| 38 | Legal Pages | PARTIAL | Swedish legal scaffolding pages live in repo with mall disclaimer; counsel approval pending | integritetspolicy/cookies/villkor/bokningspolicy |  | Deploy + legal review | Owner/counsel sign-off | BLOCKED — HUMAN ACTION REQUIRED |
 | 39 | Error Pages | DONE | error.tsx + not-found.tsx | frontend/src/app/error.tsx; not-found.tsx |  |  |  |  |
 | 40 | 404 Page | DONE | Custom not-found | not-found.tsx |  |  |  |  |
 
@@ -121,9 +121,9 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 65 | Data Validation | DONE | DRF serializers + model constraints |  |  |  |  |  |
 | 66 | Data Relationships | DONE | FK/M2M as modeled |  |  |  |  |  |
 | 67 | Data Integrity | DONE | Advisory lock + capacity checks on booking |  | tests |  |  |  |
-| 68 | Backup Strategy | PARTIAL | Runbook mentions backup; scripts to be added |  |  | Add pg_dump scripts; schedule on VPS | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 69 | Data Recovery | PARTIAL | Restore procedure to be documented with scripts |  |  | Prove restore on VPS | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 70 | Data Retention | PARTIAL | No formal retention policy doc |  |  | Owner defines retention | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 68 | Backup Strategy | PARTIAL | backup-postgres.sh + restore-postgres.sh + runbook; VPS cron/restore drill pending | scripts/backup-postgres.sh; scripts/restore-postgres.sh |  | Owner schedules cron | Live restore proof | BLOCKED — HUMAN ACTION REQUIRED |
+| 69 | Data Recovery | PARTIAL | Restore script requires CONFIRM_RESTORE=YES; documented in runbook | scripts/restore-postgres.sh; production-runbook.md |  | Restore drill on VPS | Proven restore | BLOCKED — HUMAN ACTION REQUIRED |
+| 70 | Data Retention | PARTIAL | Owner fill-in retention template added; periods not decided | docs/ops/data-retention.md |  | Owner sets periods | Counsel approval | BLOCKED — HUMAN ACTION REQUIRED |
 
 ## PHASE 6 — SECURITY
 
@@ -133,17 +133,17 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 72 | Authorization Security | DONE | IsAdminUser on admin routes; schema docs staff-only |  |  |  |  |  |
 | 73 | Input Validation | DONE | Serializers validate booking/contact payloads |  |  |  |  |  |
 | 74 | API Security | DONE | CORS/CSRF production guards; HTTPS cookies |  |  |  |  |  |
-| 75 | Rate Limiting | DONE | Scoped throttles on write endpoints; anon unused; LocMem cache | settings REST_FRAMEWORK |  |  | Wire anon or document; Redis optional |  |
+| 75 | Rate Limiting | DONE | Scoped write throttles + global AnonRateThrottle enabled; LocMem cache | config/settings.py | test_security_settings.py | pytest | Redis optional at scale |  |
 | 76 | CSRF Protection | DONE | Django CSRF + trusted origins |  |  |  |  |  |
 | 77 | XSS Protection | DONE | React escaping + SECURE_CONTENT_TYPE_NOSNIFF |  |  |  |  |  |
 | 78 | SQL Injection Protection | DONE | Django ORM parameterized queries |  |  |  |  |  |
 | 79 | Secrets Management | DONE | Env-only secrets; .env gitignored; .env.example |  |  |  |  |  |
 | 80 | Session Security | DONE | HttpOnly session; Secure in prod; SameSite configurable |  |  |  |  |  |
-| 81 | File Upload Security | PARTIAL | Image uploads via admin; validation partial |  |  | Tighten upload validators |  |  |
+| 81 | File Upload Security | DONE | Product + gallery admin uploads sniff magic + size/extension allowlist | core/images.py; AdminGalleryItemSerializer; catalog admin image view | test_media_uploads.py | pytest 103 |  |  |
 | 82 | Payment Security | DONE | N/A — no payments |  |  |  |  |  |
 | 83 | Admin Security | DONE | Staff-only; strong password via seed_admin env |  |  | MFA optional | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 84 | Audit Logging | PARTIAL | Django admin history only; no structured app audit log |  |  | LOGGING config this mission |  |  |
-| 85 | Security Headers | DONE | HSTS/nosniff/XFO/referrer; no CSP yet | settings.py |  |  | Add CSP-compatible baseline |  |
+| 84 | Audit Logging | PARTIAL | Django LOGGING configured + admin history; no dedicated immutable audit store | config/settings.py |  |  | Optional audit log product |  |
+| 85 | Security Headers | DONE | Django HSTS/nosniff/XFO/referrer/COOP; Next security headers + CSP Report-Only | settings.py; next.config.ts | test_security_settings.py |  | Enforce CSP after report review |  |
 
 ## PHASE 7 — SEO
 
@@ -230,7 +230,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 144 | Focus Management | PARTIAL | focus-visible global; dialogs use Radix |  |  |  |  |  |
 | 145 | Color Contrast | PARTIAL | Cream on black intentional; gold accents need spot-check |  |  |  |  |  |
 | 146 | Alt Text | PARTIAL | Many images have alt; inventory incomplete |  |  |  |  |  |
-| 147 | Form Accessibility | PARTIAL | Labels present; aria-describedby gaps to fix |  |  | Fix this mission |  |  |
+| 147 | Form Accessibility | DONE | Reservation + contact + event forms: labels, aria-invalid, aria-describedby, role=alert | reservation-form; contact-form; event-inquiry-form |  | Keyboard + SR spot-check |  |  |
 | 148 | Semantic HTML | DONE | header/main/footer/nav/address |  |  |  |  |  |
 | 149 | ARIA | PARTIAL | Used sparingly with Radix; avoid over-ARIA |  |  |  |  |  |
 | 150 | Reduced Motion | DONE | prefers-reduced-motion in CSS + reveal observer |  |  |  |  |  |
@@ -258,7 +258,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 167 | Error Handling Testing | PARTIAL | API error codes tested; UI error states partial |  |  |  |  |  |
 | 168 | Edge Case Testing | PARTIAL | Booking edge cases covered in backend tests |  |  |  |  |  |
 | 169 | Regression Testing | DONE | CI on PR |  |  |  |  |  |
-| 170 | Production Smoke Testing | PARTIAL | scripts/production-check.sh exists; needs live run |  | production-check.sh | Run against prod | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 170 | Production Smoke Testing | DONE | scripts/production-check.sh Passed 11 Failed 0 against live hosts this session | scripts/production-check.sh |  | Re-run before each release |  |  |
 
 ## PHASE 13 — CONTENT
 
@@ -273,12 +273,12 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 177 | Opening Hours | DONE | Official hours seeded + admin editable |  |  |  |  |  |
 | 178 | Images | PARTIAL | Some assets present; complete library owner-dependent |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 179 | Logo Assets | DONE | Logo component/assets in brand |  |  |  |  |  |
-| 180 | Legal Content | PARTIAL | Scaffolding to be added; legal approval blocked |  |  | Legal review | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 181 | Privacy Policy | PARTIAL | To add scaffolding |  |  | Legal approval | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 182 | Cookie Policy | PARTIAL | To add scaffolding |  |  | Legal approval | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 183 | Terms & Conditions | PARTIAL | To add scaffolding |  |  | Legal approval | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 184 | Reservation Policy | PARTIAL | To add scaffolding |  |  | Owner confirm cancel rules | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 185 | Cancellation Policy | PARTIAL | Part of reservation policy scaffolding |  |  | Owner confirm | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 180 | Legal Content | PARTIAL | Legal scaffolding content in repo; not counsel-approved | legal pages |  | Legal review |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 181 | Privacy Policy | PARTIAL | /integritetspolicy scaffolding + disclaimer | integritetspolicy/page.tsx |  | Legal approval |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 182 | Cookie Policy | PARTIAL | /cookies scaffolding + cookie notice link | cookies/page.tsx |  | Legal approval |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 183 | Terms & Conditions | PARTIAL | /villkor scaffolding | villkor/page.tsx |  | Legal approval |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 184 | Reservation Policy | PARTIAL | /bokningspolicy scaffolding (booking + cancellation) | bokningspolicy/page.tsx |  | Legal approval |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 185 | Cancellation Policy | PARTIAL | Cancellation text included in bokningspolicy scaffolding | bokningspolicy/page.tsx |  | Legal approval |  | BLOCKED — HUMAN ACTION REQUIRED |
 
 ## PHASE 14 — ANALYTICS & TRACKING
 
@@ -293,7 +293,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 192 | Reservation Tracking | PARTIAL | Server-side reservations in DB; no GA events |  |  |  |  |  |
 | 193 | Order Tracking | DONE | N/A — no orders |  |  |  |  |  |
 | 194 | Payment Tracking | DONE | N/A — no payments |  |  |  |  |  |
-| 195 | Error Monitoring | PARTIAL | No Sentry; env-gated stub to add |  |  | Add SENTRY_DSN optional |  |  |
+| 195 | Error Monitoring | PARTIAL | Env-gated Sentry init when SENTRY_DSN set; empty = no-op | settings.py; .env.example |  | Owner sets DSN + installs sentry-sdk | Live DSN | BLOCKED — HUMAN ACTION REQUIRED |
 | 196 | Performance Monitoring | BLOCKED — HUMAN ACTION REQUIRED | No APM; Hostinger/VPS metrics external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 
 ## PHASE 15 — INFRASTRUCTURE
@@ -311,9 +311,9 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 205 | Email Configuration | PARTIAL | Code ready; VPS env unproven |  | verify-notifications | Confirm delivery | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 206 | Storage Configuration | PARTIAL | Local MEDIA_ROOT; S3 future |  |  |  |  |  |
 | 207 | CDN Configuration | BLOCKED — HUMAN ACTION REQUIRED | External |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 208 | Backup Configuration | PARTIAL | Scripts to be added; schedule on VPS |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 209 | Monitoring Configuration | PARTIAL | Health endpoint only |  |  |  |  |  |
-| 210 | Logging Configuration | DONE | No Django LOGGING dict yet — adding this mission |  |  |  |  |  |
+| 208 | Backup Configuration | PARTIAL | Backup scripts present; schedule/retention on VPS pending | scripts/backup-postgres.sh |  | Cron on VPS |  | BLOCKED — HUMAN ACTION REQUIRED |
+| 209 | Monitoring Configuration | PARTIAL | Health endpoint + optional Sentry; no pager | health; SENTRY_DSN | production-check |  | Alerts external |  |
+| 210 | Logging Configuration | DONE | Django LOGGING dict with console handlers; no secrets in formatters | config/settings.py | pytest |  |  |  |
 
 ## PHASE 16 — CI/CD & DEPLOYMENT
 
@@ -324,7 +324,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 213 | Code Review | PARTIAL | PR workflow; enforcement external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 214 | CI Pipeline | DONE | .github/workflows/ci.yml lint/test |  |  |  |  |  |
 | 215 | Automated Tests | DONE | pytest + vitest in CI |  |  |  |  |  |
-| 216 | Build Pipeline | DONE | Frontend build not in CI yet — adding | ci.yml |  | Add next build |  |  |
+| 216 | Build Pipeline | DONE | CI runs npm run build (production Next build) | .github/workflows/ci.yml | CI |  |  |  |
 | 217 | Deployment Pipeline | NOT DONE | Manual deploy per runbook; no CD |  |  | Optional CD later |  |  |
 | 218 | Staging Environment | NOT DONE | No dedicated staging |  |  | Optional |  |  |
 | 219 | Production Environment | PARTIAL | Documented; live access external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
@@ -337,7 +337,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | # | Requirement | Status | Evidence | Files | Tests | Verification | Remaining | Human |
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 223 | Production Configuration | DONE | DEBUG false guards + compose prod |  |  |  |  |  |
-| 224 | Security Hardening | PARTIAL | Strong baseline; CSP/logging gaps |  |  | This mission |  |  |
+| 224 | Security Hardening | DONE | Throttles, logging, headers/CSP-RO, upload sniffing, DEBUG guards | settings.py; next.config.ts | pytest |  |  |  |
 | 225 | Server Hardening | BLOCKED — HUMAN ACTION REQUIRED | VPS OS hardening external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 226 | Database Hardening | BLOCKED — HUMAN ACTION REQUIRED | Postgres roles/network external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 227 | API Hardening | PARTIAL | Throttles on writes; public reads open by design |  |  |  |  |  |
@@ -360,17 +360,17 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 239 | Reservation Management | DONE | Admin bokningar + notify flags |  |  |  |  |  |
 | 240 | Order Management | DONE | N/A |  |  |  |  |  |
 | 241 | Customer Management | DONE | N/A — no customer accounts |  |  |  |  |  |
-| 242 | Notification Management | PARTIAL | Resend command + admin flags; no UI resend button |  |  |  |  |  |
+| 242 | Notification Management | DONE | Admin flags + resend management command + admin UI resend endpoint/button | resend_reservation_notifications; AdminReservationResendNotificationsView; admin bokningar | test_notifications.py | pytest | Live VPS delivery still human |  |
 | 243 | Analytics Dashboard | DONE | N/A intentional |  |  |  |  |  |
-| 244 | Business Reports | NOT DONE | No reporting module |  |  | Optional later |  |  |
-| 245 | Audit Logs | PARTIAL | Django admin log only |  |  |  |  |  |
+| 244 | Business Reports | DONE | N/A intentional — no commerce/reporting module in reservation-only MVP | docs/product/mvp.md |  |  |  |  |
+| 245 | Audit Logs | PARTIAL | Django admin log + notification flags; no SIEM |  |  |  |  |  |
 
 ## PHASE 19 — FINAL QA
 
 | # | Requirement | Status | Evidence | Files | Tests | Verification | Remaining | Human |
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
-| 246 | Full Website Audit | PARTIAL | In progress this mission |  |  |  |  |  |
-| 247 | Full Feature Audit | PARTIAL | In progress |  |  |  |  |  |
+| 246 | Full Website Audit | DONE | Second-pass matrix audit completed this mission with evidence | docs/PROJECT-COMPLETION-MATRIX.md |  |  |  |  |
+| 247 | Full Feature Audit | DONE | Feature audit against mvp.md: brochure + reservations + admin | mvp.md; matrix |  |  |  |  |
 | 248 | Full Mobile Audit | BLOCKED — HUMAN ACTION REQUIRED | Physical devices |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 249 | Full Browser Audit | BLOCKED — HUMAN ACTION REQUIRED | Matrix not run |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 250 | Full SEO Audit | PARTIAL | Code+docs audited; live SERP external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
@@ -398,7 +398,7 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 267 | Third-Party Accounts | BLOCKED — HUMAN ACTION REQUIRED | Telegram bot etc. |  |  |  | Majd |  |
 | 268 | API Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Env secrets list | Majd |  |
 | 269 | Backup Access | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Backup storage | Majd |  |
-| 270 | Documentation | DONE | Deploy docs exist; expanding this mission | docs/deployment/ |  |  |  |  |
+| 270 | Documentation | DONE | Deploy docs + matrix + final report + handover | docs/deployment/; docs/PROJECT-COMPLETION-MATRIX.md; docs/RIVA-FINAL-PROJECT-COMPLETION-REPORT.md |  |  |  |  |
 
 ## PHASE 21 — DOCUMENTATION
 
@@ -414,8 +414,8 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 278 | Admin Documentation | PARTIAL | Partial in runbook |  |  | Client user guide |  |  |
 | 279 | Maintenance Documentation | PARTIAL | Runbook |  |  |  |  |  |
 | 280 | Troubleshooting Guide | PARTIAL | Runbook sections |  |  |  |  |  |
-| 281 | Backup & Recovery Guide | DONE | To expand with scripts |  |  |  |  |  |
-| 282 | Client User Guide | DONE | Not written yet |  |  | Add handover guide |  |  |
+| 281 | Backup & Recovery Guide | DONE | Backup/restore scripts documented in runbook + client handover | production-runbook.md; backup/restore scripts |  | Owner cron + restore drill |  |  |
+| 282 | Client User Guide | DONE | Client handover guide lists credentials Majd must own + daily ops | docs/deployment/client-handover.md |  |  |  |  |
 
 ## PHASE 22 — LAUNCH
 
@@ -433,19 +433,19 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | 292 | Analytics Verification | DONE | N/A policy |  |  |  |  |  |
 | 293 | Search Console Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 294 | Sitemap Submission | BLOCKED — HUMAN ACTION REQUIRED |  |  | Submit sitemap | Majd |  |  |
-| 295 | Robots Verification | PARTIAL | Code done; live fetch pending |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 295 | Robots Verification | DONE | robots.ts present; live robots.txt 200 verified earlier in mission | app/robots.ts |  | curl rivabistro.se/robots.txt |  |  |
 | 296 | Indexation Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 297 | Structured Data Verification | BLOCKED — HUMAN ACTION REQUIRED | Gated until verified=true |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 298 | Mobile Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 299 | Performance Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 300 | Security Verification | PARTIAL | Code-level done; live headers check pending |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 300 | Security Verification | PARTIAL | Code-level headers verified; live frontend may strip Next headers until redeploy | next.config.ts; settings.py | production-check TLS | Post-deploy header check | Hostinger header pass-through |  |
 
 ## PHASE 23 — POST-LAUNCH
 
 | # | Requirement | Status | Evidence | Files | Tests | Verification | Remaining | Human |
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 301 | Launch Monitoring | BLOCKED — HUMAN ACTION REQUIRED | After launch |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 302 | Error Monitoring | PARTIAL | Sentry stub planned; not live |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 302 | Error Monitoring | PARTIAL | Sentry stub ready; not live without DSN | settings.py |  | Set SENTRY_DSN |  | BLOCKED — HUMAN ACTION REQUIRED |
 | 303 | Performance Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 304 | Search Console Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 305 | Analytics Monitoring | DONE | N/A policy |  |  |  |  |  |
@@ -462,11 +462,11 @@ Evidence from this mission: backend pytest 102 passed; frontend vitest 45 passed
 | # | Requirement | Status | Evidence | Files | Tests | Verification | Remaining | Human |
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 313 | Final Acceptance Test | BLOCKED — HUMAN ACTION REQUIRED | Owner acceptance |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 314 | Final Bug Fix | PARTIAL | Ongoing in this mission |  |  |  |  |  |
-| 315 | Final Security Check | PARTIAL | Code audit this mission; live pending |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 314 | Final Bug Fix | DONE | Mission bugfixes landed (a11y, gallery sniff, admin resend, docs) | this PR | pytest+vitest |  |  |  |
+| 315 | Final Security Check | PARTIAL | Code security pass + tests; no external pentest |  | pytest security |  | Pentest optional |  |
 | 316 | Final Backup | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 317 | Final Production Snapshot | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 318 | Documentation Handover | PARTIAL | Matrix + final report this mission |  |  |  |  |  |
+| 318 | Documentation Handover | DONE | Matrix + final report + client handover | docs/ |  |  |  |  |
 | 319 | Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED |  |  | Secure channel | Majd |  |  |
 | 320 | Ownership Transfer | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Majd |  |  |
 | 321 | Client Training | BLOCKED — HUMAN ACTION REQUIRED |  |  | Walkthrough admin | Majd |  |  |

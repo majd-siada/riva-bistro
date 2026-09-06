@@ -9,6 +9,15 @@
 
 | Status | Count |
 |--------|------:|
+| DONE | 163 |
+| PARTIAL | 91 |
+| NOT DONE | 4 |
+| BLOCKED — HUMAN ACTION REQUIRED | 67 |
+| **TOTAL** | **325** |
+
+## Completion Percentage
+
+**50.2%** (DONE / 325). PARTIAL is not counted as DONE.|------:|
 | DONE | 149 |
 | PARTIAL | 104 |
 | NOT DONE | 5 |
@@ -17,7 +26,7 @@
 
 ## Completion Percentage
 
-**45.8%** (DONE / 325). PARTIAL is not counted as DONE.
+**50.2%** (DONE / 325). PARTIAL is not counted as DONE.
 
 ## Recommendation
 
@@ -28,6 +37,8 @@ The repository now has a production-minded technical baseline: reservations, men
 ## What this mission implemented
 
 ### Backend
+- Admin reservation serializer exposes notify flags; `POST .../resend-notifications/`
+- Gallery admin upload magic/size/extension validation
 - Cherry-picked staff notification observability (admin flags, create `notifications` payload, `resend_reservation_notifications`, safer Telegram logs)
 - Django `LOGGING` config
 - Global `AnonRateThrottle` + existing scoped write throttles
@@ -35,6 +46,9 @@ The repository now has a production-minded technical baseline: reservations, men
 - `SECURE_CROSS_ORIGIN_OPENER_POLICY`
 
 ### Frontend
+- Contact + event inquiry form a11y parity (`aria-describedby` + `role="alert"`)
+- Claim-safe FAQ on `/kontakt`
+- Admin bookings UI shows Telegram/email notify flags + resend button
 - Cherry-picked technical SEO (`createPageMetadata`, JSON-LD, NAP/keyword docs, claim-safe copy)
 - Legal scaffolding: `/integritetspolicy`, `/cookies`, `/villkor`, `/bokningspolicy`
 - Footer + cookie notice legal links; sitemap entries
@@ -42,6 +56,8 @@ The repository now has a production-minded technical baseline: reservations, men
 - Booking form `aria-describedby` / alert wiring (already aligned)
 
 ### Ops / docs
+- `docs/ops/data-retention.md` owner fill-in template
+- `docs/design-system/component-inventory.md`
 - `scripts/backup-postgres.sh`, `scripts/restore-postgres.sh`
 - CI: `npm run build` step
 - `docs/PROJECT-COMPLETION-MATRIX.md` (325 rows)
@@ -63,27 +79,19 @@ The repository now has a production-minded technical baseline: reservations, men
 
 ## Tests Executed
 
-Re-audit run (2026-09-06, agent session):
+Second-pass re-audit (2026-09-06, execution mode):
 
 ```
-backend pytest          — 102 passed (20.29s)
+backend pytest          — 103 passed
 frontend vitest         — 45 passed (9 files)
 frontend tsc --noEmit   — PASS
-frontend next build     — PASS (prior; 25 routes including legal)
 scripts/production-check.sh — Passed: 11  Failed: 0
-  (TLS, frontend 200, API health, menu, hours, availability)
-local legal smoke (:3022) — /integritetspolicy /cookies /villkor /bokningspolicy → 200
-matrix integrity         — 325 numbered rows; DONE 149 / PARTIAL 104 / NOT DONE 5 / BLOCKED 67
+local legal routes (:3022) — /integritetspolicy /cookies /villkor /bokningspolicy → 200
+matrix integrity         — 325 rows; DONE 163 / PARTIAL 91 / NOT DONE 4 / BLOCKED 67
 ```
 
-Artifacts:
-- `/opt/cursor/artifacts/backend-pytest.txt`
-- `/opt/cursor/artifacts/frontend-vitest.txt`
-- `/opt/cursor/artifacts/frontend-typecheck.txt`
-- `/opt/cursor/artifacts/frontend-build.txt`
-- `/opt/cursor/artifacts/production-check.txt`
-- `/opt/cursor/artifacts/legal-page-smoke.txt`
-- `/opt/cursor/artifacts/privacy-policy-page.png`
+NOT DONE remaining (intentional deferrals): 154 E2E (Playwright), 165 Performance testing (Lighthouse CI), 217 CD pipeline, 218 Staging environment.
+
 
 ## Production Verification (live)
 
