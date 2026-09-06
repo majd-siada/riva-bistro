@@ -25,6 +25,8 @@ const sans = localFont({
   display: "swap",
 });
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
   title: {
     default: `${SITE_NAME} — Goda smaker, äkta upplevelser`,
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
-  alternates: { canonical: "/" },
+  // Canonicals are set per page via createPageMetadata — do not pin all routes to "/".
   openGraph: {
     type: "website",
     locale: "sv_SE",
@@ -56,6 +58,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ["/og-image.jpg"],
   },
+  ...(googleVerification
+    ? { verification: { google: googleVerification } }
+    : {}),
 };
 
 export const viewport: Viewport = {

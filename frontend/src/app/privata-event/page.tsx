@@ -6,11 +6,14 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { EventInquiryForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Privata event",
   description:
-    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro.",
-};
+    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro, Kungsholmen i Stockholm.",
+  path: "/privata-event",
+});
 
 const WHY = [
   {

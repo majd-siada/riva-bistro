@@ -4,10 +4,14 @@ import { ReservationForm } from "@/components/features/booking";
 import { Section } from "@/components/layout/section";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Boka bord",
-  description: "Boka bord på Riva Bistro — välj datum, tid och antal gäster.",
-};
+  description:
+    "Boka bord på Riva Bistro på Kungsholmen i Stockholm — välj datum, tid och antal gäster online.",
+  path: "/boka",
+});
 
 const GOOD_TO_KNOW = [
   {

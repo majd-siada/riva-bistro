@@ -7,10 +7,14 @@ import { ValueCard } from "@/components/brand/value-card";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Om oss",
-  description: "Lär känna Riva Bistro — vår historia, värderingar och passion för god mat.",
-};
+  description:
+    "Lär känna Riva Bistro på Kungsholmen — vår historia, värderingar och passion för god mat i Stockholm.",
+  path: "/om-oss",
+});
 
 export default function AboutPage() {
   return (

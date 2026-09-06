@@ -7,11 +7,14 @@ import {
   loadPublicMenu,
 } from "@/lib/public-menu";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Meny",
   description:
-    "Riva Bistros meny — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
-};
+    "Riva Bistros meny på Kungsholmen i Stockholm — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
+  path: "/meny",
+});
 
 export const dynamic = "force-static";
 export const revalidate = 60;

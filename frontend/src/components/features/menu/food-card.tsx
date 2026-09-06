@@ -1,3 +1,7 @@
+"use client";
+
+import Image from "next/image";
+
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -20,8 +24,13 @@ export function FoodCard({
     <div className={cn("riva-card overflow-hidden", className)}>
       {imageSrc ? (
         <div className="relative aspect-[16/10] bg-riva-surface">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageSrc} alt={name} className="h-full w-full object-cover" />
+          <Image
+            src={imageSrc}
+            alt={name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover"
+          />
         </div>
       ) : null}
       <div className="p-5">
