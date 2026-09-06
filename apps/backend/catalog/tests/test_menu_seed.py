@@ -1,4 +1,4 @@
-"""Public menu seed completeness — Förrätter + existing categories."""
+"""Public menu seed completeness — Förrätter + existing course categories."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from catalog.management.commands.seed_menu import CATEGORIES, PRODUCTS, ex_vat
 from catalog.models import Category, Product
 from catalog.pricing import price_from_ex_vat
 
-EXPECTED_CATEGORY_SLUGS = [c[1] for c in CATEGORIES]
+EXPECTED_COURSE_SLUGS = [c[1] for c in CATEGORIES]
 FORRATTER_PRODUCTS = {
     "toast-skagen-mediterranio": Decimal("95"),
     "vitloksgratinerade-bla-musslor": Decimal("90"),
@@ -26,15 +26,16 @@ FORRATTER_PRODUCTS = {
 def test_seed_menu_includes_forratter_and_existing_categories():
     call_command("seed_menu")
 
-    categories = list(Category.objects.filter(is_active=True).order_by("sort_order"))
-    slugs = [c.slug for c in categories]
-    assert slugs == EXPECTED_CATEGORY_SLUGS
-    assert slugs[0] == "forratter"
+    all_slugs = set(
+        Category.objects.filter(is_active=True).values_list("slug", flat=True)
+    )
+    assert set(EXPECTED_COURSE_SLUGS).issubset(all_slugs)
     assert Category.objects.get(slug="forratter").name == "Förrätter"
     assert Category.objects.get(slug="forratter").is_active is True
+    assert Category.objects.get(slug="forratter").parent.slug == "rivas-meny"
 
     for expected in ("varmratter", "sallader", "pasta", "barnmeny", "desserter"):
-        assert expected in slugs
+        assert expected in all_slugs
 
 
 @pytest.mark.django_db
@@ -62,8 +63,8 @@ def test_public_menu_api_returns_forratter_and_prices():
     categories = client.get("/api/v1/menu/categories/")
     assert categories.status_code == 200
     cat_slugs = [c["slug"] for c in categories.json()]
-    assert cat_slugs[0] == "forratter"
-    assert set(EXPECTED_CATEGORY_SLUGS).issubset(set(cat_slugs))
+    assert "dagens-lunch" in cat_slugs
+    assert set(EXPECTED_COURSE_SLUGS).issubset(set(cat_slugs))
 
     products = client.get("/api/v1/menu/products/")
     assert products.status_code == 200
@@ -79,8 +80,8 @@ def test_public_menu_api_returns_forratter_and_prices():
 @pytest.mark.django_db
 def test_seed_menu_ex_vat_roundtrip_matches_listed_inc_prices():
     """Seed stores ex-VAT so displayed inc-VAT matches the printed menu."""
-    for _cat, _name, _slug, _desc, price_inc in PRODUCTS:
-        if _cat != "forratter":
+    for cat_slug, _name, _slug, _desc, price_inc in PRODUCTS:
+        if cat_slug != "forratter":
             continue
         pricing = price_from_ex_vat(ex_vat(price_inc), Decimal("0.12"))
         assert Decimal(pricing["price_inc_vat"]) == Decimal(price_inc).quantize(Decimal("0.01"))

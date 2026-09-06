@@ -1,21 +1,39 @@
 import { RestaurantImage } from "@/components/brand/restaurant-image";
-import { SectionHeading } from "@/components/brand/section-heading";
-import { FoodCard, MenuCategoryNav } from "@/components/features/menu";
+import { MenuCategoryNav } from "@/components/features/menu";
+import {
+  MENU_SECTION_REGISTRY,
+  MenuSection,
+} from "@/components/features/menu/sections";
 import { Section } from "@/components/layout/section";
-import { loadPublicMenu } from "@/lib/public-menu";
+import {
+  childCategories,
+  itemsForCategory,
+  loadPublicMenu,
+  topLevelCategories,
+} from "@/lib/public-menu";
 
 export const metadata = {
   title: "Meny",
   description:
-    "Riva Bistros meny — varmrätter, sallader, pasta, barnmeny och desserter. Alla priser inklusive moms.",
+    "Riva Bistros meny — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
 };
 
 export default async function MenuPage() {
   const { categories, items } = await loadPublicMenu();
-  const byCategory = categories.map((category) => ({
-    ...category,
-    items: items.filter((item) => item.categorySlug === category.slug),
-  }));
+  const sections = topLevelCategories(categories);
+
+  const navCategories = sections.flatMap((section) => {
+    if (section.slug === "rivas-meny") {
+      return [
+        { slug: section.slug, name: section.name },
+        ...childCategories(categories, section.slug).map((c) => ({
+          slug: c.slug,
+          name: c.name,
+        })),
+      ];
+    }
+    return [{ slug: section.slug, name: section.name }];
+  });
 
   return (
     <>
@@ -41,15 +59,13 @@ export default async function MenuPage() {
         <div className="grid gap-12 lg:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
           <div className="hidden lg:block">
             <div className="sticky top-28">
-              <MenuCategoryNav
-                categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
-              />
+              <MenuCategoryNav categories={navCategories} />
             </div>
           </div>
 
           <div className="min-w-0 space-y-16">
             <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
-              {categories.map((cat) => (
+              {navCategories.map((cat) => (
                 <a
                   key={cat.slug}
                   href={`#${cat.slug}`}
@@ -60,22 +76,30 @@ export default async function MenuPage() {
               ))}
             </div>
 
-            {byCategory.map((cat) => (
-              <section key={cat.slug} id={cat.slug}>
-                <SectionHeading title={cat.name} description={cat.description} />
-                <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                  {cat.items.map((item) => (
-                    <FoodCard
-                      key={item.slug}
-                      name={item.name}
-                      description={item.description}
-                      priceIncVat={item.priceIncVat}
-                      imageSrc={item.imageUrl}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+            {sections.map((section) => {
+              const SectionComponent =
+                MENU_SECTION_REGISTRY[section.slug] ?? MenuSection;
+              const subsections =
+                section.slug === "rivas-meny"
+                  ? childCategories(categories, section.slug).map((sub) => ({
+                      category: sub,
+                      items: itemsForCategory(items, sub.slug),
+                    }))
+                  : undefined;
+              const directItems =
+                section.slug === "rivas-meny"
+                  ? []
+                  : itemsForCategory(items, section.slug);
+
+              return (
+                <SectionComponent
+                  key={section.slug}
+                  category={section}
+                  items={directItems}
+                  subsections={subsections}
+                />
+              );
+            })}
           </div>
         </div>
       </Section>

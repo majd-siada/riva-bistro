@@ -74,6 +74,7 @@ export default function AdminMenuPage() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [newCategoryParent, setNewCategoryParent] = useState<string>("none");
 
   const reload = async () => {
     const [p, c] = await Promise.all([adminListProducts(), adminListCategories()]);
@@ -154,12 +155,25 @@ export default function AdminMenuPage() {
       const created = await adminCreateCategory({
         name: newCategory.trim(),
         sort_order: categories.length,
+        parent: newCategoryParent === "none" ? null : Number(newCategoryParent),
       });
       setCategories((prev) => [...prev, created]);
       setNewCategory("");
+      setNewCategoryParent("none");
       toast.success("Kategori tillagd.");
     } catch {
       toast.error("Kunde inte lägga till kategori.");
+    }
+  };
+
+  const saveCategoryParent = async (c: AdminCategory, parentValue: string) => {
+    const nextParent = parentValue === "none" ? null : Number(parentValue);
+    if ((c.parent ?? null) === nextParent) return;
+    try {
+      const updated = await adminUpdateCategory(c.id, { parent: nextParent });
+      setCategories((prev) => prev.map((x) => (x.id === c.id ? updated : x)));
+    } catch {
+      toast.error("Kunde inte uppdatera överordnad kategori.");
     }
   };
 
@@ -276,18 +290,39 @@ export default function AdminMenuPage() {
       {/* Categories */}
       <section className="border-t border-riva-cream/10 pt-10">
         <h2 className="font-display text-2xl text-riva-cream">Kategorier</h2>
-        <div className="mt-4 max-w-2xl space-y-2">
+        <p className="mt-1 text-sm text-riva-muted">
+          Toppsektioner och underkategorier (t.ex. Förrätter under RIVAS MENY).
+        </p>
+        <div className="mt-4 max-w-3xl space-y-2">
           {categories.map((c) => (
             <div
               key={c.id}
-              className="flex items-center gap-3 rounded-md border border-riva-cream/10 bg-riva-card px-3 py-2"
+              className="flex flex-wrap items-center gap-3 rounded-md border border-riva-cream/10 bg-riva-card px-3 py-2"
             >
               <Input
                 defaultValue={c.name}
                 onBlur={(e) => void saveCategoryName(c, e.target.value)}
-                className="h-9 flex-1"
+                className="h-9 min-w-[10rem] flex-1"
                 aria-label="Kategorinamn"
               />
+              <Select
+                value={c.parent == null ? "none" : String(c.parent)}
+                onValueChange={(v) => void saveCategoryParent(c, v)}
+              >
+                <SelectTrigger className="h-9 w-48" aria-label={`Överordnad för ${c.name}`}>
+                  <SelectValue placeholder="Toppnivå" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Toppnivå</SelectItem>
+                  {categories
+                    .filter((other) => other.id !== c.id)
+                    .map((other) => (
+                      <SelectItem key={other.id} value={String(other.id)}>
+                        {other.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
               <span className="text-xs text-riva-muted">{c.product_count} rätter</span>
               <Button
                 variant="ghost"
@@ -299,13 +334,26 @@ export default function AdminMenuPage() {
               </Button>
             </div>
           ))}
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center gap-2 pt-2">
             <Input
               placeholder="Ny kategori"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              className="h-9 flex-1"
+              className="h-9 min-w-[10rem] flex-1"
             />
+            <Select value={newCategoryParent} onValueChange={setNewCategoryParent}>
+              <SelectTrigger className="h-9 w-48" aria-label="Överordnad kategori">
+                <SelectValue placeholder="Toppnivå" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Toppnivå</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button variant="outline" onClick={() => void addCategory()}>
               Lägg till
             </Button>

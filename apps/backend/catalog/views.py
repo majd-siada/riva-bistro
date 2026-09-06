@@ -15,8 +15,37 @@ from catalog.serializers import (
 class CategoryListView(APIView):
     @extend_schema(tags=["menu"], responses={200: CategorySerializer(many=True)})
     def get(self, request: Request) -> Response:
-        categories = Category.objects.filter(is_active=True)
+        categories = (
+            Category.objects.filter(is_active=True)
+            .select_related("parent")
+            .order_by("sort_order", "id")
+        )
         return Response(CategorySerializer(categories, many=True).data)
+
+
+class CategoryDetailView(APIView):
+    @extend_schema(tags=["menu"], responses={200: CategorySerializer})
+    def get(self, request: Request, slug: str) -> Response:
+        category = get_object_or_404(
+            Category.objects.filter(is_active=True).select_related("parent"),
+            slug=slug,
+        )
+        return Response(CategorySerializer(category).data)
+
+
+class CategoryItemsView(APIView):
+    """Available products belonging to this category only (no descendants)."""
+
+    @extend_schema(tags=["menu"], responses={200: ProductListSerializer(many=True)})
+    def get(self, request: Request, slug: str) -> Response:
+        category = get_object_or_404(Category.objects.filter(is_active=True), slug=slug)
+        qs = (
+            Product.objects.filter(is_available=True, category=category)
+            .select_related("category")
+            .order_by("sort_order", "id")
+        )
+        serializer = ProductListSerializer(qs, many=True, context={"request": request})
+        return Response(serializer.data)
 
 
 class ProductListView(APIView):
@@ -29,7 +58,11 @@ class ProductListView(APIView):
         responses={200: ProductListSerializer(many=True)},
     )
     def get(self, request: Request) -> Response:
-        qs = Product.objects.filter(is_available=True).select_related("category")
+        qs = (
+            Product.objects.filter(is_available=True)
+            .select_related("category")
+            .order_by("sort_order", "id")
+        )
         category_slug = request.query_params.get("category")
         if category_slug:
             qs = qs.filter(category__slug=category_slug)

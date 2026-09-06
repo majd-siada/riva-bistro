@@ -5,8 +5,11 @@ from catalog.models import Category, ModifierGroup, ModifierOption, Product
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "sort_order", "is_active"]
+    list_display = ["name", "slug", "parent", "sort_order", "is_active"]
+    list_filter = ["is_active", "parent"]
     prepopulated_fields = {"slug": ("name",)}
+    search_fields = ["name", "slug"]
+    ordering = ["sort_order", "id"]
 
 
 @admin.register(Product)

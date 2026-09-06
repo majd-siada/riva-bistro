@@ -448,6 +448,9 @@ export interface components {
             description?: string;
             sort_order?: number;
             is_active?: boolean;
+            /** Parent category id, or null for top-level sections. */
+            parent?: number | null;
+            readonly parent_slug?: string | null;
             readonly product_count: number;
         };
         AdminOverview: {
@@ -501,6 +504,9 @@ export interface components {
             name: string;
             slug: string;
             description?: string;
+            sort_order?: number;
+            parent?: number | null;
+            parent_slug?: string | null;
             readonly product_count: number;
         };
         Contact: {
@@ -566,6 +572,8 @@ export interface components {
             description?: string;
             sort_order?: number;
             is_active?: boolean;
+            parent?: number | null;
+            readonly parent_slug?: string | null;
             readonly product_count?: number;
         };
         PatchedAdminProduct: {

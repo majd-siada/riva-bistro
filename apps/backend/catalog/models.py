@@ -10,14 +10,24 @@ class Category(models.Model):
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, unique=True)
     description = models.TextField(blank=True)
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="children",
+    )
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["sort_order", "name"]
+        ordering = ["sort_order", "id"]
         verbose_name_plural = "categories"
+        indexes = [
+            models.Index(fields=["parent", "sort_order"], name="catalog_cat_parent_sort_idx"),
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -52,7 +62,13 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["sort_order", "name"]
+        ordering = ["sort_order", "id"]
+        indexes = [
+            models.Index(
+                fields=["category", "sort_order"],
+                name="catalog_prod_cat_sort_idx",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name

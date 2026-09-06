@@ -87,10 +87,31 @@ class ProductDetailSerializer(ProductListSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     product_count = serializers.SerializerMethodField()
+    parent = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
+    parent_slug = serializers.CharField(
+        source="parent.slug", read_only=True, allow_null=True, default=None
+    )
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "description", "product_count"]
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "sort_order",
+            "parent",
+            "parent_slug",
+            "product_count",
+        ]
 
     def get_product_count(self, obj: Category) -> int:
         return obj.products.filter(is_available=True).count()
+
+    def to_representation(self, instance: Category) -> dict:
+        data = super().to_representation(instance)
+        # Ensure parent_slug is null (not missing) when there is no parent.
+        if instance.parent_id is None:
+            data["parent"] = None
+            data["parent_slug"] = None
+        return data

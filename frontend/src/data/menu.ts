@@ -6,12 +6,19 @@
  * API fails so the site still shows dishes instead of an empty menu.
  * Prices inkl. moms (12 %). Do not treat this as the source of truth once
  * the catalog is seeded in production.
+ *
+ * Hierarchy mirrors production: six top-level sections; course-type
+ * categories are children of rivas-meny. Items stay on course slugs.
  */
 
 export interface MenuCategory {
   name: string;
   slug: string;
   description: string;
+  /** Canonical display order from the API/seed (not alphabetical). */
+  sortOrder: number;
+  /** null = top-level menu section */
+  parentSlug: string | null;
 }
 
 export interface MenuItem {
@@ -23,12 +30,92 @@ export interface MenuItem {
 }
 
 export const MENU_CATEGORIES: MenuCategory[] = [
-  { name: "Förrätter", slug: "forratter", description: "Små rätter som väcker aptiten." },
-  { name: "Varmrätter", slug: "varmratter", description: "Husets varma rätter, tillagade med omsorg." },
-  { name: "Sallader", slug: "sallader", description: "Fräscha sallader med säsongens råvaror." },
-  { name: "Pasta", slug: "pasta", description: "Italienskt hantverk, à la Riva." },
-  { name: "Barnmeny", slug: "barnmeny", description: "För våra minsta gäster." },
-  { name: "Desserter", slug: "desserter", description: "Söta avslut på måltiden." },
+  // Top-level sections (sort_order gaps match backend seed)
+  {
+    name: "Dagens lunch v.??",
+    slug: "dagens-lunch",
+    description: "",
+    sortOrder: 10,
+    parentSlug: null,
+  },
+  {
+    name: "RIVAS MENY",
+    slug: "rivas-meny",
+    description: "",
+    sortOrder: 20,
+    parentSlug: null,
+  },
+  {
+    name: "TAKE AWAY",
+    slug: "take-away",
+    description: "",
+    sortOrder: 30,
+    parentSlug: null,
+  },
+  {
+    name: "STORA SÄLLSKAPSMENY",
+    slug: "stora-sallskapsmeny",
+    description: "",
+    sortOrder: 40,
+    parentSlug: null,
+  },
+  {
+    name: "SNACKS & DRINKAR",
+    slug: "snacks-drinkar",
+    description: "",
+    sortOrder: 50,
+    parentSlug: null,
+  },
+  {
+    name: "DRYCK",
+    slug: "dryck",
+    description: "",
+    sortOrder: 60,
+    parentSlug: null,
+  },
+  // Course-type subsections under RIVAS MENY
+  {
+    name: "Förrätter",
+    slug: "forratter",
+    description: "Små rätter som väcker aptiten.",
+    sortOrder: 0,
+    parentSlug: "rivas-meny",
+  },
+  {
+    name: "Varmrätter",
+    slug: "varmratter",
+    description: "Husets varma rätter, tillagade med omsorg.",
+    sortOrder: 1,
+    parentSlug: "rivas-meny",
+  },
+  {
+    name: "Sallader",
+    slug: "sallader",
+    description: "Fräscha sallader med säsongens råvaror.",
+    sortOrder: 2,
+    parentSlug: "rivas-meny",
+  },
+  {
+    name: "Pasta",
+    slug: "pasta",
+    description: "Italienskt hantverk, à la Riva.",
+    sortOrder: 3,
+    parentSlug: "rivas-meny",
+  },
+  {
+    name: "Barnmeny",
+    slug: "barnmeny",
+    description: "För våra minsta gäster.",
+    sortOrder: 4,
+    parentSlug: "rivas-meny",
+  },
+  {
+    name: "Desserter",
+    slug: "desserter",
+    description: "Söta avslut på måltiden.",
+    sortOrder: 5,
+    parentSlug: "rivas-meny",
+  },
 ];
 
 export const MENU_ITEMS: MenuItem[] = [
@@ -94,8 +181,9 @@ export const FEATURED_MENU_SLUGS = [
   "rivas-kottbullar",
 ] as const;
 
+/** Course-type categories only (children of RIVAS MENY), for legacy helpers. */
 export function getMenuByCategory() {
-  return MENU_CATEGORIES.map((category) => ({
+  return MENU_CATEGORIES.filter((c) => c.parentSlug === "rivas-meny").map((category) => ({
     ...category,
     items: MENU_ITEMS.filter((item) => item.categorySlug === category.slug),
   }));

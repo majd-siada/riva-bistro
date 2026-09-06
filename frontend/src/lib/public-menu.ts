@@ -1,7 +1,21 @@
 import { FEATURED_MENU_SLUGS, MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu";
-import { fetchCategories, fetchFeatured, fetchProducts, resolveImageUrl, type Category, type Product } from "@/lib/api";
+import {
+  fetchCategories,
+  fetchFeatured,
+  fetchProducts,
+  resolveImageUrl,
+  type Category,
+  type Product,
+} from "@/lib/api";
 
-export type PublicCategory = { name: string; slug: string; description: string };
+export type PublicCategory = {
+  name: string;
+  slug: string;
+  description: string;
+  sortOrder: number;
+  parentSlug: string | null;
+};
+
 export type PublicItem = {
   categorySlug: string;
   name: string;
@@ -13,7 +27,13 @@ export type PublicItem = {
 
 function staticMenu() {
   return {
-    categories: MENU_CATEGORIES.map((c) => ({ ...c })),
+    categories: MENU_CATEGORIES.map((c) => ({
+      name: c.name,
+      slug: c.slug,
+      description: c.description,
+      sortOrder: c.sortOrder,
+      parentSlug: c.parentSlug,
+    })),
     items: MENU_ITEMS.map((item) => ({
       categorySlug: item.categorySlug,
       name: item.name,
@@ -35,6 +55,16 @@ function mapProduct(p: Product): PublicItem {
   };
 }
 
+function mapCategory(c: Category): PublicCategory {
+  return {
+    name: c.name,
+    slug: c.slug,
+    description: c.description ?? "",
+    sortOrder: c.sort_order ?? 0,
+    parentSlug: c.parent_slug ?? null,
+  };
+}
+
 export async function loadPublicMenu(): Promise<{
   categories: PublicCategory[];
   items: PublicItem[];
@@ -43,11 +73,9 @@ export async function loadPublicMenu(): Promise<{
     const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
     if (!categories.length || !products.length) return staticMenu();
     return {
-      categories: categories.map((c: Category) => ({
-        name: c.name,
-        slug: c.slug,
-        description: c.description ?? "",
-      })),
+      categories: categories
+        .map(mapCategory)
+        .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug)),
       items: products.map(mapProduct),
     };
   } catch {
@@ -67,4 +95,25 @@ export async function loadFeaturedItems(): Promise<PublicItem[]> {
   const { items } = staticMenu();
   const featuredSlugs = new Set<string>(FEATURED_MENU_SLUGS);
   return items.filter((item) => featuredSlugs.has(item.slug));
+}
+
+/** Top-level sections only, ordered by sortOrder. */
+export function topLevelCategories(categories: PublicCategory[]): PublicCategory[] {
+  return categories
+    .filter((c) => c.parentSlug == null)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
+}
+
+/** Children of a section, ordered by sortOrder. */
+export function childCategories(
+  categories: PublicCategory[],
+  parentSlug: string,
+): PublicCategory[] {
+  return categories
+    .filter((c) => c.parentSlug === parentSlug)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
+}
+
+export function itemsForCategory(items: PublicItem[], categorySlug: string): PublicItem[] {
+  return items.filter((item) => item.categorySlug === categorySlug);
 }

@@ -1,6 +1,8 @@
 from decimal import ROUND_HALF_UP, Decimal
 
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db import models
 
 from catalog.models import Category, Product
 
@@ -120,8 +122,26 @@ class Command(BaseCommand):
 
         keep_product_slugs = {p[2] for p in PRODUCTS}
         keep_category_slugs = {c[1] for c in CATEGORIES}
+        # Never prune top-level menu sections (or any category that still has
+        # children / products). Destructive category deletes wiped section
+        # hierarchy on re-seed.
+        from catalog.management.commands.seed_menu_sections import TOP_LEVEL_SECTIONS
+
+        protected_slugs = {slug for _, slug, _ in TOP_LEVEL_SECTIONS} | keep_category_slugs
         removed_products = Product.objects.exclude(slug__in=keep_product_slugs).delete()
-        removed_categories = Category.objects.exclude(slug__in=keep_category_slugs).delete()
+        # Only remove orphan course categories that are not protected sections
+        # and have no products left. Do not delete top-level sections.
+        removable = (
+            Category.objects.exclude(slug__in=protected_slugs)
+            .annotate(product_total=models.Count("products"))
+            .annotate(child_total=models.Count("children"))
+            .filter(product_total=0, child_total=0)
+        )
+        removed_categories = removable.delete()
+
+        # Ensure six top-level sections exist and course categories nest under
+        # RIVAS MENY (idempotent; does not invent items).
+        call_command("seed_menu_sections")
 
         self.stdout.write(
             self.style.SUCCESS(
