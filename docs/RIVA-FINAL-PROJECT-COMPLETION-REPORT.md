@@ -63,13 +63,17 @@ The repository now has a production-minded technical baseline: reservations, men
 
 ## Tests Executed
 
+Re-audit run (2026-09-06, agent session):
+
 ```
-backend pytest          — 102 passed
-frontend vitest         — 45 passed
+backend pytest          — 102 passed (20.29s)
+frontend vitest         — 45 passed (9 files)
 frontend tsc --noEmit   — PASS
-frontend next build     — PASS (25 routes)
+frontend next build     — PASS (prior; 25 routes including legal)
 scripts/production-check.sh — Passed: 11  Failed: 0
   (TLS, frontend 200, API health, menu, hours, availability)
+local legal smoke (:3022) — /integritetspolicy /cookies /villkor /bokningspolicy → 200
+matrix integrity         — 325 numbered rows; DONE 149 / PARTIAL 104 / NOT DONE 5 / BLOCKED 67
 ```
 
 Artifacts:
@@ -78,6 +82,8 @@ Artifacts:
 - `/opt/cursor/artifacts/frontend-typecheck.txt`
 - `/opt/cursor/artifacts/frontend-build.txt`
 - `/opt/cursor/artifacts/production-check.txt`
+- `/opt/cursor/artifacts/legal-page-smoke.txt`
+- `/opt/cursor/artifacts/privacy-policy-page.png`
 
 ## Production Verification (live)
 
