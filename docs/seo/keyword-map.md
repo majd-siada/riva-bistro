@@ -1,159 +1,238 @@
-# Riva Bistro — keyword cluster map
+# Riva Bistro — SEO keyword strategy (source of truth)
 
-**Rule:** A 1,000-keyword universe is for research and prioritization.  
-**Do not** place 1,000 keywords on the website. Cluster → intent → **one owning page** → restrained titles/copy → measure in Search Console → expand what works.
+**Purpose:** Unambiguous cluster → intent → **one primary URL** mapping.  
+**Not for publishing:** Do not paste keyword lists into page copy or metadata dumps.
 
-Authoritative NAP: see [nap-consistency.md](./nap-consistency.md) (Hornsbergs Strand 57 only).
+**Rules**
 
-Cuisine positioning on the live site: **svensk / skandinavisk** (with mediterran värme).  
-Italian-primary keywords are **deprioritized / ignore** unless the menu explicitly warrants them later.
+1. Every **active (KEEP)** cluster has exactly **one** `primary_url`.
+2. Other URLs may be `support` (internal links / conversion) — never co-primary.
+3. Claims must match live site + CMS. Seed/fallback menu data is not enough.
+4. No doorway URLs (`/restaurang-kungsholmen`, nearby-area landers, etc.).
+5. Authoritative NAP: [nap-consistency.md](./nap-consistency.md) — **Hornsbergs Strand 57** only.
 
----
+**Live CMS check (2026-09-06, `api.rivabistro.se`)**
 
-## Existing public pages (owners)
+| Signal | Result |
+|--------|--------|
+| Lunch category / lunch products | **Not published** (no `dagens-lunch` category; no lunch items) |
+| Entrecôte, Halstrad röding, Grillad lammracks, Rivas köttbullar | **Published** |
+| Pasta category + items | Published (cuisine mix — do not SEO-target “italiensk restaurang”) |
+| Uteservering / utsikt claims on site | **Not proven** in page copy |
+| Romantic / dejt framing on site | **Absent** |
 
-| Path | Role |
-|------|------|
-| `/` | Brand + Kungsholmen discovery hub |
-| `/meny` | Menu, dishes, lunch/dinner food intent |
-| `/boka` | Booking / reservation intent |
-| `/kontakt` | Address, hours, map, local/Hornsbergs intent |
-| `/privata-event` | Groups, corporate, private dining |
-| `/om-oss` | Brand story, Swedish/Scandinavian cuisine story |
-| `/galleri` | Atmosphere support (low SEO priority) |
-
-**No new doorway URLs** in this phase (`/restaurang-kungsholmen`, `/romantisk-middag`, etc.).
-
----
-
-## Cluster overview (≈18 → pages)
-
-| ID | Cluster | Primary intent | Owning page | Priority |
-|----|---------|----------------|-------------|----------|
-| C01 | Brand | Riva Bistro (+ city/area) | `/` | P0 |
-| C02 | Local Kungsholmen | restaurang Kungsholmen | `/` (+ `/kontakt`) | P0 |
-| C03 | Hornsbergs / waterfront | Hornsbergs Strand, vid vattnet | `/kontakt` (+ `/`) | P0 |
-| C04 | Stockholm generic | restaurang Stockholm | `/` secondary only | P2 |
-| C05 | Menu / dishes | meny, rätter | `/meny` | P0 |
-| C06 | Swedish / Scandinavian | svensk/skandinavisk mat | `/om-oss` + `/meny` | P1 |
-| C07 | Booking | boka bord | `/boka` | P0 |
-| C08 | Lunch | lunch Kungsholmen | `/meny` + `/boka` | P1 |
-| C09 | Dinner / evening | middag / kväll | `/` + `/boka` | P1 |
-| C10 | Romantic / couples | dejt, romantisk | `/` + `/boka` | P2 |
-| C11 | Groups / corporate / events | sällskap, företag | `/privata-event` | P1 |
-| C12 | Nearby areas | Kristineberg, Stadshagen, … | `/kontakt` support | P3 |
-| C13 | English / tourist | restaurant Stockholm/Kungsholmen | same SV pages | P2 |
-| C14 | Meat / grill | entrecôte, grill, kött | `/meny` support | P1 |
-| C15 | Fish / seafood | röding, fisk | `/meny` support | P1 |
-| C16 | Atmosphere / waterfront vibe | utsikt, uteservering | `/` + `/galleri` | P2 |
-| C17 | Long-tail discovery | “var äter man…” | nearest owner page | P2 |
-| C18 | Ignore / low value | italiensk*, thin variants | — | — |
-
-Compact row-level mapping for representatives: [keyword-clusters.csv](./keyword-clusters.csv).
+Machine-readable rows: [keyword-clusters.csv](./keyword-clusters.csv).
 
 ---
 
-## Per-page brief (primary / secondary / suggested title & H1)
+## Ownership model (active)
 
-### `/` — Home (C01, C02, C09, C16)
-
-- **Primary:** Riva Bistro Kungsholmen / Riva Bistro Stockholm  
-- **Secondary:** restaurang Kungsholmen, middag Kungsholmen, bistro Stockholm (soft)  
-- **Suggested title:** `Riva Bistro — Restaurang på Kungsholmen i Stockholm`  
-- **Suggested H1:** Keep brand/experience H1; ensure Kungsholmen + Hornsbergs appear in first viewport copy (already present via NAP blocks).  
-- **Internal links:** Meny, Boka, Kontakt, Privata event  
-
-### `/meny` — Menu (C05, C08, C14, C15)
-
-- **Primary:** Riva Bistro meny / meny Kungsholmen  
-- **Secondary:** lunchmeny, middag meny, entrecôte, röding, köttbullar (only if on menu)  
-- **Suggested title:** `Meny — Riva Bistro Kungsholmen`  
-- **Suggested H1:** `Meny`  
-- **Notes:** Dish long-tails support this URL; do not create dish landing pages unless product strategy changes.
-
-### `/boka` — Booking (C07, C08, C09, C10)
-
-- **Primary:** boka bord Kungsholmen / boka bord Riva Bistro  
-- **Secondary:** boka middag Stockholm, boka restaurang Kungsholmen  
-- **Suggested title:** `Boka bord — Riva Bistro Kungsholmen`  
-- **Suggested H1:** `Boka bord`  
-
-### `/kontakt` — Contact & location (C03, C12)
-
-- **Primary:** Riva Bistro adress / Hornsbergs Strand / öppettider  
-- **Secondary:** restaurang Hornsbergs Strand, restaurang vid vattnet Kungsholmen, nearby areas  
-- **Suggested title:** `Kontakt & hitta hit — Hornsbergs Strand, Kungsholmen`  
-- **Suggested H1:** `Kontakt`  
-- **NAP:** Always from `business.ts` (Hornsbergs Strand 57).  
-
-### `/privata-event` — Events (C11)
-
-- **Primary:** privata event / företagsmiddag Kungsholmen  
-- **Secondary:** gruppmiddag, födelsedag, sällskap  
-- **Suggested title:** `Privata event & företagsmiddagar — Riva Bistro`  
-- **Suggested H1:** `Privata event`  
-
-### `/om-oss` — About (C06)
-
-- **Primary:** om Riva Bistro / svensk skandinavisk mat Kungsholmen  
-- **Secondary:** modern svensk mat, säsongsbetonat kök  
-- **Suggested title:** `Om oss — Riva Bistro på Kungsholmen`  
-- **Suggested H1:** Keep story H1; one clear cuisine sentence.  
-
-### `/galleri` — Gallery (C16 support)
-
-- **Primary:** none competitive — atmosphere support only  
-- **Suggested title:** `Galleri — Riva Bistro Kungsholmen`  
+| Primary URL | Role | Owns (intent class) |
+|-------------|------|---------------------|
+| `/` | Brand + local discovery + dinner experience | Brand, Kungsholmen restaurant discovery, dinner/atmosphere experience |
+| `/meny` | Food / menu | Menu queries + **live** dish/category queries |
+| `/boka` | Booking conversion | Book-a-table transactional queries |
+| `/kontakt` | NAP / logistics | Address, hours, Hornsbergs / find-us |
+| `/privata-event` | Groups & corporate | Private events, company dinners, groups |
+| `/om-oss` | Brand story / philosophy | Story & values — **not** generic “svensk mat” food queries |
+| `/galleri` | Visual support only | **No** commercial primary clusters |
 
 ---
 
-## Intent → page cheat sheet
+## Active clusters (KEEP) — one primary each
 
-| User wants… | Send to |
-|-------------|---------|
-| Brand / “Riva” | `/` |
-| “Restaurang Kungsholmen” | `/` then deep link Kontakt |
-| Address / hours / map / Hornsbergs | `/kontakt` |
-| Menu / dishes / lunch list | `/meny` |
+### C01 Brand → `/`
+
+| | |
+|--|--|
+| **Primary keyword** | Riva Bistro |
+| **Secondaries** | Riva Bistro Stockholm, Riva Bistro Kungsholmen, Riva Bistro Hornsbergs Strand |
+| **Intent** | Navigational / brand |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/meny`, `/boka`, `/kontakt` for brand+intent variants (“Riva Bistro meny” → support `/meny`, etc.) |
+| **Content gap** | Clear brand + Kungsholmen identity in first viewport; dining proposition; links to `/meny`, `/boka`, `/kontakt` |
+
+### C02 Local Kungsholmen discovery → `/`
+
+| | |
+|--|--|
+| **Primary keyword** | restaurang Kungsholmen |
+| **Secondaries** | bistro Kungsholmen, mysig restaurang Kungsholmen |
+| **Intent** | Local commercial discovery |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/kontakt` (NAP proof), `/boka` (convert) |
+| **Content gap** | Explicit Kungsholmen location statement; what kind of restaurant; food/experience context; CTA to `/boka`; link to `/kontakt` |
+
+### C03 Dinner experience → `/`
+
+| | |
+|--|--|
+| **Primary keyword** | middag Kungsholmen |
+| **Secondaries** | kvällsrestaurang Kungsholmen, middag Riva Bistro |
+| **Intent** | Evening dining discovery |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/boka` (conversion only — not co-primary) |
+| **Content gap** | Evening dining framing (not only generic hero); path to book; avoid duplicating `/kontakt` location copy |
+
+### C04 Menu → `/meny`
+
+| | |
+|--|--|
+| **Primary keyword** | Riva Bistro meny |
+| **Secondaries** | meny Kungsholmen, restaurang meny Kungsholmen, middagsmeny Kungsholmen |
+| **Intent** | Informational food / menu |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/boka` |
+| **Content gap** | Stable published categories; clear lunch section **only if** lunch goes live; signatures that match CMS; link to `/boka` |
+
+### C05 Live dishes → `/meny`
+
+| | |
+|--|--|
+| **Primary keyword** | *(per-dish; see CSV)* |
+| **KEEP dishes (live CMS)** | Entrecôte Kungsholmen; Halstrad röding / röding Kungsholmen; Grillad lammracks / lammracks Kungsholmen; Rivas köttbullar / köttbullar Kungsholmen |
+| **Intent** | Dish-led commercial |
+| **Status** | KEEP · MEDIUM |
+| **Support URLs** | `/boka` |
+| **Content gap** | Dish visible on `/meny`; optional short dish context; no dish landing pages |
+
+### C06 Booking → `/boka`
+
+| | |
+|--|--|
+| **Primary keyword** | boka bord Kungsholmen |
+| **Secondaries** | boka bord Riva Bistro, boka restaurang Kungsholmen, boka middag Kungsholmen |
+| **Intent** | Transactional reservation |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | none as SEO co-owners (`/` / `/kontakt` must **not** primary booking terms) |
+| **Content gap** | Clear booking value prop; trust (confirm/cancel); NAP/hours link to `/kontakt` without stealing booking queries |
+
+### C07 Location / NAP → `/kontakt`
+
+| | |
+|--|--|
+| **Primary keyword** | Riva Bistro adress |
+| **Secondaries** | restaurang Hornsbergs Strand, restaurang Hornsberg, Riva Bistro öppettider, hitta Riva Bistro |
+| **Intent** | Local logistics / NAP |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/boka` (after finding location) |
+| **Content gap** | Unambiguous Hornsbergs Strand 57 + map + hours; transit/parking if known; **do not** primary-target generic “middag” here |
+
+### C08 Private events → `/privata-event`
+
+| | |
+|--|--|
+| **Primary keyword** | privata event Kungsholmen |
+| **Secondaries** | företagsmiddag Kungsholmen, gruppmiddag Kungsholmen, restaurang event Kungsholmen, födelsedagsmiddag Kungsholmen |
+| **Intent** | Groups / corporate / celebrations |
+| **Status** | KEEP · HIGH |
+| **Support URLs** | `/` teaser only |
+| **Content gap** | Formats, capacity/range if true, how inquiry works; food/event fit without inventing packages |
+
+### C09 Brand story → `/om-oss`
+
+| | |
+|--|--|
+| **Primary keyword** | Riva Bistro berättelse / om Riva Bistro |
+| **Secondaries** | Riva Bistro filosofi, skandinavisk restaurang Kungsholmen *(philosophy only)* |
+| **Intent** | Brand / about |
+| **Status** | KEEP · MEDIUM |
+| **Not owned here** | Generic “svensk mat Stockholm/Kungsholmen” food queries → `/meny` (C04) or MONITOR |
+| **Content gap** | One clear philosophy sentence aligned with live positioning; CTA to `/meny` and `/boka` |
+
+### C10 Gallery → `/galleri`
+
+| | |
+|--|--|
+| **Primary keyword** | — |
+| **Status** | KEEP as **support page only** · LOW |
+| **Rule** | No important commercial cluster primaries |
+
+---
+
+## Non-active statuses (do not target in metadata)
+
+| Status | Meaning |
+|--------|---------|
+| **RESEARCH** | Possible later; needs proof (content, CMS, or GSC demand) |
+| **REMOVE** | Do not target; conflicts or unsupported |
+| **GBP_ONLY** | Maps / Business Profile / citations — not organic page targets |
+| **MONITOR** | Track in Search Console; no active optimization |
+
+### Romantic / dejt → REMOVE (active targeting)
+
+romantisk restaurang, romantisk middag, dejtrestaurang, middag för två, restaurang för par, …  
+**Reason:** No on-page evidence.
+
+### Nearby areas → GBP_ONLY / RESEARCH
+
+Kristineberg, Stadshagen, Fridhemsplan, Lindhagen, Thorildsplan, …  
+**Reason:** No dedicated content; no doorway pages.
+
+### Broad Stockholm heads → MONITOR
+
+restaurang Stockholm, bästa restaurang(er) Stockholm, …  
+**Reason:** Too competitive / weak ownership; OK as brand co-occurrence only.
+
+### Unsupported category claims → REMOVE or RESEARCH
+
+| Term class | Status | Reason |
+|------------|--------|--------|
+| fiskrestaurang / skaldjursrestaurang | REMOVE | Not a fish restaurant positioning |
+| köttrestaurang / grillrestaurang | REMOVE | Over-claim vs full menu |
+| uteservering / restaurang med utsikt | RESEARCH / CONTENT GAP (CSV `C12b`) | Outdoor/view not proven on site |
+| restaurang vid vattnet / middag vid vattnet | RESEARCH / CONTENT GAP (CSV `C12a`) | Prefer enriching `/kontakt` (and light `/` support) before KEEP |
+| husmanskost | REMOVE | Not supported by live menu positioning |
+| italiensk restaurang | REMOVE | Conflicts with stated Scandinavian positioning (pasta items ≠ Italian restaurant) |
+
+### Lunch → RESEARCH (conditional)
+
+| Check | Live result |
+|-------|-------------|
+| Lunch category in CMS | No |
+| Lunch products published | No |
+| Customer-facing lunch product | **Not confirmed** |
+| Hours could allow daytime dining | Opens ~10:30 most days — not sufficient alone |
+
+**If lunch is later confirmed in CMS:** primary owner = `/meny`; `/boka` = conversion support only; then promote lunch rows from RESEARCH → KEEP.
+
+### Cuisine food queries (svensk/skandinavisk mat)
+
+| Query type | Owner | Status |
+|------------|-------|--------|
+| Brand philosophy / “om oss” Scandinavian framing | `/om-oss` | KEEP (C09) |
+| “svensk mat Kungsholmen” as **food** intent | `/meny` | MONITOR until copy/menu clearly support |
+| husmanskost | — | REMOVE |
+
+---
+
+## Intent cheat sheet
+
+| User wants | Primary URL |
+|------------|-------------|
+| Brand / Riva | `/` |
+| Restaurang Kungsholmen / middag discovery | `/` |
+| Menu / dishes | `/meny` |
 | Book a table | `/boka` |
+| Address / hours / Hornsbergs / hitta hit | `/kontakt` |
 | Company dinner / private party | `/privata-event` |
-| Story / Swedish food philosophy | `/om-oss` |
-| Photos / vibe | `/galleri` |
+| Story / philosophy | `/om-oss` |
+| Photos | `/galleri` (support) |
 
 ---
 
-## Ignore or deprioritize (C18)
+## Measurement (external)
 
-- **italiensk restaurang / Italian restaurant** as primaries — conflicts with current Swedish/Scandinavian positioning.  
-- Exact-match spam variants and near-duplicates (keep one representative per stem in tracking).  
-- “Nära mig” terms — useful for GBP, weak for static page targeting.  
-- Thin English duplicates of Swedish heads unless tourist traffic proves real in GSC.
-
----
-
-## Suggested measurement loop (external)
-
-1. Search Console property for `rivabistro.se`  
-2. Submit sitemap  
-3. Filter queries by cluster  
-4. Double down on pages earning impressions; only then consider **one** genuine new guide-style page if a cluster has demand and no fit
+1. Search Console for the production domain  
+2. Filter queries by cluster ID in CSV  
+3. Promote RESEARCH → KEEP only with impressions **and** honest content/CMS proof  
+4. Never fix citation drift by adding alternate street names on-site  
 
 ---
 
-## Representative keyword assignments
+## Explicit non-goals
 
-See CSV for machine-readable rows. Summary samples:
-
-**C01 Brand → `/`:** Riva Bistro, Riva Bistro Stockholm, Riva Bistro Kungsholmen, Riva Bistro meny, Riva Bistro boka bord, Riva Bistro öppettider  
-
-**C02 Kungsholmen → `/`:** restaurang Kungsholmen, bistro Kungsholmen, middag Kungsholmen, mysig restaurang Kungsholmen  
-
-**C03 Hornsbergs → `/kontakt`:** restaurang Hornsbergs Strand, restaurang Hornsberg, middag Hornsbergs Strand, restaurang vid vattnet Hornsbergs Strand  
-
-**C05 Menu → `/meny`:** Riva Bistro meny, meny Kungsholmen, lunchmeny Kungsholmen, entrecôte Kungsholmen, röding Kungsholmen, köttbullar Kungsholmen  
-
-**C07 Booking → `/boka`:** boka bord Kungsholmen, boka bord Stockholm, boka middag Kungsholmen, boka restaurang Hornsbergs Strand  
-
-**C11 Events → `/privata-event`:** företagsmiddag Kungsholmen, gruppmiddag Stockholm, privata event Stockholm, födelsedag restaurang Kungsholmen  
-
-Full stem coverage from the 1–1000 list is folded into these clusters; variants inherit the parent cluster’s `target_page` and `priority`.
+- No new SEO landers in this strategy phase  
+- No metadata changes in this documentation task  
+- No keyword stuffing briefs  
+- No Strandvägen (or other non-NAP streets) in any SEO doc  
