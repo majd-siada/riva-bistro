@@ -63,7 +63,6 @@ class Command(BaseCommand):
             if unsent:
                 qs = qs.filter(unsent_q)
             rows = list(qs)
-            found = {r.ref for r in rows}
             # Only treat as missing when the ref does not exist at all.
             existing = set(
                 Reservation.objects.filter(ref__in=refs).values_list("ref", flat=True)

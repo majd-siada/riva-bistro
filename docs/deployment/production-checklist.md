@@ -181,6 +181,21 @@ docker compose -f docker-compose.production.yml exec backend \
 
 Put the printed chat id into `TELEGRAM_CHAT_ID`. Never log or commit the bot token.
 
+After `.env` changes, recreate backend (`env_file` is only re-read on recreate), then smoke-test:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate backend
+./scripts/verify-notifications.sh --send-test
+```
+
+Create responses include `notifications.telegram` / `notifications.staff_email`. Admin lists
+`telegram_notified` / `staff_email_notified` / `confirmation_email_sent`. To retry unsent staff alerts:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py resend_reservation_notifications --unsent
+```
+
 ### Hostinger Mail API (optional staff reservation email)
 
 Verified package: `hostinger_mail_api` (Bearer auth → `https://api.mail.hostinger.com`).
