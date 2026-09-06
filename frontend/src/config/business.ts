@@ -9,8 +9,9 @@
  * - verified=true  → JSON-LD publishes; only set after OWNER confirms real values.
  *
  * Address matches the owner-provided Google Business listing
- * (Hornsbergs Strand 57). Phone is omitted until confirmed; social / kitchen
- * hours may still be placeholders — keep verified=false until confirmed.
+ * (Hornsbergs Strand 57). Phone is the owner-confirmed public number
+ * 087042050. Social / kitchen hours may still be placeholders —
+ * keep verified=false until those are confirmed.
  *
  * Opening hours: prefer Admin → Öppettider / GET /api/v1/hours/ at runtime.
  * `restaurantHoursLabel` is a static fallback from `opening-hours.ts`
@@ -31,10 +32,10 @@ export const business = {
     city: "Stockholm",
     country: "SE",
   },
-  /** Leave empty until the owner confirms the real phone number. */
-  phone: "",
-  phoneHref: "",
-  phoneE164: "",
+  /** Owner-confirmed public number. */
+  phone: "087042050",
+  phoneHref: "tel:+4687042050",
+  phoneE164: "+4687042050",
   email: "info@rivabistro.se",
   /** Leave empty until the owner confirms kitchen last-order times. */
   kitchenHours: "",
