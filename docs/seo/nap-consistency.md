@@ -21,14 +21,13 @@ Defined in [`frontend/src/config/business.ts`](../../frontend/src/config/busines
 |-------|--------|
 | `business.ts` address | Hornsbergs Strand 57 |
 | Live homepage NAP | Hornsbergs Strand 57 (verified against production) |
-| Repo search for `Strandvägen` | **No matches** |
 | Maps embed / `mapUrl` | Derived from the same `business` address |
 
-**Conclusion:** The website and codebase are consistent. Do **not** change site content to “disprove” Strandvägen. That looks spammy and does not fix citations.
+**Conclusion:** The website and codebase use a single NAP. Keep one street address only—do not add alternate or “disprove” copy on the site; fix wrong third-party citations instead.
 
-## Strandvägen conflict (external)
+## External citation consistency
 
-Crawled/indexed results that mention **Strandvägen 5** (or similar) are almost certainly from:
+If search engines or directories show a different street than Hornsbergs Strand 57, the source is almost certainly outside this repo:
 
 - Stale Google Business Profile data
 - Old Search index snapshots
@@ -38,7 +37,7 @@ Those must be corrected **outside** the repo.
 
 ## Owner cleanup checklist (outside Cursor)
 
-1. **Google Business Profile** — confirm primary address is Hornsbergs Strand 57, 112 16 Stockholm; remove any Strandvägen listing.
+1. **Google Business Profile** — confirm primary address is Hornsbergs Strand 57, 112 16 Stockholm; remove any incorrect listing.
 2. **Google Search Console** — verify property for `rivabistro.se`; request indexing of `/` and `/kontakt`; inspect URL for address in rendered HTML.
 3. **Apple Maps / Maps Connect** — claim and correct if wrong.
 4. **Hitta.se / Eniro / Guide companies** — update or claim listings.
