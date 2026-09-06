@@ -117,11 +117,31 @@ class AvailabilitySerializer(serializers.Serializer):
     slots = AvailabilitySlotSerializer(many=True)
 
 
+class StaffNotificationResultsSerializer(serializers.Serializer):
+    telegram = serializers.BooleanField(
+        help_text="True when staff Telegram alert was sent for this create."
+    )
+    staff_email = serializers.BooleanField(
+        help_text="True when staff email alert was sent for this create."
+    )
+
+
 class ReservationCreateResponseSerializer(ReservationSerializer):
     email_sent = serializers.BooleanField(read_only=True)
+    notifications = StaffNotificationResultsSerializer(
+        read_only=True,
+        help_text=(
+            "Best-effort staff alert results for this create. Booking still "
+            "succeeds when either channel is false."
+        ),
+    )
 
     class Meta(ReservationSerializer.Meta):
-        fields = [*ReservationSerializer.Meta.fields, "email_sent"]
+        fields = [
+            *ReservationSerializer.Meta.fields,
+            "email_sent",
+            "notifications",
+        ]
         read_only_fields = fields
 
 
