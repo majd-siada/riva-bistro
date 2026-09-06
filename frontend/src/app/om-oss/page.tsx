@@ -11,8 +11,9 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Om oss",
+  absoluteTitle: "Om oss — Riva Bistro på Kungsholmen",
   description:
-    "Lär känna Riva Bistro på Kungsholmen — vår historia, värderingar och passion för god mat i Stockholm.",
+    "Lär känna Riva Bistro på Kungsholmen — skandinavisk mat, vår historia och passion för säsongsbetonade smaker i Stockholm.",
   path: "/om-oss",
 });
 

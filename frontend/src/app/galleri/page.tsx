@@ -6,8 +6,9 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Galleri",
+  absoluteTitle: "Galleri — Riva Bistro Kungsholmen",
   description:
-    "Bilder från Riva Bistro på Kungsholmen — matsalen, köket och kvällens stämning.",
+    "Bilder från Riva Bistro på Kungsholmen — matsalen, köket och stämningen vid Hornsbergs Strand.",
   path: "/galleri",
 });
 

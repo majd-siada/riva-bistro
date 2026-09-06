@@ -8,8 +8,9 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Boka bord",
+  absoluteTitle: "Boka bord — Riva Bistro Kungsholmen",
   description:
-    "Boka bord på Riva Bistro på Kungsholmen i Stockholm — välj datum, tid och antal gäster online.",
+    "Boka bord på Riva Bistro, Kungsholmen — välj datum, tid och antal gäster online. Lunch eller middag vid Hornsbergs Strand.",
   path: "/boka",
 });
 

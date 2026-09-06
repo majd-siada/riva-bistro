@@ -16,8 +16,9 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Kontakt",
+  absoluteTitle: "Kontakt & hitta hit — Hornsbergs Strand, Kungsholmen",
   description:
-    "Kontakta Riva Bistro på Hornsbergs Strand, Kungsholmen — adress, öppettider, karta och meddelandeformulär.",
+    "Hitta Riva Bistro på Hornsbergs Strand 57, Kungsholmen — adress, öppettider, karta och kontaktformulär.",
   path: "/kontakt",
 });
 
