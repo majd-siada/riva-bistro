@@ -26,17 +26,16 @@ const FAQ_ITEMS = [
   {
     question: "Hur bokar jag bord?",
     answer:
-      "Använd vår bokningssida för att välja datum, tid och antal gäster. Du får en direkt bekräftelse med bokningsnummer.",
+      "Använd sidan Boka bord för att välja datum, tid och antal gäster. När onlinebokning är aktiverad får du en bekräftelse med bokningsreferens. Annars når du oss via telefon eller formuläret på den här sidan.",
   },
   {
     question: "Kan jag boka för större sällskap?",
     answer:
-      "Ja — för grupper större än tolv personer rekommenderar vi att ni kontaktar oss via formuläret eller telefon så vi kan anpassa upplägget.",
+      "För större sällskap — särskilt över tolv personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
   },
   {
-    question: "Erbjuder ni vegetariska alternativ?",
-    answer:
-      "Absolut. Menyn innehåller flera vegetariska rätter och vår kock kan ofta anpassa rätter efter önskemål — meddela gärna vid bokning.",
+    question: "Hur når jag er?",
+    answer: `Ring ${business.phone}, mejla ${business.email}, eller skriv via formuläret. Adress: ${fullAddress()}.`,
   },
   {
     question: "Var finns ni?",

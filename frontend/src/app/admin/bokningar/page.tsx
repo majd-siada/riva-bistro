@@ -23,8 +23,10 @@ import {
 import { StateMessage } from "@/components/ui/state-message";
 import {
   adminListReservations,
+  adminResendReservationNotifications,
   adminUpdateReservationStatus,
   type AdminReservation,
+  type AdminReservationWithNotify,
 } from "@/lib/admin-api";
 
 const STATUSES = [
@@ -51,7 +53,8 @@ export default function AdminBookingsPage() {
   const [rows, setRows] = useState<AdminReservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [selected, setSelected] = useState<AdminReservation | null>(null);
+  const [selected, setSelected] = useState<AdminReservationWithNotify | null>(null);
+  const [resending, setResending] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,10 +82,24 @@ export default function AdminBookingsPage() {
     try {
       const updated = await adminUpdateReservationStatus(id, newStatus);
       setRows((prev) => prev.map((r) => (r.id === id ? updated : r)));
-      setSelected((prev) => (prev && prev.id === id ? updated : prev));
+      setSelected((prev) => (prev && prev.id === id ? { ...prev, ...updated } : prev));
       toast.success("Status uppdaterad.");
     } catch {
       toast.error("Kunde inte uppdatera status.");
+    }
+  };
+
+  const resendNotifications = async (id: number) => {
+    setResending(true);
+    try {
+      const updated = await adminResendReservationNotifications(id);
+      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...updated } : r)));
+      setSelected((prev) => (prev && prev.id === id ? { ...prev, ...updated } : prev));
+      toast.success("Notiser skickades om (best-effort).");
+    } catch {
+      toast.error("Kunde inte skicka om notiser.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -198,12 +215,32 @@ export default function AdminBookingsPage() {
                 <Detail label="Telefon" value={selected.phone} />
                 <Detail label="E-post" value={selected.email} />
               </dl>
-              {selected.special_request && (
+              {selected.special_request ? (
                 <div className="rounded-md bg-riva-surface p-3 text-sm">
                   <p className="riva-label">Särskilda önskemål</p>
                   <p className="mt-1 text-riva-muted">{selected.special_request}</p>
                 </div>
-              )}
+              ) : null}
+
+              <div className="rounded-md border border-riva-cream/10 bg-riva-surface/40 p-3 text-sm">
+                <p className="riva-label">Personalnotiser</p>
+                <ul className="mt-2 space-y-1 text-riva-muted">
+                  <li>Telegram: {selected.telegram_notified ? "skickad" : "ej skickad"}</li>
+                  <li>
+                    Personal-e-post: {selected.staff_email_notified ? "skickad" : "ej skickad"}
+                  </li>
+                </ul>
+                <Button
+                  className="mt-3"
+                  variant="outline"
+                  size="sm"
+                  loading={resending}
+                  onClick={() => void resendNotifications(selected.id)}
+                >
+                  Skicka om notiser
+                </Button>
+              </div>
+
               <div>
                 <Label htmlFor="status-change">Ändra status</Label>
                 <Select

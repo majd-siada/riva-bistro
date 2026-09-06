@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -77,11 +78,13 @@ class AdminNewsDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class AdminGalleryListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     serializer_class = AdminGalleryItemSerializer
     queryset = GalleryItem.objects.all()
 
 
 class AdminGalleryDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     serializer_class = AdminGalleryItemSerializer
     queryset = GalleryItem.objects.all()

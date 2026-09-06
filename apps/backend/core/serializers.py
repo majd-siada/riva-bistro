@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.images import ALLOWED_IMAGE_EXTENSIONS, MAX_IMAGE_BYTES, sniff_image_kind
 from core.models import ContactMessage, EventInquiry, GalleryItem, NewsItem
 
 
@@ -111,15 +112,35 @@ class AdminNewsItemSerializer(serializers.ModelSerializer):
 
 
 class AdminGalleryItemSerializer(serializers.ModelSerializer):
+    image = serializers.FileField(required=False, allow_null=True)
+
     class Meta:
         model = GalleryItem
         fields = [
             "id",
             "title",
             "alt",
+            "image",
             "image_url",
             "sort_order",
             "is_published",
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
+
+    def validate_image(self, uploaded):
+        if uploaded is None:
+            return uploaded
+        name = (getattr(uploaded, "name", "") or "").lower()
+        if not any(name.endswith(ext) for ext in ALLOWED_IMAGE_EXTENSIONS):
+            raise serializers.ValidationError(
+                "Bilden måste vara JPG, PNG eller WebP."
+            )
+        size = getattr(uploaded, "size", None)
+        if size is not None and size > MAX_IMAGE_BYTES:
+            raise serializers.ValidationError("Bilden är för stor (max 5 MB).")
+        if sniff_image_kind(uploaded) is None:
+            raise serializers.ValidationError(
+                "Filen är inte en giltig JPG, PNG eller WebP."
+            )
+        return uploaded

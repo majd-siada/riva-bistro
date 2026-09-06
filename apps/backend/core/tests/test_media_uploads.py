@@ -99,3 +99,18 @@ def test_product_image_upload_rejects_fake_magic():
     assert resp.status_code == 400
     detail = resp.json()["detail"].lower()
     assert "giltig" in detail or "jpg" in detail or "webp" in detail
+
+
+@pytest.mark.django_db
+def test_gallery_image_upload_rejects_fake_magic():
+    staff = User.objects.create_user("gallerist", password="hemligt123", is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=staff)
+    fake = SimpleUploadedFile("scene.jpg", b"not-really-an-image", content_type="image/jpeg")
+    resp = client.post(
+        "/api/v1/admin/gallery/",
+        {"title": "X", "alt": "test", "image": fake, "sort_order": 1, "is_published": True},
+        format="multipart",
+    )
+    assert resp.status_code == 400
+    assert "image" in resp.json()

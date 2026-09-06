@@ -57,6 +57,19 @@ class ReservationSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+
+
+class AdminReservationSerializer(ReservationSerializer):
+    """Staff-only reservation payload including notification delivery flags."""
+
+    class Meta(ReservationSerializer.Meta):
+        fields = [
+            *ReservationSerializer.Meta.fields,
+            "telegram_notified",
+            "staff_email_notified",
+        ]
+        read_only_fields = fields
+
 class ReservationStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=Reservation.Status.choices)
 

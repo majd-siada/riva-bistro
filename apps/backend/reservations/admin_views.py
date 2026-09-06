@@ -11,6 +11,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.notifications import notify_reservation_created
+
 from reservations.models import (
     OpeningHours,
     Reservation,
@@ -19,6 +21,7 @@ from reservations.models import (
 )
 from reservations.serializers import (
     AdminOverviewSerializer,
+    AdminReservationSerializer,
     OpeningHoursSerializer,
     ReservationSerializer,
     ReservationSettingsSerializer,
@@ -37,7 +40,7 @@ class AdminReservationListView(APIView):
             OpenApiParameter(name="status", type=str, location=OpenApiParameter.QUERY),
             OpenApiParameter(name="q", type=str, location=OpenApiParameter.QUERY),
         ],
-        responses={200: ReservationSerializer(many=True)},
+        responses={200: AdminReservationSerializer(many=True)},
     )
     def get(self, request: Request) -> Response:
         qs = Reservation.objects.all()
@@ -61,7 +64,7 @@ class AdminReservationListView(APIView):
                 | Q(phone__icontains=query)
                 | Q(ref__icontains=query)
             )
-        return Response(ReservationSerializer(qs[:500], many=True).data)
+        return Response(AdminReservationSerializer(qs[:500], many=True).data)
 
 
 class AdminReservationDetailView(APIView):
@@ -70,17 +73,17 @@ class AdminReservationDetailView(APIView):
     def get_object(self, pk: int) -> Reservation | None:
         return Reservation.objects.filter(pk=pk).first()
 
-    @extend_schema(tags=["admin"], responses={200: ReservationSerializer})
+    @extend_schema(tags=["admin"], responses={200: AdminReservationSerializer})
     def get(self, request: Request, pk: int) -> Response:
         reservation = self.get_object(pk)
         if not reservation:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(ReservationSerializer(reservation).data)
+        return Response(AdminReservationSerializer(reservation).data)
 
     @extend_schema(
         tags=["admin"],
         request=ReservationStatusSerializer,
-        responses={200: ReservationSerializer},
+        responses={200: AdminReservationSerializer},
     )
     def patch(self, request: Request, pk: int) -> Response:
         reservation = self.get_object(pk)
@@ -90,7 +93,7 @@ class AdminReservationDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         reservation.status = serializer.validated_data["status"]
         reservation.save(update_fields=["status", "updated_at"])
-        return Response(ReservationSerializer(reservation).data)
+        return Response(AdminReservationSerializer(reservation).data)
 
 
 class AdminHoursView(APIView):
@@ -197,3 +200,22 @@ class AdminReservationOverviewView(APIView):
                 ).data,
             }
         )
+
+
+class AdminReservationResendNotificationsView(APIView):
+    """Retry staff Telegram/email for one reservation (idempotent claim flags)."""
+
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(
+        tags=["admin"],
+        request=None,
+        responses={200: AdminReservationSerializer},
+    )
+    def post(self, request: Request, pk: int) -> Response:
+        reservation = Reservation.objects.filter(pk=pk).first()
+        if not reservation:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        notify_reservation_created(reservation)
+        reservation.refresh_from_db()
+        return Response(AdminReservationSerializer(reservation).data)
