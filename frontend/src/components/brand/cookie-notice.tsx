@@ -24,7 +24,11 @@ export function CookieNotice() {
       <p className="text-sm text-riva-cream">Vi värdesätter din integritet</p>
       <p className="mt-2 text-xs leading-relaxed text-riva-muted">
         Vi använder endast nödvändiga kakor för att webbplatsen ska fungera, bland annat
-        för inloggning i administrationen. Ingen reklamspårning.
+        för inloggning i administrationen. Ingen reklamspårning. Läs mer i vår{" "}
+        <a href="/cookies" className="text-riva-cream underline underline-offset-2">
+          cookiepolicy
+        </a>
+        .
       </p>
       <div className="mt-3 flex justify-end">
         <Button

@@ -18,6 +18,38 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "www.rivabistro.se" },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "DENY" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=()",
+          },
+          // Report-only CSP: observe without breaking Next.js inline/runtime scripts.
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: [
+              "default-src 'self'",
+              "img-src 'self' data: blob: https://api.rivabistro.se https://maps.gstatic.com https://maps.googleapis.com",
+              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "connect-src 'self' https://api.rivabistro.se",
+              "font-src 'self' data:",
+              "frame-src https://www.google.com https://maps.google.com",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

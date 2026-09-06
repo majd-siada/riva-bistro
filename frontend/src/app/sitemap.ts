@@ -11,6 +11,10 @@ const PUBLIC_ROUTES: ReadonlyArray<{ path: string; priority: number }> = [
   { path: "/galleri", priority: 0.5 },
   { path: "/om-oss", priority: 0.6 },
   { path: "/kontakt", priority: 0.6 },
+  { path: "/integritetspolicy", priority: 0.3 },
+  { path: "/cookies", priority: 0.3 },
+  { path: "/villkor", priority: 0.3 },
+  { path: "/bokningspolicy", priority: 0.3 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
