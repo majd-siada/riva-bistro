@@ -11,7 +11,7 @@ export const metadata = createPageMetadata({
 
 export default function PrivacyPage() {
   return (
-    <LegalDocument title="Integritetspolicy">
+    <LegalDocument title="Integritetspolicy" path="/integritetspolicy">
       <p>
         Personuppgiftsansvarig: {business.name}, {fullAddress()}. Kontakt:{" "}
         <a className="text-riva-cream underline" href={`mailto:${business.email}`}>

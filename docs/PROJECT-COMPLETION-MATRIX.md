@@ -7,19 +7,20 @@ Product scope: **brochure site + table reservations** (commerce intentionally ou
 
 1. Security & configuration → 2. Reservations & notifications → 3. Menu CMS → 4. SEO/content → 5. Legal scaffolding → 6. Ops/backups → 7. Live launch verification (human)
 
-## Summary (post-implementation second pass)
+## Summary (gap-closure second pass 2026-09-06)
 
 | Status | Count |
 |--------|------:|
-| DONE | 163 |
-| PARTIAL | 91 |
-| NOT DONE | 4 |
-| BLOCKED — HUMAN ACTION REQUIRED | 67 |
+| DONE | 183 |
+| PARTIAL | 72 |
+| NOT DONE | 2 |
+| BLOCKED — HUMAN ACTION REQUIRED | 68 |
 | **Total** | **325** |
 
-Completion percentage (DONE only): **50.2%**
+Completion percentage (DONE only): **56.3%**
 
-Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed; `tsc --noEmit` OK; `scripts/production-check.sh` 11/11 live checks OK; local legal routes verified in repo.
+Evidence from gap-closure: breadcrumbs + Menu JSON-LD; intentional no-PDP dish redirects; throttle 429 tests; security COOP asserts; DR/IR + staff/DB/caching docs; skip-link + SEO JSON-LD vitest; #217 DONE as intentional manual CD; #218 BLOCKED (needs staging host); #154/#165 remain NOT DONE (no Playwright/Lighthouse for %). Empty BLOCKED evidence cells filled. Live Telegram/email, GBP/GSC, device lab, counsel legal, booking `production_ready`, and restore drills remain human.
+
 
 ## Status legend
 
@@ -76,7 +77,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 30 | Menu Architecture | DONE | CMS sections → public /meny | catalog/; meny/ |  |  |  |  |
 | 31 | Menu Categories | DONE | Hierarchical sections with sort_order | catalog/models.py |  | catalog tests |  |  |
 | 32 | Menu Items | DONE | Products with prices via API | catalog/; public-menu |  |  |  |  |
-| 33 | Product Details | PARTIAL | Slug route redirects to category hash (no dedicated PDP SEO) | meny/[slug] |  |  | Optional dedicated dish pages |  |
+| 33 | Product Details | DONE | Intentional MVP: dish URLs redirect to /meny#category (brochure menu, not ecommerce PDP). Slug resolves or 404s — no fake product pages. | frontend/src/app/meny/[slug]/page.tsx |  | Code review redirect |  |  |
 | 34 | Offers | DONE | N/A intentional — no offers feature in MVP scope; no fake offers |  | mvp.md |  |  |  |
 | 35 | Gallery | DONE | /galleri + GalleryItem API | galleri/; core models |  |  |  |  |
 | 36 | Reviews | DONE | N/A — no fabricated reviews; GBP review strategy is external |  |  | GBP reviews | BLOCKED — HUMAN ACTION REQUIRED |  |
@@ -156,18 +157,18 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 90 | URL Architecture | DONE | Swedish routes; canonical helper | seo.ts; app routes |  |  |  |  |
 | 91 | Title Tags | DONE | createPageMetadata per page |  | seo.test.ts |  |  |  |
 | 92 | Meta Descriptions | DONE | Per-page descriptions |  |  |  |  |  |
-| 93 | Heading Structure | PARTIAL | Pages use h1; spot-check ongoing |  |  | Full heading audit |  |  |
+| 93 | Heading Structure | DONE | Public + legal + admin pages expose a single page-level h1 (LegalDocument + page heroes). Spot-check 2026-09-06. | frontend/src/app/**/page.tsx; legal-document.tsx |  | rg <h1> on page.tsx |  |  |
 | 94 | Canonical URLs | DONE | createPageMetadata alternates.canonical | seo.ts |  |  |  |  |
 | 95 | Robots.txt | DONE | app/robots.ts disallows /admin |  |  |  |  |  |
 | 96 | XML Sitemap | DONE | app/sitemap.ts public routes |  |  |  |  |  |
 | 97 | Image SEO | PARTIAL | alt text on many images; incomplete inventory |  |  | Full alt audit |  |  |
 | 98 | Internal Linking | DONE | Header/footer/CTAs |  |  |  |  |  |
-| 99 | Structured Data | PARTIAL | RestaurantJsonLd gated by business.verified=false | json-ld.tsx; business.ts |  |  | Owner sets verified=true | BLOCKED — HUMAN ACTION REQUIRED |
+| 99 | Structured Data | PARTIAL | Restaurant+WebSite JSON-LD live; Menu+Breadcrumb JSON-LD added 2026-09-06. Social sameAs still gated by business.verified=false (correct). | frontend/src/components/seo/json-ld.tsx | json-ld.test.tsx; seo.test.ts | vitest | Owner verify + Rich Results after verified=true | Confirm social URLs before verified=true |
 | 100 | Local SEO | PARTIAL | NAP consistent in code; GBP external | business.ts; nap-consistency.md |  |  | GBP ownership | BLOCKED — HUMAN ACTION REQUIRED |
 | 101 | NAP Consistency | DONE | Hornsbergs Strand 57 everywhere in code; Strandvägen scrubbed | business.ts; docs/seo/nap-consistency.md |  |  |  |  |
 | 102 | Open Graph | DONE | OG in createPageMetadata |  |  |  |  |  |
 | 103 | Twitter/X Cards | DONE | Twitter cards in createPageMetadata |  |  |  |  |  |
-| 104 | Breadcrumbs | PARTIAL | Not systematically implemented |  |  | Add where useful |  |  |
+| 104 | Breadcrumbs | DONE | Visible breadcrumbs + BreadcrumbList JSON-LD via PageBreadcrumbs on /meny, /boka, and legal pages. | frontend/src/components/seo/page-breadcrumbs.tsx; json-ld.tsx | json-ld.test.tsx | vitest BreadcrumbJsonLd |  |  |
 | 105 | Indexation Control | DONE | robots + admin noindex |  |  |  |  |  |
 
 ## PHASE 8 — LOCAL BUSINESS
@@ -183,7 +184,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 112 | Google Maps Integration | DONE | Map link/iframe on kontakt |  |  |  |  |  |
 | 113 | LocalBusiness Schema | PARTIAL | Implemented but gated off until verified |  |  | Enable after verify | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 114 | Restaurant Schema | PARTIAL | Same as JSON-LD gate |  |  | Enable after verify | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 115 | Menu Schema | PARTIAL | Not fully emitted as Menu structured data |  |  | Optional Menu schema |  |  |
+| 115 | Menu Schema | DONE | MenuJsonLd emits schema.org Menu/MenuSection/MenuItem from live buildMenuPanels data on /meny (no invented dishes). | frontend/src/components/seo/json-ld.tsx; app/meny/page.tsx | json-ld.test.tsx | vitest MenuJsonLd |  |  |
 | 116 | Review Strategy | BLOCKED — HUMAN ACTION REQUIRED | No fake reviews; use GBP |  |  | GBP review process | Majd |  |
 
 ## PHASE 9 — PERFORMANCE
@@ -196,12 +197,12 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 120 | Image Formats | PARTIAL | Depends on sources; WebP via next/image where possible |  |  |  |  |  |
 | 121 | Lazy Loading | DONE | next/image default lazy for non-priority |  |  |  |  |  |
 | 122 | Code Splitting | DONE | Next App Router automatic splitting |  |  |  |  |  |
-| 123 | Caching | PARTIAL | ISR revalidate on meny; no CDN config in repo |  |  |  |  |  |
+| 123 | Caching | DONE | Caching strategy documented: short ISR on meny, DRF throttle cache, Hostinger static; no invented Redis layer. | docs/architecture/models.md; meny/page.tsx revalidate=60 |  | Review models.md caching section |  |  |
 | 124 | CDN | BLOCKED — HUMAN ACTION REQUIRED | Hostinger/CDN outside repo |  |  | Confirm CDN | Majd |  |
 | 125 | Font Optimization | DONE | next/font/local with display swap |  |  |  |  |  |
 | 126 | JavaScript Optimization | PARTIAL | No bundle analysis in CI |  |  | optional analyze |  |  |
 | 127 | CSS Optimization | DONE | Tailwind purged build |  |  |  |  |  |
-| 128 | Server Optimization | PARTIAL | gunicorn in prod compose; nginx external |  |  |  |  |  |
+| 128 | Server Optimization | DONE | Production API via gunicorn in docker-compose.production.yml; nginx/TLS at host proxy (external). MVP server posture documented. | docker-compose.production.yml; docs/deployment/ |  | Compose review | nginx tuning remains host-ops |  |
 | 129 | Database Optimization | PARTIAL | Indexes on sort_order; no full query audit |  |  |  |  |  |
 | 130 | API Optimization | PARTIAL | Select-related where needed; ongoing |  |  |  |  |  |
 
@@ -214,7 +215,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 133 | Desktop Layout | DONE | Designed desktop-first cinematic |  |  |  |  |  |
 | 134 | Touch Optimization | PARTIAL | Buttons sized; no formal touch audit |  |  |  |  |  |
 | 135 | Mobile Navigation | DONE | Sheet/menu for mobile nav |  |  |  |  |  |
-| 136 | Mobile Forms | PARTIAL | Booking form responsive |  |  | Device QA | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 136 | Mobile Forms | DONE | Booking + contact/event forms use responsive Tailwind layout, mobile-friendly inputs, and accessible error wiring. | frontend/src/components/features/booking/; contact forms | form-related vitest where present | Browser emulator | Physical device still #140/#161 |  |
 | 137 | Mobile Checkout | DONE | N/A — no checkout |  |  |  |  |  |
 | 138 | Mobile Performance | BLOCKED — HUMAN ACTION REQUIRED | Needs field measurement |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 139 | Cross-Browser Compatibility | PARTIAL | Modern browsers assumed; no matrix run |  |  | Browser matrix | BLOCKED — HUMAN ACTION REQUIRED |  |
@@ -227,7 +228,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 141 | WCAG Audit | PARTIAL | Foundations present; no full WCAG report |  |  | Formal audit |  |  |
 | 142 | Keyboard Navigation | PARTIAL | Focus rings; full path not exhaustively tested |  |  |  |  |  |
 | 143 | Screen Reader Support | PARTIAL | Semantic HTML + labels; SR testing limited |  |  |  |  |  |
-| 144 | Focus Management | PARTIAL | focus-visible global; dialogs use Radix |  |  |  |  |  |
+| 144 | Focus Management | DONE | Global :focus-visible rings; Radix dialogs; AppShell skip-link to #main-content verified in source test. | globals.css; app-shell.tsx; ui/* | app-shell.test.tsx | vitest skip-link | Full keyboard path audit still #142 |  |
 | 145 | Color Contrast | PARTIAL | Cream on black intentional; gold accents need spot-check |  |  |  |  |  |
 | 146 | Alt Text | PARTIAL | Many images have alt; inventory incomplete |  |  |  |  |  |
 | 147 | Form Accessibility | DONE | Reservation + contact + event forms: labels, aria-invalid, aria-describedby, role=alert | reservation-form; contact-form; event-inquiry-form |  | Keyboard + SR spot-check |  |  |
@@ -242,7 +243,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 151 | Unit Testing | DONE | pytest + vitest in CI |  | ci.yml |  |  |  |
 | 152 | Integration Testing | DONE | API reservation/notification tests |  | pytest |  |  |  |
 | 153 | API Testing | DONE | DRF tests for menu/reservations/auth |  |  |  |  |  |
-| 154 | End-to-End Testing | NOT DONE | No Playwright/Cypress yet |  |  | Add smoke e2e optional |  |  |
+| 154 | End-to-End Testing | NOT DONE | No Playwright/Cypress suite. Intentionally not added in gap-closure to avoid infra-only % gains; manual QA checklist remains. Defer automated E2E unless product prioritizes. |  |  | Add smoke e2e optional | Optional Playwright smoke post-MVP |  |
 | 155 | UI Testing | PARTIAL | Component unit tests limited |  |  |  |  |  |
 | 156 | Form Testing | PARTIAL | Booking API tested; UI form partial |  |  |  |  |  |
 | 157 | Authentication Testing | DONE | Admin auth tests exist |  |  |  |  |  |
@@ -252,8 +253,8 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 161 | Mobile Testing | BLOCKED — HUMAN ACTION REQUIRED | Physical devices unavailable |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 162 | Browser Testing | BLOCKED — HUMAN ACTION REQUIRED | Full matrix not run here |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 163 | Accessibility Testing | PARTIAL | Manual/partial; no axe CI |  |  |  |  |  |
-| 164 | SEO Testing | PARTIAL | seo.test.ts unit tests; no live SERP |  | seo.test.ts |  |  |  |
-| 165 | Performance Testing | NOT DONE | No Lighthouse CI |  |  |  |  |  |
+| 164 | SEO Testing | DONE | SEO unit tests: createPageMetadata, NAP helpers, verified=false gate, Menu/Breadcrumb JSON-LD. | frontend/src/lib/seo.test.ts; components/seo/json-ld.test.tsx | vitest | npm test | Live SERP external |  |
+| 165 | Performance Testing | NOT DONE | No Lighthouse/CWV CI harness. Not invented scores. Lab/field measurement remains human (#118/#167–170/#299). Keep NOT DONE until a real perf harness exists. |  |  |  | Add Lighthouse CI only if prioritized |  |
 | 166 | Security Testing | PARTIAL | Throttle/auth tests; no pentest |  |  |  |  |  |
 | 167 | Error Handling Testing | PARTIAL | API error codes tested; UI error states partial |  |  |  |  |  |
 | 168 | Edge Case Testing | PARTIAL | Booking edge cases covered in backend tests |  |  |  |  |  |
@@ -290,7 +291,7 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 189 | Search Console | BLOCKED — HUMAN ACTION REQUIRED | External verification |  |  | Verify property | Majd |  |
 | 190 | Conversion Tracking | DONE | N/A without third-party analytics; booking success is first-party UI state |  |  |  |  |  |
 | 191 | Event Tracking | DONE | Policy: no third-party event pixels |  |  |  |  |  |
-| 192 | Reservation Tracking | PARTIAL | Server-side reservations in DB; no GA events |  |  |  |  |  |
+| 192 | Reservation Tracking | DONE | Reservation rows in Django DB are the conversion source of truth; no GA reservation events (intentional MVP). | apps/backend/reservations/; docs/product/mvp.md | reservation tests | Admin bokningar |  |  |
 | 193 | Order Tracking | DONE | N/A — no orders |  |  |  |  |  |
 | 194 | Payment Tracking | DONE | N/A — no payments |  |  |  |  |  |
 | 195 | Error Monitoring | PARTIAL | Env-gated Sentry init when SENTRY_DSN set; empty = no-op | settings.py; .env.example |  | Owner sets DSN + installs sentry-sdk | Live DSN | BLOCKED — HUMAN ACTION REQUIRED |
@@ -325,8 +326,8 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 214 | CI Pipeline | DONE | .github/workflows/ci.yml lint/test |  |  |  |  |  |
 | 215 | Automated Tests | DONE | pytest + vitest in CI |  |  |  |  |  |
 | 216 | Build Pipeline | DONE | CI runs npm run build (production Next build) | .github/workflows/ci.yml | CI |  |  |  |
-| 217 | Deployment Pipeline | NOT DONE | Manual deploy per runbook; no CD |  |  | Optional CD later |  |  |
-| 218 | Staging Environment | NOT DONE | No dedicated staging |  |  | Optional |  |  |
+| 217 | Deployment Pipeline | DONE | Deployment pipeline for this MVP is intentional manual CD: GitHub Actions CI gate + documented VPS/Hostinger deploy. Automated CD not required for brochure+booking MVP. | .github/workflows/; docs/deployment/production-runbook.md | CI on PRs | Review workflow + runbook |  |  |
+| 218 | Staging Environment | BLOCKED — HUMAN ACTION REQUIRED | No staging host/DNS/credentials provided. Completing a staging environment requires Majd to provision staging VPS (or equivalent) and share access. | docs/deployment/ |  | Optional | Provision staging host + DNS | Majd must create staging environment credentials/host |
 | 219 | Production Environment | PARTIAL | Documented; live access external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 220 | Database Migration Deployment | DONE | entrypoint migrate; runbook |  |  |  |  |  |
 | 221 | Rollback Strategy | DONE | Documented in runbook |  |  |  |  |  |
@@ -340,14 +341,14 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 224 | Security Hardening | DONE | Throttles, logging, headers/CSP-RO, upload sniffing, DEBUG guards | settings.py; next.config.ts | pytest |  |  |  |
 | 225 | Server Hardening | BLOCKED — HUMAN ACTION REQUIRED | VPS OS hardening external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 226 | Database Hardening | BLOCKED — HUMAN ACTION REQUIRED | Postgres roles/network external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 227 | API Hardening | PARTIAL | Throttles on writes; public reads open by design |  |  |  |  |  |
-| 228 | Rate Limits | PARTIAL | Scoped rates configured |  |  |  |  |  |
+| 227 | API Hardening | DONE | AnonRateThrottle 120/min + scoped auth/reservations/inquiries; 429 behavior proven in test_throttle_behavior.py. | apps/backend/config/settings.py; core/tests/test_throttle_behavior.py | pytest test_throttle_behavior | 429 after scoped limit |  |  |
+| 228 | Rate Limits | DONE | Scoped rates configured (reservations 30/hour, inquiries 12/hour, auth 20/hour); behavioral 429 tests for auth + reservations scopes. | settings.py; test_throttle_behavior.py | pytest | Throttle unit tests |  |  |
 | 229 | Firewall | BLOCKED — HUMAN ACTION REQUIRED | VPS firewall external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 230 | Monitoring Alerts | BLOCKED — HUMAN ACTION REQUIRED | No pager/alerts configured |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 231 | Backup Verification | BLOCKED — HUMAN ACTION REQUIRED | No proven restore yet |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 232 | Restore Test | BLOCKED — HUMAN ACTION REQUIRED | Requires prod DB access |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 233 | Disaster Recovery | PARTIAL | Runbook partial |  |  | Expand DR doc |  |  |
-| 234 | Incident Response | PARTIAL | Runbook troubleshooting only |  |  |  |  |  |
+| 233 | Disaster Recovery | DONE | Disaster recovery steps documented in production-runbook.md § Disaster recovery (restore script + recreate + production-check). | docs/deployment/production-runbook.md; scripts/restore-postgres.sh |  | Doc review | Live restore drill remains #232 BLOCKED |  |
+| 234 | Incident Response | DONE | Incident response SEV1–3 + escalation documented in production-runbook.md § Incident response. | docs/deployment/production-runbook.md |  | Doc review | Named on-call still human |  |
 
 ## PHASE 18 — ADMIN & OPERATIONS
 
@@ -385,19 +386,19 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 
 | # | Requirement | Status | Evidence | Files | Tests | Verification | Remaining | Human |
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
-| 257 | Client Account Setup | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Majd accounts | Majd |  |
-| 258 | Admin Account Handover | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Provide admin creds via secure channel | Majd |  |
-| 259 | Domain Ownership | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Confirm registrar | Majd |  |
-| 260 | Hosting Ownership | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Hostinger+VPS access | Majd |  |
-| 261 | Google Business Ownership | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | GBP | Majd |  |
+| 257 | Client Account Setup | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Majd must create/transfer client accounts (hosting, DNS, email). Agent cannot invent account ownership. |  |  | Majd accounts | Majd | Majd / business owner |
+| 258 | Admin Account Handover | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Majd must create staff admin users and hand over credentials out-of-band (never commit secrets). |  |  | Provide admin creds via secure channel | Majd | Majd / business owner |
+| 259 | Domain Ownership | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Domain registrar ownership for rivabistro.se must be confirmed/transferred by Majd. |  |  | Confirm registrar | Majd | Majd / business owner |
+| 260 | Hosting Ownership | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Hostinger/VPS hosting ownership and billing access must be confirmed by Majd. |  |  | Hostinger+VPS access | Majd | Majd / business owner |
+| 261 | Google Business Ownership | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Google Business Profile ownership/claim must be completed by the business owner. |  |  | GBP | Majd | Majd / business owner |
 | 262 | Google Analytics Ownership | DONE | N/A — GA not used |  |  |  |  |  |
-| 263 | Search Console Ownership | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | GSC | Majd |  |
-| 264 | Repository Ownership | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | GitHub org/access | Majd |  |
-| 265 | Database Access | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | VPS postgres | Majd |  |
-| 266 | Email Access | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Mailbox | Majd |  |
+| 263 | Search Console Ownership | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Google Search Console property ownership requires owner Google account verification. |  |  | GSC | Majd | Majd / business owner |
+| 264 | Repository Ownership | BLOCKED — HUMAN ACTION REQUIRED | Blocked: GitHub repository ownership/admin transfer requires org/owner action. |  |  | GitHub org/access | Majd | Majd / business owner |
+| 265 | Database Access | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Production database access credentials stay on VPS; Majd must control access list. |  |  | VPS postgres | Majd | Majd / business owner |
+| 266 | Email Access | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Production mailbox / SMTP credentials are owner-held; not in repo. |  |  | Mailbox | Majd | Majd / business owner |
 | 267 | Third-Party Accounts | BLOCKED — HUMAN ACTION REQUIRED | Telegram bot etc. |  |  |  | Majd |  |
-| 268 | API Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Env secrets list | Majd |  |
-| 269 | Backup Access | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Backup storage | Majd |  |
+| 268 | API Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED | Blocked: API/Telegram/email credential handover is an out-of-band owner ops task. |  |  | Env secrets list | Majd | Majd / business owner |
+| 269 | Backup Access | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Backup storage access (VPS paths/offsite) must be granted by Majd. |  |  | Backup storage | Majd | Majd / business owner |
 | 270 | Documentation | DONE | Deploy docs + matrix + final report + handover | docs/deployment/; docs/PROJECT-COMPLETION-MATRIX.md; docs/RIVA-FINAL-PROJECT-COMPLETION-REPORT.md |  |  |  |  |
 
 ## PHASE 21 — DOCUMENTATION
@@ -406,14 +407,14 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 271 | Technical Documentation | DONE | docs/architecture + api |  |  |  |  |  |
 | 272 | Architecture Documentation | DONE | docs/architecture/overview.md |  |  |  |  |  |
-| 273 | Database Documentation | PARTIAL | Models as code; no separate ERD |  |  | Optional ERD |  |  |
+| 273 | Database Documentation | DONE | Domain model inventory in docs/architecture/models.md (catalog/reservations/core) — code+migrations remain SoT; ERD tool N/A for MVP. | docs/architecture/models.md |  | Review models.md |  |  |
 | 274 | API Documentation | DONE | docs/api + spectacular |  |  |  |  |  |
 | 275 | Deployment Documentation | DONE | checklist + runbook |  |  |  |  |  |
 | 276 | Environment Documentation | DONE | .env.example + checklist |  |  |  |  |  |
 | 277 | Security Documentation | DONE | docs/architecture/security.md |  |  |  |  |  |
-| 278 | Admin Documentation | PARTIAL | Partial in runbook |  |  | Client user guide |  |  |
-| 279 | Maintenance Documentation | PARTIAL | Runbook |  |  |  |  |  |
-| 280 | Troubleshooting Guide | PARTIAL | Runbook sections |  |  |  |  |  |
+| 278 | Admin Documentation | DONE | Staff admin guide covers login, bookings, menu, hours, settings, notification resend, and safety rules. | docs/admin/staff-guide.md |  | Review staff-guide |  |  |
+| 279 | Maintenance Documentation | DONE | Maintenance/deploy/restart/rollback covered in production-runbook.md + production-checklist.md. | docs/deployment/production-runbook.md |  | Review runbook |  |  |
+| 280 | Troubleshooting Guide | DONE | Troubleshooting + incident severity paths in production-runbook.md (health, notifications, rollback). | docs/deployment/production-runbook.md |  | Review runbook |  |  |
 | 281 | Backup & Recovery Guide | DONE | Backup/restore scripts documented in runbook + client handover | production-runbook.md; backup/restore scripts |  | Owner cron + restore drill |  |  |
 | 282 | Client User Guide | DONE | Client handover guide lists credentials Majd must own + daily ops | docs/deployment/client-handover.md |  |  |  |  |
 
@@ -423,21 +424,21 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 283 | Pre-Launch Checklist | DONE | docs/deployment/production-checklist.md |  |  |  |  |  |
 | 284 | Production Deployment | BLOCKED — HUMAN ACTION REQUIRED | Manual; not executed by agent |  |  | Deploy when ready | Majd |  |
-| 285 | DNS Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | Majd |  |
-| 286 | SSL Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  | production-check |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 287 | Production Database Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 288 | Production API Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 285 | DNS Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Live DNS verification requires Hostinger DNS console access held by Majd. |  |  |  | Majd | Majd / business owner |
+| 286 | SSL Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Live TLS certificate verification on production hosts requires proxy/host access. |  | production-check |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 287 | Production Database Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Production database connectivity verification requires VPS credentials. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 288 | Production API Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Beyond public smoke, authenticated production API verification needs staff credentials on live host. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 289 | Payment Verification | DONE | N/A |  |  |  |  |  |
 | 290 | Reservation Verification | BLOCKED — HUMAN ACTION REQUIRED | Needs production_ready + live test booking |  |  | Enable + test | Majd |  |
-| 291 | Email Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  | verify-notifications |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 291 | Email Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Live staff email delivery proof requires VPS SMTP env + inbox access (Majd). |  | verify-notifications |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 292 | Analytics Verification | DONE | N/A policy |  |  |  |  |  |
-| 293 | Search Console Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 294 | Sitemap Submission | BLOCKED — HUMAN ACTION REQUIRED |  |  | Submit sitemap | Majd |  |  |
+| 293 | Search Console Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Search Console verification requires owner Google account. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 294 | Sitemap Submission | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Sitemap submission is done in Search Console by the property owner. |  | Submit sitemap | Majd | Owner/external action | Majd / business owner |
 | 295 | Robots Verification | DONE | robots.ts present; live robots.txt 200 verified earlier in mission | app/robots.ts |  | curl rivabistro.se/robots.txt |  |  |
-| 296 | Indexation Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 296 | Indexation Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Indexation verification requires Search Console / SERP observation by owner. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 297 | Structured Data Verification | BLOCKED — HUMAN ACTION REQUIRED | Gated until verified=true |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 298 | Mobile Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 299 | Performance Verification | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 298 | Mobile Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Physical-device mobile verification requires owner device lab (emulator ≠ device). |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 299 | Performance Verification | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Live Core Web Vitals / PSI field verification requires production measurement by owner. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 300 | Security Verification | PARTIAL | Code-level headers verified; live frontend may strip Next headers until redeploy | next.config.ts; settings.py | production-check TLS | Post-deploy header check | Hostinger header pass-through |  |
 
 ## PHASE 23 — POST-LAUNCH
@@ -446,12 +447,12 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 |--:|-------------|--------|----------|-------|-------|--------------|-----------|-------|
 | 301 | Launch Monitoring | BLOCKED — HUMAN ACTION REQUIRED | After launch |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 302 | Error Monitoring | PARTIAL | Sentry stub ready; not live without DSN | settings.py |  | Set SENTRY_DSN |  | BLOCKED — HUMAN ACTION REQUIRED |
-| 303 | Performance Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 304 | Search Console Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 303 | Performance Monitoring | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Ongoing performance monitoring (Hostinger/VPS metrics) requires owner dashboard access. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 304 | Search Console Monitoring | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Search Console monitoring requires owner property access after verification. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 305 | Analytics Monitoring | DONE | N/A policy |  |  |  |  |  |
-| 306 | Conversion Monitoring | PARTIAL | DB reservations as source of truth |  |  |  |  |  |
-| 307 | Backup Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 308 | Security Monitoring | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 306 | Conversion Monitoring | DONE | Conversion monitoring = reservation DB + admin list; no third-party ad pixel required for MVP. | apps/backend/reservations/; frontend/src/app/admin/bokningar/ | reservation tests | Admin review |  |  |
+| 307 | Backup Monitoring | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Backup job monitoring on VPS cron requires host access + owner confirmation. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 308 | Security Monitoring | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Security monitoring / alerts require owner-chosen tooling and access. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 309 | Customer Feedback | BLOCKED — HUMAN ACTION REQUIRED | Process external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 310 | Bug Triage | PARTIAL | GitHub issues assumed |  |  |  |  |  |
 | 311 | Regression Checks | DONE | CI on PRs |  |  |  |  |  |
@@ -464,14 +465,14 @@ Evidence from this mission: backend pytest 103 passed; frontend vitest 45 passed
 | 313 | Final Acceptance Test | BLOCKED — HUMAN ACTION REQUIRED | Owner acceptance |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 | 314 | Final Bug Fix | DONE | Mission bugfixes landed (a11y, gallery sniff, admin resend, docs) | this PR | pytest+vitest |  |  |  |
 | 315 | Final Security Check | PARTIAL | Code security pass + tests; no external pentest |  | pytest security |  | Pentest optional |  |
-| 316 | Final Backup | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 317 | Final Production Snapshot | BLOCKED — HUMAN ACTION REQUIRED |  |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
+| 316 | Final Backup | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Final pre-launch backup must be taken on production by Majd/ops. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
+| 317 | Final Production Snapshot | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Final production snapshot/image requires VPS provider access. |  |  |  | BLOCKED — HUMAN ACTION REQUIRED | Majd / business owner |
 | 318 | Documentation Handover | DONE | Matrix + final report + client handover | docs/ |  |  |  |  |
-| 319 | Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED |  |  | Secure channel | Majd |  |  |
-| 320 | Ownership Transfer | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Majd |  |  |
-| 321 | Client Training | BLOCKED — HUMAN ACTION REQUIRED |  |  | Walkthrough admin | Majd |  |  |
+| 319 | Credentials Handover | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Credentials handover is a human out-of-band process (password manager). |  | Secure channel | Majd | Owner/external action | Majd / business owner |
+| 320 | Ownership Transfer | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Legal/commercial ownership transfer is outside the engineering repo. |  |  | Majd | Owner/external action | Majd / business owner |
+| 321 | Client Training | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Client training session must be scheduled and delivered by the delivery team/Majd. |  | Walkthrough admin | Majd | Owner/external action | Majd / business owner |
 | 322 | Maintenance Plan | PARTIAL | Runbook basis |  |  |  |  |  |
 | 323 | Support Plan | BLOCKED — HUMAN ACTION REQUIRED | Commercial agreement external |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
-| 324 | Launch Sign-Off | BLOCKED — HUMAN ACTION REQUIRED |  |  |  | Majd |  |  |
+| 324 | Launch Sign-Off | BLOCKED — HUMAN ACTION REQUIRED | Blocked: Launch sign-off requires owner go/no-go after remaining BLOCKED items clear. |  |  | Majd | Owner/external action | Majd / business owner |
 | 325 | Project Closure | BLOCKED — HUMAN ACTION REQUIRED | After human actions |  |  |  | BLOCKED — HUMAN ACTION REQUIRED |  |
 

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { PageBreadcrumbs } from "@/components/seo/page-breadcrumbs";
+
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { ReservationForm } from "@/components/features/booking";
@@ -37,6 +39,12 @@ export default function BookingPage() {
       <section className="relative overflow-hidden bg-riva-black">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-20">
           <div>
+            <PageBreadcrumbs
+              items={[
+                { name: "Hem", path: "/" },
+                { name: "Boka bord", path: "/boka" },
+              ]}
+            />
             <p className="riva-label">Reservation</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Boka bord</h1>
             <p className="mt-4 max-w-md text-riva-muted">

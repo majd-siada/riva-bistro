@@ -11,7 +11,7 @@ export const metadata = createPageMetadata({
 
 export default function BookingPolicyPage() {
   return (
-    <LegalDocument title="Boknings- och avbokningspolicy">
+    <LegalDocument title="Boknings- och avbokningspolicy" path="/bokningspolicy">
       <p>
         Du kan begära bord via webbplatsen när onlinebokning är aktiverad. Vid frågor,
         kontakta oss på{" "}

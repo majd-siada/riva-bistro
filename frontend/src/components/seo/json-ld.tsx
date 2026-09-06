@@ -116,3 +116,81 @@ export function FaqJsonLd({ items }: { items: FaqJsonLdItem[] }) {
 export function restaurantDescription(): string {
   return `${business.name} — ${fullAddress()}`;
 }
+
+
+export type BreadcrumbJsonLdItem = { name: string; path: string };
+
+/** BreadcrumbList JSON-LD. Paths must be site-relative (e.g. `/meny`). */
+export function BreadcrumbJsonLd({ items }: { items: BreadcrumbJsonLdItem[] }) {
+  if (items.length < 2) return null;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path === "/" ? "" : item.path}`,
+    })),
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export type MenuJsonLdSection = {
+  name: string;
+  items: Array<{ name: string; description?: string; priceIncVat?: number | string }>;
+};
+
+/**
+ * Menu structured data from the public catalog only — never invent dishes.
+ * Emits nothing when there are no real items.
+ */
+export function MenuJsonLd({
+  sections,
+}: {
+  sections: MenuJsonLdSection[];
+}) {
+  const hasItems = sections.some((s) => s.items.length > 0);
+  if (!hasItems) return null;
+
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    "@id": `${SITE_URL}/meny#menu`,
+    name: `${SITE_NAME} meny`,
+    url: `${SITE_URL}/meny`,
+    hasMenuSection: sections
+      .filter((s) => s.items.length > 0)
+      .map((section) => ({
+        "@type": "MenuSection",
+        name: section.name,
+        hasMenuItem: section.items.map((item) => {
+          const entry: Record<string, unknown> = {
+            "@type": "MenuItem",
+            name: item.name,
+          };
+          if (item.description) entry.description = item.description;
+          if (item.priceIncVat !== undefined && item.priceIncVat !== "") {
+            entry.offers = {
+              "@type": "Offer",
+              price: String(item.priceIncVat),
+              priceCurrency: "SEK",
+            };
+          }
+          return entry;
+        }),
+      })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}

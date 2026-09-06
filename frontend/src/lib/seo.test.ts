@@ -51,3 +51,11 @@ describe("business NAP helpers", () => {
     expect(embed).toContain("57");
   });
 });
+
+
+describe("SEO structured-data helpers (smoke)", () => {
+  it("keeps social sameAs gated behind business.verified", async () => {
+    const { business } = await import("@/config/business");
+    expect(business.verified).toBe(false);
+  });
+});

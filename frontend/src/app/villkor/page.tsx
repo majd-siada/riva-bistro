@@ -10,7 +10,7 @@ export const metadata = createPageMetadata({
 
 export default function TermsPage() {
   return (
-    <LegalDocument title="Villkor">
+    <LegalDocument title="Villkor" path="/villkor">
       <p>
         Webbplatsen drivs av {business.name}, {fullAddress()}. Genom att använda sajten
         godkänner du dessa villkor i den form de publiceras.

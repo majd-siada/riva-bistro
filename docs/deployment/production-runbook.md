@@ -340,3 +340,31 @@ CONFIRM_RESTORE=YES DATABASE_URL=postgres://… \
 Schedule `backup-postgres.sh` daily via cron. A restore drill on production is an owner ops task (mark verified only after a successful restore).
 
 Optional error monitoring: set `SENTRY_DSN` (and install `sentry-sdk` in the API image). Empty DSN = no-op.
+
+
+---
+
+## Disaster recovery
+
+Goal: restore API + database service after host or data loss **without** inventing a second hosting architecture.
+
+1. Provision/repair the VPS and Docker stack using `docker-compose.production.yml`.
+2. Restore the latest known-good dump:
+   `CONFIRM_RESTORE=YES DATABASE_URL=… ./scripts/restore-postgres.sh ./backups/<file>.sql.gz`
+3. Recreate backend: `docker compose -f docker-compose.production.yml up -d --force-recreate backend`
+4. Verify: `./scripts/production-check.sh` and admin login.
+5. Re-check notification env and run `./scripts/verify-notifications.sh --send-test` (owner).
+
+RTO posture for MVP: best-effort same business day; no multi-region failover is claimed.
+
+## Incident response
+
+Severity hints:
+
+- **SEV1** — site/API down or data loss risk → restore from backup; pause booking enablement if needed.
+- **SEV2** — bookings failing or notifications silent → check health, logs, env; resend notifications after fix.
+- **SEV3** — content/SEO issues → fix in admin/CMS and redeploy frontend if required.
+
+Communication: owner (Majd) is the escalation contact. Do not post secrets in tickets/chat.
+
+Rollback: redeploy previous known-good git SHA on VPS + Hostinger rebuild of the matching frontend commit.

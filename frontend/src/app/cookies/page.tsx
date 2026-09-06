@@ -12,7 +12,7 @@ export const metadata = createPageMetadata({
 
 export default function CookiesPage() {
   return (
-    <LegalDocument title="Cookiepolicy">
+    <LegalDocument title="Cookiepolicy" path="/cookies">
       <p>
         Vi använder endast nödvändiga kakor för att webbplatsen ska fungera, bland annat
         för att komma ihåg ditt samtycke i cookiemeddelandet och för inloggning i
