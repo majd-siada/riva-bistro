@@ -11,6 +11,15 @@ import { Button } from "@/components/ui/button";
 import { business } from "@/config/business";
 import { loadFeaturedItems } from "@/lib/public-menu";
 import { loadGallery, loadHours, loadNews } from "@/lib/public-data";
+import { createPageMetadata } from "@/lib/seo";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+
+export const metadata = createPageMetadata({
+  title: SITE_NAME,
+  absoluteTitle: `${SITE_NAME} — Goda smaker, äkta upplevelser`,
+  description: SITE_DESCRIPTION,
+  path: "/",
+});
 
 export default async function HomePage() {
   const [featured, hours, news, gallery] = await Promise.all([

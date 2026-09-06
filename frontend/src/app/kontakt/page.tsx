@@ -8,14 +8,18 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { ContactForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
-import { business, fullAddress } from "@/config/business";
+import { business, fullAddress, mapsEmbedUrl } from "@/config/business";
 import { formatDayHours } from "@/lib/hours";
 import { loadHours } from "@/lib/public-data";
+import { createPageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Kontakt",
-  description: "Kontakta Riva Bistro — adress, öppettider, karta och meddelandeformulär.",
-};
+  description:
+    "Kontakta Riva Bistro på Hornsbergs Strand, Kungsholmen — adress, öppettider, karta och meddelandeformulär.",
+  path: "/kontakt",
+});
 
 const FAQ_ITEMS = [
   {
@@ -143,8 +147,8 @@ export default async function ContactPage() {
         <SectionHeading title="Hitta hit" align="center" className="mx-auto" />
         <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-lg border border-riva-cream/10">
           <iframe
-            title="Karta till Riva Bistro på Hornsbergs Strand 57, Stockholm"
-            src="https://maps.google.com/maps?q=Hornsbergs+Strand+57+112+16+Stockholm&output=embed"
+            title={`Karta till Riva Bistro på ${business.address.street}, ${business.address.city}`}
+            src={mapsEmbedUrl()}
             className="aspect-[16/9] w-full border-0 bg-riva-card"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -163,6 +167,7 @@ export default async function ContactPage() {
         <SectionHeading title="Vanliga frågor" align="center" className="mx-auto" />
         <FAQ items={FAQ_ITEMS} className="mx-auto mt-8 max-w-3xl" />
       </Section>
+      <FaqJsonLd items={FAQ_ITEMS} />
     </>
   );
 }
