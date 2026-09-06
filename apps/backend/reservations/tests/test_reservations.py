@@ -776,7 +776,17 @@ def test_sunday_2026_09_06_open_with_official_hours(api, settings):
     assert sunday_row["opens_at"].startswith("10:30")
     assert sunday_row["closes_at"].startswith("21:00")
 
-    with patch("reservations.availability.timezone.localdate", return_value=date(2026, 9, 5)):
+    # Pin both calendar date and clock. Patching only localdate is not enough:
+    # same-day lead-time uses localtime(), and CI running on 2026-09-06 would
+    # otherwise filter morning slots against the real wall clock.
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    pinned_morning = datetime(2026, 9, 5, 8, 0, tzinfo=ZoneInfo("Europe/Stockholm"))
+    with (
+        patch("reservations.availability.timezone.localdate", return_value=date(2026, 9, 5)),
+        patch("reservations.availability.timezone.localtime", return_value=pinned_morning),
+    ):
         avail = api.get(
             "/api/v1/reservations/availability/?date=2026-09-06&party_size=2"
         )
@@ -904,9 +914,21 @@ def test_date_query_not_timezone_shifted_to_wrong_weekday(api, settings):
     assert closes_at == time(21, 0)
 
     # Even if "now" is interpreted in UTC, the requested YYYY-MM-DD stays Sunday.
-    with patch(
-        "reservations.availability.timezone.localdate",
-        return_value=date(2026, 9, 5),
+    # Pin localtime as well so same-day lead-time cannot strip morning slots
+    # when CI runs on the real 2026-09-06 calendar day.
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    pinned_morning = datetime(2026, 9, 5, 8, 0, tzinfo=ZoneInfo("Europe/Stockholm"))
+    with (
+        patch(
+            "reservations.availability.timezone.localdate",
+            return_value=date(2026, 9, 5),
+        ),
+        patch(
+            "reservations.availability.timezone.localtime",
+            return_value=pinned_morning,
+        ),
     ):
         body = api.get(
             "/api/v1/reservations/availability/?date=2026-09-06&party_size=2"

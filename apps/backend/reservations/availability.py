@@ -86,7 +86,14 @@ def booked_guests(target: date_cls, slot: time) -> int:
 
 
 def _slot_is_bookable(target: date_cls, slot: time, config: ReservationSettings) -> bool:
-    """Enforce lead time for slots on the current day."""
+    """Enforce lead time for slots on the current day.
+
+    Future calendar dates are always bookable from a lead-time perspective —
+    ``booking_lead_minutes`` only filters same-day slots relative to now.
+    """
+    today = timezone.localdate()
+    if target > today:
+        return True
     now = timezone.localtime()
     slot_dt = timezone.make_aware(datetime.combine(target, slot))
     return slot_dt >= now + timedelta(minutes=config.booking_lead_minutes)
