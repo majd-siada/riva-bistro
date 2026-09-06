@@ -7,11 +7,7 @@ import {
   MENU_SECTION_REGISTRY,
   MenuSection,
 } from "@/components/features/menu/sections";
-import {
-  RIVAS_MENY_COURSE_SLUGS,
-  type MenuNavEntry,
-  type MenuPanelData,
-} from "@/lib/public-menu";
+import type { MenuNavEntry, MenuPanelData } from "@/lib/public-menu";
 
 export type MenuPanel = MenuPanelData;
 
@@ -20,8 +16,6 @@ type MenuBrowserProps = {
   panels: MenuPanelData[];
   defaultSlug: string;
 };
-
-const COURSE_SET = new Set<string>(RIVAS_MENY_COURSE_SLUGS);
 
 function resolveInitialSlug(panels: MenuPanelData[], defaultSlug: string): string {
   if (typeof window === "undefined") return defaultSlug;
