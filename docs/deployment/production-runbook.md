@@ -320,3 +320,23 @@ docker compose -f docker-compose.production.yml exec backend \
 ```
 
 Requires production env already loaded in the container (no secrets printed here).
+
+---
+
+## Database backups
+
+On the API host (Postgres client tools required):
+
+```bash
+# Dump (password never printed)
+DATABASE_URL=postgres://… ./scripts/backup-postgres.sh
+# or POSTGRES_HOST/POSTGRES_DB/POSTGRES_USER/POSTGRES_PASSWORD
+
+# Destructive restore — only with explicit confirmation
+CONFIRM_RESTORE=YES DATABASE_URL=postgres://… \
+  ./scripts/restore-postgres.sh ./backups/riva-bistro-YYYYMMDDTHHMMSSZ.sql.gz
+```
+
+Schedule `backup-postgres.sh` daily via cron. A restore drill on production is an owner ops task (mark verified only after a successful restore).
+
+Optional error monitoring: set `SENTRY_DSN` (and install `sentry-sdk` in the API image). Empty DSN = no-op.

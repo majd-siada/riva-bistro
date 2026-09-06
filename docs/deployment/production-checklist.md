@@ -291,3 +291,8 @@ See root [`.env.example`](../../.env.example) for local defaults vs the producti
 
 
 See also: [production-runbook.md](./production-runbook.md) for deploy / rollback / verification commands.
+
+## Completion matrix
+
+See `docs/PROJECT-COMPLETION-MATRIX.md` and `docs/deployment/client-handover.md`.
+
