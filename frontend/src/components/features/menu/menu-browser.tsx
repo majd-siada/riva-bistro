@@ -31,8 +31,8 @@ function resolveInitialSlug(panels: MenuPanelData[], defaultSlug: string): strin
 }
 
 /**
- * Shows exactly one meny panel at a time. Category clicks switch the panel
- * instead of scrolling through every section on one long page.
+ * Top category bar + one active meny panel. No left sidebar; no long scroll
+ * through every section.
  */
 export function MenuBrowser({ nav, panels, defaultSlug }: MenuBrowserProps) {
   const panelBySlug = useMemo(
@@ -41,7 +41,6 @@ export function MenuBrowser({ nav, panels, defaultSlug }: MenuBrowserProps) {
   );
 
   const [activeSlug, setActiveSlug] = useState(defaultSlug);
-  const rivasChildren = nav.find((c) => c.slug === "rivas-meny")?.children ?? [];
 
   useEffect(() => {
     setActiveSlug(resolveInitialSlug(panels, defaultSlug));
@@ -71,82 +70,21 @@ export function MenuBrowser({ nav, panels, defaultSlug }: MenuBrowserProps) {
       ? MENU_SECTION_REGISTRY["rivas-meny"]!
       : (MENU_SECTION_REGISTRY[active.category.slug] ?? MenuSection);
 
-  const rivasContextActive =
-    activeSlug === "rivas-meny" || COURSE_SET.has(activeSlug);
-
   return (
-    <div className="grid gap-12 lg:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
-      <div className="hidden lg:block">
-        <div className="sticky top-28">
-          <MenuCategoryNav
-            categories={nav}
-            activeSlug={activeSlug}
-            onSelect={select}
-          />
-        </div>
-      </div>
+    <div className="space-y-10">
+      <MenuCategoryNav
+        categories={nav}
+        activeSlug={activeSlug}
+        onSelect={select}
+      />
 
-      <div className="min-w-0">
-        <div className="-mx-6 mb-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
-          {nav.map((cat) => {
-            const selected =
-              activeSlug === cat.slug ||
-              Boolean(cat.children?.some((c) => c.slug === activeSlug));
-            return (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => select(cat.slug)}
-                className={
-                  selected
-                    ? "shrink-0 rounded-full border border-riva-gold/50 bg-riva-gold/15 px-4 py-2 text-sm text-riva-gold"
-                    : "shrink-0 rounded-full border border-riva-gold/30 px-4 py-2 text-sm text-riva-cream"
-                }
-              >
-                {cat.name}
-              </button>
-            );
-          })}
-        </div>
-
-        {rivasContextActive && rivasChildren.length > 0 ? (
-          <div className="-mx-6 mb-6 flex gap-2 overflow-x-auto px-6 pb-1 lg:hidden">
-            <button
-              type="button"
-              onClick={() => select("rivas-meny")}
-              className={
-                activeSlug === "rivas-meny"
-                  ? "shrink-0 rounded-full bg-riva-gold/20 px-3 py-1.5 text-xs text-riva-gold"
-                  : "shrink-0 rounded-full px-3 py-1.5 text-xs text-riva-muted"
-              }
-            >
-              Alla
-            </button>
-            {rivasChildren.map((child) => (
-              <button
-                key={child.slug}
-                type="button"
-                onClick={() => select(child.slug)}
-                className={
-                  activeSlug === child.slug
-                    ? "shrink-0 rounded-full bg-riva-gold/20 px-3 py-1.5 text-xs text-riva-gold"
-                    : "shrink-0 rounded-full px-3 py-1.5 text-xs text-riva-muted"
-                }
-              >
-                {child.name}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        <Resolved
-          key={active.slug}
-          category={active.category}
-          items={active.items}
-          subsections={active.subsections}
-          isolated
-        />
-      </div>
+      <Resolved
+        key={active.slug}
+        category={active.category}
+        items={active.items}
+        subsections={active.subsections}
+        isolated
+      />
     </div>
   );
 }

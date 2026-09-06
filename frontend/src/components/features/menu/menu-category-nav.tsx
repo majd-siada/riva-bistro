@@ -12,78 +12,90 @@ interface MenuCategoryNavProps {
   className?: string;
 }
 
+/**
+ * Horizontal category bar for /meny — sits above the active panel so guests
+ * pick one section at a time instead of using a left sidebar.
+ */
 export function MenuCategoryNav({
   categories,
   activeSlug,
   onSelect,
   className,
 }: MenuCategoryNavProps) {
-  return (
-    <nav className={cn("space-y-6", className)} aria-label="Menykategorier">
-      <div>
-        <p className="riva-label mb-4">Kategorier</p>
-        <ul className="space-y-1">
-          {categories.map((cat) => {
-            const childActive = cat.children?.some((c) => c.slug === activeSlug);
-            const parentActive = activeSlug === cat.slug || Boolean(childActive);
+  const rivas = categories.find((c) => c.slug === "rivas-meny");
+  const rivasActive =
+    activeSlug === "rivas-meny" ||
+    Boolean(rivas?.children?.some((c) => c.slug === activeSlug));
 
-            return (
-              <li key={cat.slug}>
-                <NavButton
-                  slug={cat.slug}
-                  name={cat.name}
-                  active={activeSlug === cat.slug}
-                  emphasized={parentActive}
-                  onSelect={onSelect}
-                />
-                {cat.children?.length ? (
-                  <ul className="mt-1 space-y-0.5 border-l border-riva-gold/20 py-1 pl-3">
-                    {cat.children.map((child) => (
-                      <li key={child.slug}>
-                        <NavButton
-                          slug={child.slug}
-                          name={child.name}
-                          active={activeSlug === child.slug}
-                          onSelect={onSelect}
-                          compact
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+  return (
+    <nav
+      className={cn("space-y-4 border-b border-riva-gold/20 pb-5", className)}
+      aria-label="Menykategorier"
+    >
+      <p className="riva-label">Kategorier</p>
+
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin]">
+        {categories.map((cat) => {
+          const childActive = cat.children?.some((c) => c.slug === activeSlug);
+          const selected = activeSlug === cat.slug || Boolean(childActive);
+          return (
+            <NavChip
+              key={cat.slug}
+              slug={cat.slug}
+              name={cat.name}
+              active={selected}
+              onSelect={onSelect}
+            />
+          );
+        })}
       </div>
-      <AllergyBox />
+
+      {rivasActive && rivas?.children?.length ? (
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin]">
+          <NavChip
+            slug="rivas-meny"
+            name="Alla"
+            active={activeSlug === "rivas-meny"}
+            onSelect={onSelect}
+            subtle
+          />
+          {rivas.children.map((child) => (
+            <NavChip
+              key={child.slug}
+              slug={child.slug}
+              name={child.name}
+              active={activeSlug === child.slug}
+              onSelect={onSelect}
+              subtle
+            />
+          ))}
+        </div>
+      ) : null}
+
+      <AllergyNote />
     </nav>
   );
 }
 
-function NavButton({
+function NavChip({
   slug,
   name,
   active,
-  emphasized,
-  compact,
   onSelect,
+  subtle,
 }: {
   slug: string;
   name: string;
   active?: boolean;
-  emphasized?: boolean;
-  compact?: boolean;
   onSelect?: (slug: string) => void;
+  subtle?: boolean;
 }) {
   const className = cn(
-    "block w-full rounded-md text-left transition-riva",
-    compact ? "px-3 py-1.5 text-sm" : "px-3 py-2 text-sm",
+    "shrink-0 rounded-full border px-4 transition-riva",
+    subtle ? "py-1.5 text-xs" : "py-2 text-sm",
     active
-      ? "bg-riva-gold/15 text-riva-gold"
-      : emphasized
-        ? "text-riva-cream"
-        : "text-riva-muted hover:bg-riva-card hover:text-riva-cream",
+      ? "border-riva-gold/50 bg-riva-gold/15 text-riva-gold"
+      : "border-riva-gold/25 text-riva-muted hover:border-riva-gold/40 hover:text-riva-cream",
   );
 
   if (onSelect) {
@@ -106,21 +118,17 @@ function NavButton({
   );
 }
 
-function AllergyBox() {
+function AllergyNote() {
   return (
-    <div className="rounded-lg border border-riva-gold/25 bg-riva-card/80 p-4">
-      <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-riva-gold" strokeWidth={1.25} />
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-riva-gold">
-            Allergier
-          </p>
-          <p className="mt-2 text-xs leading-relaxed text-riva-muted">
-            Berätta gärna om allergier eller intoleranser när du bokar bord eller beställer.
-            Vi anpassar måltiden efter dina behov.
-          </p>
-        </div>
-      </div>
-    </div>
+    <p className="flex items-start gap-2 text-xs leading-relaxed text-riva-muted">
+      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-riva-gold" strokeWidth={1.25} />
+      <span>
+        <span className="font-semibold uppercase tracking-[0.14em] text-riva-gold">
+          Allergier
+        </span>
+        {" — "}
+        Berätta gärna om allergier eller intoleranser när du bokar eller beställer.
+      </span>
+    </p>
   );
 }
