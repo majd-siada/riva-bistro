@@ -37,9 +37,14 @@ function ItemGrid({ items }: { items: PublicItem[] }) {
 /** Generic top-level section: heading + direct items (no nested courses). */
 export function MenuSection({ category, items }: MenuSectionProps) {
   return (
-    <section id={category.slug}>
+    <section
+      id={category.slug}
+      aria-labelledby={`${category.slug}-heading`}
+      className="scroll-mt-28 border-t border-riva-gold/15 pt-14"
+    >
       <SectionHeading
         title={category.name}
+        titleId={`${category.slug}-heading`}
         description={category.description || undefined}
       />
       {items.length ? <ItemGrid items={items} /> : <EmptyState label={category.name} />}
@@ -67,7 +72,10 @@ export function DryckSection(props: MenuSectionProps) {
   return <MenuSection {...props} />;
 }
 
-/** RIVAS MENY: section heading + course-type subsections with their items. */
+/**
+ * RIVAS MENY — visually isolated group that owns the course categories
+ * (Förrätter → Desserter). Sibling top-level sections stay outside this frame.
+ */
 export function RivasMenySection({
   category,
   subsections = [],
@@ -75,33 +83,47 @@ export function RivasMenySection({
   const hasAnyItems = subsections.some((s) => s.items.length > 0);
 
   return (
-    <section id={category.slug}>
-      <SectionHeading
-        title={category.name}
-        description={category.description || undefined}
-      />
+    <section
+      id={category.slug}
+      aria-labelledby={`${category.slug}-heading`}
+      className="scroll-mt-28 border-t border-riva-gold/15 pt-14"
+    >
+      <div className="rounded-2xl border border-riva-gold/25 bg-riva-card/40 px-5 py-8 md:px-8 md:py-10">
+        <SectionHeading
+          title={category.name}
+          titleId={`${category.slug}-heading`}
+          description={
+            category.description ||
+            "Förrätter, varmrätter, sallader, pasta, barnmeny och desserter."
+          }
+        />
 
-      {!hasAnyItems ? (
-        <EmptyState label={category.name} />
-      ) : (
-        <div className="mt-10 space-y-14">
-          {subsections.map(({ category: sub, items }) => (
-            <div key={sub.slug} id={sub.slug}>
-              <h3 className="font-display text-2xl text-riva-cream md:text-3xl">
-                {sub.name}
-              </h3>
-              {sub.description ? (
-                <p className="mt-2 text-sm text-riva-muted">{sub.description}</p>
-              ) : null}
-              {items.length ? (
-                <ItemGrid items={items} />
-              ) : (
-                <EmptyState label={sub.name} />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+        {!hasAnyItems ? (
+          <EmptyState label={category.name} />
+        ) : (
+          <div className="mt-10 space-y-14">
+            {subsections.map(({ category: sub, items }) => (
+              <div
+                key={sub.slug}
+                id={sub.slug}
+                className="scroll-mt-28 border-t border-riva-gold/10 pt-10 first:border-t-0 first:pt-0"
+              >
+                <h3 className="font-display text-2xl text-riva-cream md:text-3xl">
+                  {sub.name}
+                </h3>
+                {sub.description ? (
+                  <p className="mt-2 text-sm text-riva-muted">{sub.description}</p>
+                ) : null}
+                {items.length ? (
+                  <ItemGrid items={items} />
+                ) : (
+                  <EmptyState label={sub.name} />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

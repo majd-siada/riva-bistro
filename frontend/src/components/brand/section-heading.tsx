@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 interface SectionHeadingProps {
   eyebrow?: string;
   title: string;
+  titleId?: string;
   description?: string;
   align?: "left" | "center";
   className?: string;
@@ -11,6 +12,7 @@ interface SectionHeadingProps {
 export function SectionHeading({
   eyebrow,
   title,
+  titleId,
   description,
   align = "left",
   className,
@@ -24,7 +26,10 @@ export function SectionHeading({
       )}
     >
       {eyebrow && <p className="riva-label">{eyebrow}</p>}
-      <h2 className={cn("font-display text-3xl text-riva-cream md:text-4xl lg:text-5xl", eyebrow && "mt-4")}>
+      <h2
+        id={titleId}
+        className={cn("font-display text-3xl text-riva-cream md:text-4xl lg:text-5xl", eyebrow && "mt-4")}
+      >
         {title}
       </h2>
       {description && (

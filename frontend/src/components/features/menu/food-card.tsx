@@ -26,7 +26,7 @@ export function FoodCard({
       ) : null}
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-display text-xl text-riva-cream">{name}</h3>
+          <p className="font-display text-xl text-riva-cream">{name}</p>
           <span className="riva-price shrink-0 text-base">{formatPrice(priceIncVat)}</span>
         </div>
         {description && (

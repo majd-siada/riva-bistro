@@ -6,6 +6,7 @@ import {
 } from "@/components/features/menu/sections";
 import { Section } from "@/components/layout/section";
 import {
+  buildMenuNav,
   childCategories,
   itemsForCategory,
   loadPublicMenu,
@@ -18,22 +19,14 @@ export const metadata = {
     "Riva Bistros meny — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
 };
 
+/** Prefer a complete HTML document so RIVAS MENY is not split across streamed chunks. */
+export const dynamic = "force-static";
+export const revalidate = 60;
+
 export default async function MenuPage() {
   const { categories, items } = await loadPublicMenu();
   const sections = topLevelCategories(categories);
-
-  const navCategories = sections.flatMap((section) => {
-    if (section.slug === "rivas-meny") {
-      return [
-        { slug: section.slug, name: section.name },
-        ...childCategories(categories, section.slug).map((c) => ({
-          slug: c.slug,
-          name: c.name,
-        })),
-      ];
-    }
-    return [{ slug: section.slug, name: section.name }];
-  });
+  const navCategories = buildMenuNav(categories);
 
   return (
     <>
@@ -55,7 +48,8 @@ export default async function MenuPage() {
         </div>
       </section>
 
-      <Section>
+      {/* as="div" avoids nested <section> with each meny block (cleaner isolation). */}
+      <Section as="div">
         <div className="grid gap-12 lg:grid-cols-[220px_1fr] xl:grid-cols-[260px_1fr]">
           <div className="hidden lg:block">
             <div className="sticky top-28">
@@ -63,7 +57,7 @@ export default async function MenuPage() {
             </div>
           </div>
 
-          <div className="min-w-0 space-y-16">
+          <div className="min-w-0 space-y-4 md:space-y-6">
             <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2 lg:hidden">
               {navCategories.map((cat) => (
                 <a
