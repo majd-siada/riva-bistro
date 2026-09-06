@@ -135,11 +135,19 @@ def notify_reservation_created(reservation) -> dict[str, bool]:
     return results
 
 
-def schedule_reservation_notifications(reservation) -> None:
-    """Run notifications only after the surrounding transaction commits."""
+def schedule_reservation_notifications(reservation) -> dict[str, bool]:
+    """Run notifications after the surrounding transaction commits.
+
+    Returns channel results when the callback can run immediately (no open
+    atomic block — the usual path after ``create_reservation`` already
+    committed). Inside an atomic block the work is deferred via ``on_commit``
+    and this returns ``{"telegram": False, "email": False}`` as placeholders.
+    """
     reservation_id = reservation.pk
+    results: dict[str, bool] = {"telegram": False, "email": False}
 
     def _run() -> None:
+        nonlocal results
         from reservations.models import Reservation
 
         try:
@@ -147,6 +155,7 @@ def schedule_reservation_notifications(reservation) -> None:
         except Reservation.DoesNotExist:
             logger.warning("Reservation %s missing at notify time", reservation_id)
             return
-        notify_reservation_created(row)
+        results = notify_reservation_created(row)
 
     transaction.on_commit(_run)
+    return results

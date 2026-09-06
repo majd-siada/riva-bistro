@@ -198,7 +198,11 @@ After a reservation row is **committed**, the API best-effort sends:
 2. Staff email to `RESTAURANT_NOTIFICATION_EMAIL` (Hostinger Mail API if configured; on API failure falls back to Django SMTP)
 3. Guest confirmation to the booker’s email (Django SMTP when `EMAIL_HOST` is set; otherwise Hostinger Mail API when configured)
 
-Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified` avoid duplicate alerts on idempotent retries.
+Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified`
+avoid duplicate alerts on idempotent retries. Django admin lists those flags (plus
+`confirmation_email_sent`). Create responses include
+`notifications: { telegram, staff_email }` so failed staff alerts are visible
+without failing HTTP 201.
 
 Configure on the VPS `.env` (never commit real secrets):
 
@@ -220,6 +224,9 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 After editing the host `.env`, recreate the backend so env is reloaded, then verify:
 
 ```bash
+# Confirm keys exist (values stay secret)
+grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|HOSTINGER_MAIL_API_TOKEN|HOSTINGER_MAIL_MAILBOX_RESOURCE_ID|RESTAURANT_NOTIFICATION_EMAIL|EMAIL_HOST)=' .env | sed 's/=.*/=***/'
+
 docker compose -f docker-compose.production.yml up -d --force-recreate backend
 ./scripts/verify-notifications.sh --send-test
 # or:
@@ -232,6 +239,16 @@ Discover chat id after messaging the bot:
 ```bash
 docker compose -f docker-compose.production.yml exec backend \
   python manage.py telegram_discover_chat
+```
+
+Retry staff alerts for bookings that still have notify flags false:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py resend_reservation_notifications --ref=RB-ABC123
+# or all unsent (capped):
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py resend_reservation_notifications --unsent
 ```
 
 If `/api/v1/hours/` still returns seven `is_closed: true` / null opens/closes rows,

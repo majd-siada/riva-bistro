@@ -65,6 +65,11 @@ def test_successful_reservation_triggers_notification_services(
     ):
         resp = api.post("/api/v1/reservations/", _payload(), format="json")
     assert resp.status_code == 201
+    body = resp.json()
+    assert "notifications" in body
+    assert set(body["notifications"]) == {"telegram", "staff_email"}
+    assert isinstance(body["notifications"]["telegram"], bool)
+    assert isinstance(body["notifications"]["staff_email"], bool)
     assert Reservation.objects.count() == 1
     row = Reservation.objects.get()
     assert row.telegram_notified is True
@@ -78,6 +83,154 @@ def test_successful_reservation_triggers_notification_services(
     assert "Anna Andersson" in text
     assert "0701234567" in text
     assert "anna@example.com" in text
+
+
+@pytest.mark.django_db(transaction=True)
+def test_create_response_includes_live_notification_results(api, settings):
+    """Outside TestCase atomic wrapping, on_commit runs before the response."""
+    settings.DEBUG = False
+    _open_all_week()
+    with (
+        patch(
+            "core.notifications.reservation.send_telegram_message",
+            return_value=True,
+        ),
+        patch(
+            "core.notifications.reservation.send_staff_reservation_email",
+            return_value=True,
+        ),
+    ):
+        resp = api.post("/api/v1/reservations/", _payload(), format="json")
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["notifications"] == {"telegram": True, "staff_email": True}
+    row = Reservation.objects.get()
+    assert row.telegram_notified is True
+    assert row.staff_email_notified is True
+
+
+@pytest.mark.django_db
+def test_resend_reservation_notifications_command_retries_unsent():
+    from django.core.management import call_command
+    from io import StringIO
+
+    _open_all_week()
+    row = Reservation.objects.create(
+        name="Erik",
+        phone="0703334455",
+        email="erik@example.com",
+        party_size=2,
+        date=date.today() + timedelta(days=5),
+        time=time(15, 0),
+        status=Reservation.Status.CONFIRMED,
+        telegram_notified=False,
+        staff_email_notified=False,
+    )
+    out = StringIO()
+    with (
+        patch(
+            "core.notifications.reservation.send_telegram_message",
+            return_value=True,
+        ) as telegram,
+        patch(
+            "core.notifications.reservation.send_staff_reservation_email",
+            return_value=True,
+        ) as email,
+    ):
+        call_command(
+            "resend_reservation_notifications",
+            f"--ref={row.ref}",
+            stdout=out,
+        )
+    row.refresh_from_db()
+    assert row.telegram_notified is True
+    assert row.staff_email_notified is True
+    telegram.assert_called_once()
+    email.assert_called_once()
+    text = out.getvalue()
+    assert row.ref in text
+    assert "telegram=OK" in text
+    assert "staff_email=OK" in text
+
+
+@pytest.mark.django_db
+def test_resend_unsent_skips_fully_notified_rows():
+    from django.core.management import call_command
+    from io import StringIO
+
+    _open_all_week()
+    Reservation.objects.create(
+        name="Already",
+        phone="0704445566",
+        email="already@example.com",
+        party_size=2,
+        date=date.today() + timedelta(days=6),
+        time=time(16, 0),
+        status=Reservation.Status.CONFIRMED,
+        telegram_notified=True,
+        staff_email_notified=True,
+    )
+    pending = Reservation.objects.create(
+        name="Pending",
+        phone="0705556677",
+        email="pending@example.com",
+        party_size=2,
+        date=date.today() + timedelta(days=7),
+        time=time(17, 0),
+        status=Reservation.Status.CONFIRMED,
+        telegram_notified=False,
+        staff_email_notified=False,
+    )
+    out = StringIO()
+    with (
+        patch(
+            "core.notifications.reservation.send_telegram_message",
+            return_value=True,
+        ) as telegram,
+        patch(
+            "core.notifications.reservation.send_staff_reservation_email",
+            return_value=True,
+        ) as email,
+    ):
+        call_command("resend_reservation_notifications", "--unsent", stdout=out)
+    pending.refresh_from_db()
+    assert pending.telegram_notified is True
+    assert pending.staff_email_notified is True
+    assert telegram.call_count == 1
+    assert email.call_count == 1
+    assert pending.ref in out.getvalue()
+    assert "Already" not in out.getvalue()
+
+
+def test_telegram_http_error_logs_status_without_token(settings, caplog):
+    import logging
+    from io import BytesIO
+
+    from core.notifications import telegram as telegram_mod
+
+    settings.TELEGRAM_BOT_TOKEN = "123456:SECRET-TOKEN-VALUE"
+    settings.TELEGRAM_CHAT_ID = "999"
+
+    err = telegram_mod.urllib.error.HTTPError(
+        url="https://api.telegram.org/bot123456:SECRET-TOKEN-VALUE/sendMessage",
+        code=403,
+        msg="Forbidden",
+        hdrs=None,
+        fp=BytesIO(b'{"ok":false,"error_code":403,"description":"Forbidden"}'),
+    )
+    with (
+        patch(
+            "core.notifications.telegram.urllib.request.urlopen",
+            side_effect=err,
+        ),
+        caplog.at_level(logging.ERROR, logger="riva.notifications.telegram"),
+    ):
+        assert telegram_mod.send_telegram_message("hello") is False
+    joined = " ".join(r.getMessage() for r in caplog.records)
+    assert "SECRET-TOKEN-VALUE" not in joined
+    assert "123456:" not in joined
+    assert "http_status=403" in joined
+    assert "error_code=403" in joined
 
 
 @pytest.mark.django_db
