@@ -55,7 +55,8 @@ export default async function ContactPage() {
             <p className="riva-label">Hör av dig</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Kontakt</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Frågor, feedback eller specialönskemål — vi svarar så snart vi kan.
+              Hitta Riva Bistro på Hornsbergs Strand 57, Kungsholmen — vid vattnet i
+              Stockholm. Här finns adress, öppettider, karta och formulär.
             </p>
           </div>
           <RestaurantImage
@@ -75,6 +76,10 @@ export default async function ContactPage() {
               <p className="mt-3 flex items-start gap-2 text-lg text-riva-cream">
                 <MapPin className="mt-1 h-4 w-4 shrink-0 text-riva-gold" strokeWidth={1.25} />
                 {fullAddress()}
+              </p>
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-riva-muted">
+                Vi ligger på Kungsholmen vid Hornsbergs Strand, med utsikt över vattnet
+                och uteservering när vädret tillåter.
               </p>
             </div>
             <div>

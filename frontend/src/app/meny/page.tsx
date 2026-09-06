@@ -37,7 +37,8 @@ export default async function MenuPage() {
             <p className="riva-label">Mat &amp; dryck</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Meny</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Säsongens råvaror, tillagade med omsorg. Alla priser inklusive moms (12 % på mat).
+              Lunch och middag på Kungsholmen — säsongens råvaror, tillagade med omsorg.
+              Bläddra bland dagens utbud; alla priser inklusive moms (12&nbsp;% på mat).
             </p>
           </div>
           <RestaurantImage

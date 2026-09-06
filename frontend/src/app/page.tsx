@@ -123,7 +123,10 @@ export default async function HomePage() {
       <Section className="bg-riva-surface/40">
         <RestaurantInfo hours={hours} />
       </Section>
-      <CTASection />
+      <CTASection
+        title="Boka ett bord"
+        description="Lunch eller middag på Kungsholmen — välj tid på bokningssidan, eller se menyn först."
+      />
     </>
   );
 }
@@ -144,13 +147,14 @@ function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
       <div className="absolute inset-0 bg-gradient-to-t from-riva-black via-riva-black/70 to-riva-black/30" />
       <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end gap-10 px-5 pb-16 pt-28 md:px-8 md:pb-20">
         <div className="max-w-2xl">
-          <p className="riva-label">Stockholm · {business.tagline}</p>
+          <p className="riva-label">Kungsholmen · {business.tagline}</p>
           <h1 className="mt-5 font-display text-5xl leading-[1.05] text-riva-cream md:text-7xl">
             Goda smaker, äkta upplevelser
           </h1>
           <p className="mt-6 max-w-md text-pretty leading-relaxed text-riva-muted">
-            Svensk gastronomi i en stillsam, cinematisk miljö på Kungsholmen. Vi dukar
-            för långa middagar och minnesvärda kvällar.
+            Riva Bistro är en restaurang på Kungsholmen i Stockholm — skandinavisk mat i
+            stillsam miljö vid vattnet, med utsikt och uteservering. Vi dukar för lunch,
+            långa middagar och minnesvärda kvällar.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="gold">
@@ -158,6 +162,9 @@ function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/meny">Se vår meny</Link>
+            </Button>
+            <Button asChild size="lg" variant="ghost">
+              <Link href="/kontakt">Hitta hit</Link>
             </Button>
           </div>
         </div>
@@ -181,11 +188,16 @@ function AboutSplit() {
           <SectionHeading
             eyebrow="Om Riva"
             title="En bistro där råvaran får tala"
-            description="Vi lagar mat med omsorg och serverar den utan krångel. Skandinavisk enkelhet möter mediterran värme — i en miljö som är lika bekväm för en vardagsmiddag som för det stora firandet."
+            description="Vi lagar mat med omsorg och serverar den utan krångel. Skandinavisk enkelhet möter mediterran värme — i en miljö som är lika bekväm för en vardagsmiddag som för det stora firandet. På Kungsholmen, vid Hornsbergs Strand, bjuder vi på middag med utsikt och plats utomhus när vädret tillåter."
           />
-          <Button asChild variant="outline" className="mt-8">
-            <Link href="/om-oss">Läs mer om oss</Link>
-          </Button>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button asChild variant="outline">
+              <Link href="/om-oss">Läs mer om oss</Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/kontakt">Adress &amp; öppettider</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </Section>
