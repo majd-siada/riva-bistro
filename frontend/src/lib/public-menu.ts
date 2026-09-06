@@ -117,25 +117,3 @@ export function childCategories(
 export function itemsForCategory(items: PublicItem[], categorySlug: string): PublicItem[] {
   return items.filter((item) => item.categorySlug === categorySlug);
 }
-
-/** True when the section has direct dishes or a child course with dishes. */
-export function sectionHasContent(
-  section: PublicCategory,
-  categories: PublicCategory[],
-  items: PublicItem[],
-): boolean {
-  if (itemsForCategory(items, section.slug).length > 0) return true;
-  return childCategories(categories, section.slug).some(
-    (child) => itemsForCategory(items, child.slug).length > 0,
-  );
-}
-
-/** Public meny: hide empty shells (e.g. TAKE AWAY before dishes are added). */
-export function visibleTopLevelSections(
-  categories: PublicCategory[],
-  items: PublicItem[],
-): PublicCategory[] {
-  return topLevelCategories(categories).filter((section) =>
-    sectionHasContent(section, categories, items),
-  );
-}
