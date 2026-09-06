@@ -235,4 +235,4 @@ restaurang Stockholm, bästa restaurang(er) Stockholm, …
 - No new SEO landers in this strategy phase  
 - No metadata changes in this documentation task  
 - No keyword stuffing briefs  
-- No Strandvägen (or other non-NAP streets) in any SEO doc  
+- No alternate or non-authoritative street names in any SEO doc  
