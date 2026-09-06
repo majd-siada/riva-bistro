@@ -52,7 +52,39 @@ def send_reservation_confirmation(reservation) -> bool:
     if reservation.special_request:
         body += f"Önskemål: {reservation.special_request}\n"
     body += "\nVälkommen!\nRiva Bistro"
-    return _send(subject, body, [reservation.email])
+
+    guest = (reservation.email or "").strip()
+    if not guest:
+        logger.warning("Reservation confirmation skipped: no guest email")
+        return False
+
+    # Prefer Django SMTP when EMAIL_HOST is configured; otherwise use Hostinger
+    # Mail API (same credentials as staff alerts) so guest mail still delivers.
+    smtp_host = (getattr(settings, "EMAIL_HOST", "") or "").strip()
+    if smtp_host:
+        if _send(subject, body, [guest]):
+            return True
+        logger.warning(
+            "Django SMTP guest confirmation failed; trying Hostinger Mail API"
+        )
+
+    from core.notifications.staff_email import (
+        hostinger_api_configured,
+        send_email_via_hostinger,
+    )
+
+    if hostinger_api_configured():
+        html = f"<pre style='font-family:system-ui,sans-serif'>{body}</pre>"
+        return send_email_via_hostinger(
+            to=guest, subject=subject, text=body, html=html
+        )
+
+    if not smtp_host:
+        logger.info(
+            "Guest confirmation skipped: EMAIL_HOST empty and Hostinger unset"
+        )
+        return False
+    return False
 
 
 def send_contact_message(

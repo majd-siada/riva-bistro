@@ -402,3 +402,32 @@ def test_incomplete_hostinger_uses_django_only(settings):
     assert ok is True
     hostinger.assert_not_called()
     django_send.assert_called_once()
+
+
+def test_guest_confirmation_uses_hostinger_when_smtp_unset(settings):
+    """Guest confirmation falls back to Hostinger when EMAIL_HOST is empty."""
+    from datetime import date, time
+    from types import SimpleNamespace
+
+    from core.email import send_reservation_confirmation
+
+    settings.EMAIL_HOST = ""
+    settings.HOSTINGER_MAIL_API_TOKEN = "hostinger-token"
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = "mailbox-id"
+
+    reservation = SimpleNamespace(
+        ref="RB-GUEST1",
+        name="Guest",
+        email="guest@example.com",
+        date=date(2026, 9, 12),
+        time=time(19, 0),
+        party_size=2,
+        special_request="",
+    )
+    with patch(
+        "core.notifications.staff_email.send_email_via_hostinger",
+        return_value=True,
+    ) as hostinger:
+        assert send_reservation_confirmation(reservation) is True
+    hostinger.assert_called_once()
+    assert hostinger.call_args.kwargs["to"] == "guest@example.com"

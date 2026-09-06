@@ -188,7 +188,8 @@ Expected while `production_ready=false` (even with real hours configured):
 After a reservation row is **committed**, the API best-effort sends:
 
 1. Telegram message to `TELEGRAM_CHAT_ID` via `@RivaB_bot` (`TELEGRAM_BOT_TOKEN`)
-2. Staff email to `RESTAURANT_NOTIFICATION_EMAIL` (Hostinger Mail API if configured, else Django SMTP)
+2. Staff email to `RESTAURANT_NOTIFICATION_EMAIL` (Hostinger Mail API if configured; on API failure falls back to Django SMTP)
+3. Guest confirmation to the booker’s email (Django SMTP when `EMAIL_HOST` is set; otherwise Hostinger Mail API when configured)
 
 Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified` avoid duplicate alerts on idempotent retries.
 
@@ -197,9 +198,26 @@ Configure on the VPS `.env` (never commit real secrets):
 ```bash
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
-HOSTINGER_MAIL_API_TOKEN=          # optional
-HOSTINGER_MAIL_MAILBOX_RESOURCE_ID= # optional
+HOSTINGER_MAIL_API_TOKEN=
+HOSTINGER_MAIL_MAILBOX_RESOURCE_ID=
 RESTAURANT_NOTIFICATION_EMAIL=
+EMAIL_HOST=                  # optional if Hostinger is set
+EMAIL_PORT=587
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=true
+DEFAULT_FROM_EMAIL=
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+```
+
+After editing the host `.env`, recreate the backend so env is reloaded, then verify:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate backend
+./scripts/verify-notifications.sh --send-test
+# or:
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py check_notifications --send-test
 ```
 
 Discover chat id after messaging the bot:

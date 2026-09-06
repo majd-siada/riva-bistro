@@ -39,8 +39,38 @@ def _hostinger_mailbox_id() -> str:
     return (getattr(settings, "HOSTINGER_MAIL_MAILBOX_RESOURCE_ID", "") or "").strip()
 
 
+def hostinger_api_configured() -> bool:
+    """True when Hostinger Mail API credentials are present (any recipient)."""
+    return bool(_hostinger_token() and _hostinger_mailbox_id())
+
+
 def hostinger_mail_configured() -> bool:
-    return bool(_hostinger_token() and _hostinger_mailbox_id() and _recipient())
+    return bool(hostinger_api_configured() and _recipient())
+
+
+def send_email_via_hostinger(
+    *,
+    to: str,
+    subject: str,
+    text: str,
+    html: str = "",
+    display_name: str = "Riva Bistro",
+) -> bool:
+    """Send one message via Hostinger Mail API to an arbitrary recipient."""
+    to = (to or "").strip()
+    if not to:
+        logger.info("Hostinger send skipped: no recipient")
+        return False
+    if not hostinger_api_configured():
+        logger.info("Hostinger send skipped: API credentials unset")
+        return False
+    return _send_via_hostinger(
+        to=to,
+        subject=subject,
+        text=text,
+        html=html or f"<pre>{text}</pre>",
+        display_name=display_name,
+    )
 
 
 def send_staff_reservation_email(*, subject: str, text: str, html: str) -> bool:
@@ -64,7 +94,14 @@ def send_staff_reservation_email(*, subject: str, text: str, html: str) -> bool:
     return _send_via_django(to=to, subject=subject, text=text, html=html)
 
 
-def _send_via_hostinger(*, to: str, subject: str, text: str, html: str) -> bool:
+def _send_via_hostinger(
+    *,
+    to: str,
+    subject: str,
+    text: str,
+    html: str,
+    display_name: str = "Riva Bistro",
+) -> bool:
     """Send via Hostinger only. Returns False on ImportError or API failure.
 
     Callers decide whether to fall back to Django SMTP.
@@ -85,7 +122,7 @@ def _send_via_hostinger(*, to: str, subject: str, text: str, html: str) -> bool:
                 subject=subject,
                 text=text,
                 html=html,
-                display_name="Riva Bistro",
+                display_name=display_name,
             )
             api.send_email(
                 mailbox_resource_id=_hostinger_mailbox_id(),
