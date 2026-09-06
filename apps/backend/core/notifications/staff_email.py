@@ -10,8 +10,9 @@ Required env when using Hostinger Mail API:
   HOSTINGER_MAIL_MAILBOX_RESOURCE_ID
   RESTAURANT_NOTIFICATION_EMAIL  (recipient)
 
-If Hostinger is not fully configured, falls back to the existing Django
-EMAIL_* / SMTP path used elsewhere (does not replace guest confirmations).
+If Hostinger is not fully configured, or the Mail API send fails, falls
+back to the existing Django EMAIL_* / SMTP path used elsewhere (does not
+replace guest confirmations).
 """
 
 from __future__ import annotations
@@ -43,26 +44,37 @@ def hostinger_mail_configured() -> bool:
 
 
 def send_staff_reservation_email(*, subject: str, text: str, html: str) -> bool:
-    """Send staff notification. Prefer Hostinger Mail API; else Django SMTP."""
+    """Send staff notification. Prefer Hostinger Mail API; else Django SMTP.
+
+    If Hostinger is configured but the API call fails (or the package is
+    missing), fall back to Django EMAIL_* so staff still get the alert.
+    """
     to = _recipient()
     if not to:
         logger.info("Staff reservation email skipped: RESTAURANT_NOTIFICATION_EMAIL unset")
         return False
 
     if hostinger_mail_configured():
-        return _send_via_hostinger(to=to, subject=subject, text=text, html=html)
+        if _send_via_hostinger(to=to, subject=subject, text=text, html=html):
+            return True
+        logger.warning(
+            "Hostinger Mail API send failed; falling back to Django email backend"
+        )
+        return _send_via_django(to=to, subject=subject, text=text, html=html)
     return _send_via_django(to=to, subject=subject, text=text, html=html)
 
 
 def _send_via_hostinger(*, to: str, subject: str, text: str, html: str) -> bool:
+    """Send via Hostinger only. Returns False on ImportError or API failure.
+
+    Callers decide whether to fall back to Django SMTP.
+    """
     try:
         from hostinger_mail_api import ApiClient, Configuration, SendApi
         from hostinger_mail_api.models import V1SendRequest
     except ImportError:
-        logger.warning(
-            "hostinger_mail_api not installed; falling back to Django email backend"
-        )
-        return _send_via_django(to=to, subject=subject, text=text, html=html)
+        logger.warning("hostinger_mail_api not installed")
+        return False
 
     configuration = Configuration(access_token=_hostinger_token())
     try:

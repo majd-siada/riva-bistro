@@ -336,3 +336,69 @@ def test_telegram_errors_do_not_log_token(settings, caplog):
     joined = " ".join(r.getMessage() for r in caplog.records)
     assert "SECRET-TOKEN-VALUE" not in joined
     assert "123456:" not in joined
+
+
+def test_hostinger_api_failure_falls_back_to_django_smtp(settings):
+    """When Hostinger is configured but the API fails, use Django EMAIL_*."""
+    from core.notifications import staff_email as staff_email_mod
+
+    settings.RESTAURANT_NOTIFICATION_EMAIL = "staff@rivabistro.se"
+    settings.HOSTINGER_MAIL_API_TOKEN = "hostinger-token"
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = "mailbox-id"
+    settings.DEFAULT_FROM_EMAIL = "noreply@rivabistro.se"
+
+    with (
+        patch.object(staff_email_mod, "_send_via_hostinger", return_value=False) as hostinger,
+        patch.object(staff_email_mod, "_send_via_django", return_value=True) as django_send,
+    ):
+        ok = staff_email_mod.send_staff_reservation_email(
+            subject="Test",
+            text="body",
+            html="<p>body</p>",
+        )
+    assert ok is True
+    hostinger.assert_called_once()
+    django_send.assert_called_once()
+    assert django_send.call_args.kwargs["to"] == "staff@rivabistro.se"
+
+
+def test_hostinger_success_skips_django_smtp(settings):
+    from core.notifications import staff_email as staff_email_mod
+
+    settings.RESTAURANT_NOTIFICATION_EMAIL = "staff@rivabistro.se"
+    settings.HOSTINGER_MAIL_API_TOKEN = "hostinger-token"
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = "mailbox-id"
+
+    with (
+        patch.object(staff_email_mod, "_send_via_hostinger", return_value=True) as hostinger,
+        patch.object(staff_email_mod, "_send_via_django", return_value=True) as django_send,
+    ):
+        ok = staff_email_mod.send_staff_reservation_email(
+            subject="Test",
+            text="body",
+            html="<p>body</p>",
+        )
+    assert ok is True
+    hostinger.assert_called_once()
+    django_send.assert_not_called()
+
+
+def test_incomplete_hostinger_uses_django_only(settings):
+    from core.notifications import staff_email as staff_email_mod
+
+    settings.RESTAURANT_NOTIFICATION_EMAIL = "staff@rivabistro.se"
+    settings.HOSTINGER_MAIL_API_TOKEN = ""
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = ""
+
+    with (
+        patch.object(staff_email_mod, "_send_via_hostinger", return_value=True) as hostinger,
+        patch.object(staff_email_mod, "_send_via_django", return_value=True) as django_send,
+    ):
+        ok = staff_email_mod.send_staff_reservation_email(
+            subject="Test",
+            text="body",
+            html="<p>body</p>",
+        )
+    assert ok is True
+    hostinger.assert_not_called()
+    django_send.assert_called_once()
