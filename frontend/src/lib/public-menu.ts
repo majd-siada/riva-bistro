@@ -65,6 +65,29 @@ function mapCategory(c: Category): PublicCategory {
   };
 }
 
+/** Top-level section slugs created by seed_menu_sections. */
+export const MENU_SECTION_SLUGS = [
+  "dagens-lunch",
+  "rivas-meny",
+  "take-away",
+  "stora-sallskapsmeny",
+  "snacks-drinkar",
+  "dryck",
+] as const;
+
+/**
+ * True when the catalog already has the six public meny sections.
+ * Older production DBs only have flat course categories (Förrätter, …).
+ */
+export function catalogHasMenuSections(
+  categories: Array<{ slug: string; parentSlug?: string | null }>,
+): boolean {
+  const topSlugs = new Set(
+    categories.filter((c) => c.parentSlug == null).map((c) => c.slug),
+  );
+  return MENU_SECTION_SLUGS.every((slug) => topSlugs.has(slug));
+}
+
 export async function loadPublicMenu(): Promise<{
   categories: PublicCategory[];
   items: PublicItem[];
@@ -72,11 +95,25 @@ export async function loadPublicMenu(): Promise<{
   try {
     const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
     if (!categories.length || !products.length) return staticMenu();
+
+    const mappedCategories = categories
+      .map(mapCategory)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
+    const mappedItems = products.map(mapProduct);
+
+    // Until production runs migrate + seed_menu_sections, the API returns only
+    // flat course categories. Keep live dishes from the API, but use the static
+    // six-section hierarchy so /meny shows Dagens lunch, RIVAS MENY, etc.
+    if (!catalogHasMenuSections(mappedCategories)) {
+      return {
+        categories: staticMenu().categories,
+        items: mappedItems,
+      };
+    }
+
     return {
-      categories: categories
-        .map(mapCategory)
-        .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug)),
-      items: products.map(mapProduct),
+      categories: mappedCategories,
+      items: mappedItems,
     };
   } catch {
     return staticMenu();

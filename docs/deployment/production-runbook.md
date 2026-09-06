@@ -155,8 +155,15 @@ curl -fsS "https://api.rivabistro.se/api/v1/reservations/availability/?date=$(da
 Menu seed (only if you intentionally need to re-seed; does not invent hours):
 
 ```bash
-docker compose -f docker-compose.production.yml exec backend python manage.py seed_menu
+docker compose -f docker-compose.production.yml exec backend python manage.py migrate --noinput
+docker compose -f docker-compose.production.yml exec backend python manage.py seed_menu_sections
+# Optional full dish seed (idempotent; prefer seed_menu_sections alone for hierarchy):
+# docker compose -f docker-compose.production.yml exec backend python manage.py seed_menu
 ```
+
+After `seed_menu_sections`, `GET /api/v1/menu/categories/` should include
+`dagens-lunch`, `rivas-meny`, `take-away`, `stora-sallskapsmeny`, `snacks-drinkar`,
+`dryck`, plus course categories with `parent_slug: "rivas-meny"`.
 
 ---
 
