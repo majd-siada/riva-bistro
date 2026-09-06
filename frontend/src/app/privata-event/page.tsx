@@ -10,8 +10,9 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Privata event",
+  absoluteTitle: "Privata event & företagsmiddagar — Riva Bistro",
   description:
-    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro, Kungsholmen i Stockholm.",
+    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro, Kungsholmen. Förfrågan för privata event.",
   path: "/privata-event",
 });
 

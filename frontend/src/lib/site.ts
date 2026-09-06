@@ -16,4 +16,4 @@ export const SITE_URL = resolveSiteUrl();
 export const SITE_NAME = "Riva Bistro";
 
 export const SITE_DESCRIPTION =
-  "Riva Bistro — goda smaker, äkta upplevelser på Kungsholmen i Stockholm. Boka bord och utforska menyn.";
+  "Riva Bistro — restaurang på Kungsholmen i Stockholm. Skandinavisk mat, lunch och middag vid Hornsbergs Strand. Boka bord och se menyn.";

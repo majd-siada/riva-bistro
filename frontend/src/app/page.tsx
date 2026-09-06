@@ -16,7 +16,7 @@ import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export const metadata = createPageMetadata({
   title: SITE_NAME,
-  absoluteTitle: `${SITE_NAME} — Goda smaker, äkta upplevelser`,
+  absoluteTitle: `${SITE_NAME} — Restaurang på Kungsholmen i Stockholm`,
   description: SITE_DESCRIPTION,
   path: "/",
 });

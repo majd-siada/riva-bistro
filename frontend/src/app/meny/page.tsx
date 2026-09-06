@@ -11,8 +11,9 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Meny",
+  absoluteTitle: "Meny — Riva Bistro Kungsholmen",
   description:
-    "Riva Bistros meny på Kungsholmen i Stockholm — dagens lunch, RIVAS MENY, take away, sällskap, snacks och dryck. Alla priser inklusive moms.",
+    "Se menyn på Riva Bistro, Kungsholmen — lunch, middag, take away, sällskap och dryck. Alla priser inklusive moms.",
   path: "/meny",
 });
 
