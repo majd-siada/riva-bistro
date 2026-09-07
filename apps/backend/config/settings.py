@@ -225,6 +225,10 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ],
+    # Global anon throttle complements scoped write throttles on booking/auth/inquiries.
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
     "DEFAULT_THROTTLE_RATES": {
         "reservations": "30/hour",
         "inquiries": "12/hour",
@@ -233,6 +237,56 @@ REST_FRAMEWORK = {
     },
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
 }
+
+# Structured logging (never log secrets / Telegram bot tokens).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        # Notification loggers propagate to root so pytest caplog and operators
+        # both see them. Never log bot tokens / API secrets in those modules.
+    },
+}
+
+# Optional Sentry — no-op unless SENTRY_DSN is set and sentry-sdk is installed.
+_sentry_dsn = os.getenv("SENTRY_DSN", "").strip()
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+
+        sentry_sdk.init(
+            dsn=_sentry_dsn,
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0")),
+            send_default_pii=False,
+            environment=os.getenv(
+                "SENTRY_ENVIRONMENT",
+                "production" if not DEBUG else "development",
+            ),
+        )
+    except ImportError:
+        pass
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_HTTPONLY = True
@@ -305,3 +359,6 @@ if not DEBUG:
     if SESSION_COOKIE_SAMESITE == "None":
         SESSION_COOKIE_SECURE = True
         CSRF_COOKIE_SECURE = True
+
+# Cross-Origin-Opener-Policy for clickjacking-adjacent hardening (Django 4.2+).
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"

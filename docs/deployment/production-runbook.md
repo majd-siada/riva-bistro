@@ -97,6 +97,9 @@ docker compose -f docker-compose.production.yml ps
 
 ### Rollback
 
+See also the accepted **manual-deploy / non-ZDD** limitation:
+[zero-downtime-limitation.md](./zero-downtime-limitation.md).
+
 ```bash
 git log --oneline -n 10
 git checkout <known-good-sha>
@@ -198,7 +201,11 @@ After a reservation row is **committed**, the API best-effort sends:
 2. Staff email to `RESTAURANT_NOTIFICATION_EMAIL` (Hostinger Mail API if configured; on API failure falls back to Django SMTP)
 3. Guest confirmation to the booker’s email (Django SMTP when `EMAIL_HOST` is set; otherwise Hostinger Mail API when configured)
 
-Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified` avoid duplicate alerts on idempotent retries.
+Failures never roll back the booking. Flags `telegram_notified` / `staff_email_notified`
+avoid duplicate alerts on idempotent retries. Django admin lists those flags (plus
+`confirmation_email_sent`). Create responses include
+`notifications: { telegram, staff_email }` so failed staff alerts are visible
+without failing HTTP 201.
 
 Configure on the VPS `.env` (never commit real secrets):
 
@@ -220,6 +227,9 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 After editing the host `.env`, recreate the backend so env is reloaded, then verify:
 
 ```bash
+# Confirm keys exist (values stay secret)
+grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|HOSTINGER_MAIL_API_TOKEN|HOSTINGER_MAIL_MAILBOX_RESOURCE_ID|RESTAURANT_NOTIFICATION_EMAIL|EMAIL_HOST)=' .env | sed 's/=.*/=***/'
+
 docker compose -f docker-compose.production.yml up -d --force-recreate backend
 ./scripts/verify-notifications.sh --send-test
 # or:
@@ -232,6 +242,16 @@ Discover chat id after messaging the bot:
 ```bash
 docker compose -f docker-compose.production.yml exec backend \
   python manage.py telegram_discover_chat
+```
+
+Retry staff alerts for bookings that still have notify flags false:
+
+```bash
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py resend_reservation_notifications --ref=RB-ABC123
+# or all unsent (capped):
+docker compose -f docker-compose.production.yml exec backend \
+  python manage.py resend_reservation_notifications --unsent
 ```
 
 If `/api/v1/hours/` still returns seven `is_closed: true` / null opens/closes rows,
@@ -303,3 +323,51 @@ docker compose -f docker-compose.production.yml exec backend \
 ```
 
 Requires production env already loaded in the container (no secrets printed here).
+
+---
+
+## Database backups
+
+On the API host (Postgres client tools required):
+
+```bash
+# Dump (password never printed)
+DATABASE_URL=postgres://… ./scripts/backup-postgres.sh
+# or POSTGRES_HOST/POSTGRES_DB/POSTGRES_USER/POSTGRES_PASSWORD
+
+# Destructive restore — only with explicit confirmation
+CONFIRM_RESTORE=YES DATABASE_URL=postgres://… \
+  ./scripts/restore-postgres.sh ./backups/riva-bistro-YYYYMMDDTHHMMSSZ.sql.gz
+```
+
+Schedule `backup-postgres.sh` daily via cron. A restore drill on production is an owner ops task (mark verified only after a successful restore).
+
+Optional error monitoring: set `SENTRY_DSN` (and install `sentry-sdk` in the API image). Empty DSN = no-op.
+
+
+---
+
+## Disaster recovery
+
+Goal: restore API + database service after host or data loss **without** inventing a second hosting architecture.
+
+1. Provision/repair the VPS and Docker stack using `docker-compose.production.yml`.
+2. Restore the latest known-good dump:
+   `CONFIRM_RESTORE=YES DATABASE_URL=… ./scripts/restore-postgres.sh ./backups/<file>.sql.gz`
+3. Recreate backend: `docker compose -f docker-compose.production.yml up -d --force-recreate backend`
+4. Verify: `./scripts/production-check.sh` and admin login.
+5. Re-check notification env and run `./scripts/verify-notifications.sh --send-test` (owner).
+
+RTO posture for MVP: best-effort same business day; no multi-region failover is claimed.
+
+## Incident response
+
+Severity hints:
+
+- **SEV1** — site/API down or data loss risk → restore from backup; pause booking enablement if needed.
+- **SEV2** — bookings failing or notifications silent → check health, logs, env; resend notifications after fix.
+- **SEV3** — content/SEO issues → fix in admin/CMS and redeploy frontend if required.
+
+Communication: owner (Majd) is the escalation contact. Do not post secrets in tickets/chat.
+
+Rollback: redeploy previous known-good git SHA on VPS + Hostinger rebuild of the matching frontend commit.

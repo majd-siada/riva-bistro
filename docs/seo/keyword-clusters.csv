@@ -1,0 +1,114 @@
+cluster_id,cluster_name,keyword,keyword_role,intent,primary_url,url_role,status,priority,notes
+C01,Brand,Riva Bistro,primary,navigational_brand,/,primary,KEEP,HIGH,Brand home owner
+C01,Brand,Riva Bistro Stockholm,secondary,navigational_brand,/,primary,KEEP,HIGH,
+C01,Brand,Riva Bistro Kungsholmen,secondary,navigational_brand,/,primary,KEEP,HIGH,
+C01,Brand,Riva Bistro Hornsbergs Strand,secondary,navigational_brand,/,primary,KEEP,MEDIUM,
+C01,Brand,Riva Bistro meny,secondary,navigational_menu,/meny,support,KEEP,HIGH,Brand+menu → meny support not co-primary on /
+C01,Brand,Riva Bistro boka bord,secondary,navigational_booking,/boka,support,KEEP,HIGH,Brand+book → boka only
+C01,Brand,Riva Bistro öppettider,secondary,navigational_nap,/kontakt,support,KEEP,HIGH,
+C01,Brand,Riva Bistro adress,secondary,navigational_nap,/kontakt,support,KEEP,HIGH,
+C02,Local Kungsholmen discovery,restaurang Kungsholmen,primary,local_commercial,/,primary,KEEP,HIGH,Single primary owner /
+C02,Local Kungsholmen discovery,bistro Kungsholmen,secondary,local_commercial,/,primary,KEEP,HIGH,
+C02,Local Kungsholmen discovery,mysig restaurang Kungsholmen,secondary,local_commercial,/,primary,KEEP,MEDIUM,
+C02,Local Kungsholmen discovery,restauranger Kungsholmen,secondary,local_commercial,/,primary,KEEP,MEDIUM,
+C02,Local Kungsholmen discovery,matställe Kungsholmen,secondary,local_commercial,/,primary,MONITOR,LOW,Soft synonym — monitor only
+C03,Dinner experience,middag Kungsholmen,primary,dinner_discovery,/,primary,KEEP,HIGH,/ owns dinner discovery; /boka converts
+C03,Dinner experience,kvällsrestaurang Kungsholmen,secondary,dinner_discovery,/,primary,KEEP,MEDIUM,
+C03,Dinner experience,middag Riva Bistro,secondary,dinner_discovery,/,primary,KEEP,MEDIUM,
+C03,Dinner experience,helgmiddag Kungsholmen,secondary,dinner_discovery,/boka,support,KEEP,LOW,Conversion support only
+C03,Dinner experience,middag Hornsbergs Strand,secondary,dinner_discovery,/,primary,MONITOR,LOW,Do not give /kontakt dinner primary
+C04,Menu,Riva Bistro meny,primary,menu_informational,/meny,primary,KEEP,HIGH,
+C04,Menu,meny Kungsholmen,secondary,menu_informational,/meny,primary,KEEP,HIGH,
+C04,Menu,restaurang meny Kungsholmen,secondary,menu_informational,/meny,primary,KEEP,HIGH,
+C04,Menu,middagsmeny Kungsholmen,secondary,menu_informational,/meny,primary,KEEP,MEDIUM,
+C04,Menu,säsongsmeny Stockholm,secondary,menu_informational,/meny,primary,MONITOR,LOW,
+C05,Live dishes,entrecôte Kungsholmen,primary,dish,/meny,primary,KEEP,MEDIUM,Live CMS 2026-09-06: Entrecôte
+C05,Live dishes,Riva Bistro entrecôte,secondary,dish,/meny,primary,KEEP,MEDIUM,
+C05,Live dishes,halstrad röding Kungsholmen,primary,dish,/meny,primary,KEEP,MEDIUM,Live CMS: Halstrad röding — one primary dish term per row ok within cluster
+C05,Live dishes,röding Kungsholmen,secondary,dish,/meny,primary,KEEP,MEDIUM,
+C05,Live dishes,grillad lammracks Kungsholmen,primary,dish,/meny,primary,KEEP,MEDIUM,Live CMS: Grillad lammracks
+C05,Live dishes,lammracks Kungsholmen,secondary,dish,/meny,primary,KEEP,MEDIUM,
+C05,Live dishes,Rivas köttbullar,primary,dish,/meny,primary,KEEP,MEDIUM,Live CMS: Rivas köttbullar
+C05,Live dishes,köttbullar Kungsholmen,secondary,dish,/meny,primary,KEEP,MEDIUM,
+C05,Live dishes,entrecôte Stockholm,secondary,dish,/meny,primary,MONITOR,LOW,City modifier — weak
+C06,Booking,boka bord Kungsholmen,primary,transactional_booking,/boka,primary,KEEP,HIGH,Only /boka owns booking primaries
+C06,Booking,boka bord Riva Bistro,secondary,transactional_booking,/boka,primary,KEEP,HIGH,
+C06,Booking,boka restaurang Kungsholmen,secondary,transactional_booking,/boka,primary,KEEP,HIGH,
+C06,Booking,boka middag Kungsholmen,secondary,transactional_booking,/boka,primary,KEEP,HIGH,
+C06,Booking,boka bord Stockholm,secondary,transactional_booking,/boka,primary,KEEP,MEDIUM,
+C06,Booking,boka bord Hornsbergs Strand,secondary,transactional_booking,/boka,primary,KEEP,MEDIUM,
+C06,Booking,boka bord lördag Kungsholmen,secondary,transactional_booking,/boka,primary,MONITOR,LOW,
+C07,Location NAP,Riva Bistro adress,primary,local_nap,/kontakt,primary,KEEP,HIGH,
+C07,Location NAP,restaurang Hornsbergs Strand,secondary,local_nap,/kontakt,primary,KEEP,HIGH,
+C07,Location NAP,restaurang Hornsberg,secondary,local_nap,/kontakt,primary,KEEP,HIGH,
+C07,Location NAP,Riva Bistro öppettider,secondary,local_nap,/kontakt,primary,KEEP,HIGH,
+C07,Location NAP,hitta Riva Bistro,secondary,local_nap,/kontakt,primary,KEEP,HIGH,
+C07,Location NAP,bistro Hornsbergs Strand,secondary,local_nap,/kontakt,primary,KEEP,MEDIUM,
+C07,Location NAP,restaurang vid Hornsbergs Strand,secondary,local_nap,/kontakt,primary,KEEP,MEDIUM,
+C08,Private events,privata event Kungsholmen,primary,events_groups,/privata-event,primary,KEEP,HIGH,
+C08,Private events,företagsmiddag Kungsholmen,secondary,events_groups,/privata-event,primary,KEEP,HIGH,
+C08,Private events,gruppmiddag Kungsholmen,secondary,events_groups,/privata-event,primary,KEEP,HIGH,
+C08,Private events,restaurang event Kungsholmen,secondary,events_groups,/privata-event,primary,KEEP,HIGH,
+C08,Private events,födelsedagsmiddag Kungsholmen,secondary,events_groups,/privata-event,primary,KEEP,MEDIUM,
+C08,Private events,företagsmiddag Stockholm,secondary,events_groups,/privata-event,primary,KEEP,MEDIUM,
+C08,Private events,restaurang stora sällskap Stockholm,secondary,events_groups,/privata-event,primary,KEEP,MEDIUM,
+C08,Private events,privat event Stockholm restaurang,secondary,events_groups,/privata-event,primary,KEEP,MEDIUM,
+C08,Private events,boka företagsmiddag Stockholm,secondary,events_groups,/privata-event,primary,KEEP,MEDIUM,Inquiry intent — events page not /boka
+C09,Brand story,om Riva Bistro,primary,brand_story,/om-oss,primary,KEEP,MEDIUM,
+C09,Brand story,Riva Bistro berättelse,secondary,brand_story,/om-oss,primary,KEEP,MEDIUM,
+C09,Brand story,Riva Bistro filosofi,secondary,brand_story,/om-oss,primary,KEEP,MEDIUM,
+C09,Brand story,skandinavisk restaurang Kungsholmen,secondary,brand_philosophy,/om-oss,primary,KEEP,MEDIUM,Philosophy only — food queries not co-owned with /meny
+C09,Brand story,svensk mat Kungsholmen,secondary,cuisine_food,/meny,support,MONITOR,LOW,Food intent → meny; not primary on /om-oss
+C09,Brand story,svensk mat Stockholm,secondary,cuisine_food,/meny,support,MONITOR,LOW,
+C09,Brand story,skandinavisk mat Stockholm,secondary,cuisine_food,/meny,support,MONITOR,LOW,
+C10,Gallery support,Riva Bistro galleri,primary,visual_support,/galleri,primary,KEEP,LOW,No commercial cluster competition
+C10,Gallery support,bilder Riva Bistro,secondary,visual_support,/galleri,primary,KEEP,LOW,
+C11,Lunch conditional,lunchmeny Kungsholmen,primary,lunch,/meny,primary,RESEARCH,MEDIUM,No live CMS lunch category/products 2026-09-06
+C11,Lunch conditional,lunch Kungsholmen,secondary,lunch,/meny,primary,RESEARCH,MEDIUM,
+C11,Lunch conditional,dagens lunch Kungsholmen,secondary,lunch,/meny,primary,RESEARCH,MEDIUM,
+C11,Lunch conditional,lunchrestaurang Kungsholmen,secondary,lunch,/meny,primary,RESEARCH,MEDIUM,
+C11,Lunch conditional,boka lunch Kungsholmen,secondary,lunch,/boka,support,RESEARCH,LOW,Only if lunch confirmed — still support not co-primary info owner
+C11,Lunch conditional,Riva Bistro lunch,secondary,lunch,/meny,primary,RESEARCH,MEDIUM,
+C12a,Waterfront content gap,restaurang vid vattnet Kungsholmen,primary,waterfront,/kontakt,primary,RESEARCH,MEDIUM,Address near water; page proof thin — CONTENT GAP
+C12a,Waterfront content gap,restaurang vid vattnet Hornsbergs Strand,secondary,waterfront,/kontakt,primary,RESEARCH,MEDIUM,
+C12a,Waterfront content gap,middag vid vattnet Hornsbergs Strand,secondary,waterfront,/kontakt,support,RESEARCH,LOW,Do not activate until copy proves claim
+C12b,Outdoor view content gap,uteservering Kungsholmen,primary,outdoor,/,primary,RESEARCH,LOW,Not proven on site
+C12b,Outdoor view content gap,restaurang med utsikt Kungsholmen,primary,view,/,primary,RESEARCH,LOW,Not proven on site
+C12b,Outdoor view content gap,uteservering Hornsbergs Strand,secondary,outdoor,/kontakt,support,RESEARCH,LOW,
+C13,Romantic unsupported,romantisk restaurang Kungsholmen,primary,romantic,/,primary,REMOVE,LOW,No on-page evidence
+C13,Romantic unsupported,romantisk middag Kungsholmen,secondary,romantic,/,support,REMOVE,LOW,
+C13,Romantic unsupported,dejtrestaurang Kungsholmen,secondary,romantic,/,support,REMOVE,LOW,
+C13,Romantic unsupported,middag för två Kungsholmen,secondary,romantic,/,support,REMOVE,LOW,
+C13,Romantic unsupported,restaurang för par Kungsholmen,secondary,romantic,/,support,REMOVE,LOW,
+C13,Romantic unsupported,romantisk restaurang Stockholm,secondary,romantic,/,support,REMOVE,LOW,
+C14,Nearby areas GBP,restaurang Kristineberg Stockholm,primary,nearby_geo,/kontakt,support,GBP_ONLY,LOW,No doorway page
+C14,Nearby areas GBP,restaurang Stadshagen Stockholm,primary,nearby_geo,/kontakt,support,GBP_ONLY,LOW,
+C14,Nearby areas GBP,restaurang Fridhemsplan,primary,nearby_geo,/kontakt,support,GBP_ONLY,LOW,
+C14,Nearby areas GBP,boka bord Fridhemsplan,secondary,nearby_geo,/boka,support,GBP_ONLY,LOW,
+C14,Nearby areas GBP,restaurang Lindhagen Stockholm,primary,nearby_geo,/kontakt,support,GBP_ONLY,LOW,
+C14,Nearby areas GBP,restaurang Thorildsplan,primary,nearby_geo,/kontakt,support,GBP_ONLY,LOW,
+C15,Broad Stockholm monitor,restaurang Stockholm,primary,city_head,/,primary,MONITOR,LOW,Not an active win target
+C15,Broad Stockholm monitor,bästa restaurang Stockholm,secondary,city_head,/,primary,MONITOR,LOW,
+C15,Broad Stockholm monitor,bästa restauranger Stockholm,secondary,city_head,/,primary,MONITOR,LOW,
+C15,Broad Stockholm monitor,bistro Stockholm,secondary,city_head,/,primary,MONITOR,LOW,
+C15,Broad Stockholm monitor,middag Stockholm,secondary,city_head,/,primary,MONITOR,LOW,
+C15,Broad Stockholm monitor,restaurang nära mig Stockholm,secondary,geo_near_me,/,primary,GBP_ONLY,LOW,Maps intent
+C16,Unsupported categories,fiskrestaurang Kungsholmen,primary,category_overclaim,/meny,primary,REMOVE,LOW,Has fish dishes ≠ fish restaurant
+C16,Unsupported categories,fisk och skaldjur Kungsholmen,secondary,category_overclaim,/meny,primary,REMOVE,LOW,
+C16,Unsupported categories,köttrestaurang Kungsholmen,primary,category_overclaim,/meny,primary,REMOVE,LOW,
+C16,Unsupported categories,grillrestaurang Kungsholmen,primary,category_overclaim,/meny,primary,REMOVE,LOW,
+C16,Unsupported categories,bästa entrecôte Stockholm,secondary,category_overclaim,/meny,primary,MONITOR,LOW,Use dish KEEP rows instead if needed
+C16,Unsupported categories,husmanskost Kungsholmen,primary,cuisine_overclaim,/meny,primary,REMOVE,LOW,Not supported by live positioning
+C16,Unsupported categories,svensk husmanskost Kungsholmen,secondary,cuisine_overclaim,/meny,primary,REMOVE,LOW,
+C16,Unsupported categories,italiensk restaurang Kungsholmen,primary,cuisine_conflict,,primary,REMOVE,LOW,Conflicts with Scandinavian positioning
+C16,Unsupported categories,Riva Bistro italiensk mat,secondary,cuisine_conflict,,primary,REMOVE,LOW,
+C16,Unsupported categories,vegetarisk restaurang Stockholm,primary,category_overclaim,/meny,primary,REMOVE,LOW,Has veg items ≠ vegetarian restaurant
+C17,English tourist monitor,restaurant Kungsholmen,primary,tourist_en,/,primary,MONITOR,LOW,SV pages only — no EN locale
+C17,English tourist monitor,restaurant Hornsbergs Strand,secondary,tourist_en,/kontakt,support,MONITOR,LOW,
+C17,English tourist monitor,Swedish restaurant Stockholm,secondary,tourist_en,/om-oss,support,MONITOR,LOW,
+C17,English tourist monitor,waterfront restaurant Kungsholmen,secondary,tourist_en,/kontakt,support,RESEARCH,LOW,Same proof gap as SV waterfront
+C17,English tourist monitor,romantic dinner Stockholm,secondary,tourist_en,/,primary,REMOVE,LOW,
+C18,Long-tail monitor,var äter man gott på Kungsholmen,primary,longtail_discovery,/,primary,MONITOR,LOW,
+C18,Long-tail monitor,äta gott Kungsholmen,secondary,longtail_discovery,/,primary,MONITOR,LOW,
+C18,Long-tail monitor,bästa restaurangen vid Hornsbergs Strand,secondary,longtail_discovery,/kontakt,support,MONITOR,LOW,
+C18,Long-tail monitor,restaurang med svensk mat Kungsholmen,secondary,longtail_discovery,/meny,support,MONITOR,LOW,Food → meny support

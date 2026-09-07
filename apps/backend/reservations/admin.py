@@ -34,9 +34,33 @@ class ReservationSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ["ref", "date", "time", "party_size", "name", "phone", "status"]
-    list_filter = ["status", "date"]
+    list_display = [
+        "ref",
+        "date",
+        "time",
+        "party_size",
+        "name",
+        "phone",
+        "status",
+        "telegram_notified",
+        "staff_email_notified",
+        "confirmation_email_sent",
+    ]
+    list_filter = [
+        "status",
+        "date",
+        "telegram_notified",
+        "staff_email_notified",
+        "confirmation_email_sent",
+    ]
     search_fields = ["ref", "name", "email", "phone"]
-    readonly_fields = ["ref", "created_at", "updated_at"]
+    readonly_fields = [
+        "ref",
+        "created_at",
+        "updated_at",
+        "telegram_notified",
+        "staff_email_notified",
+        "confirmation_email_sent",
+    ]
     date_hierarchy = "date"
     ordering = ["-date", "-time"]

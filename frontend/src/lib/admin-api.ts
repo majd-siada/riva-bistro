@@ -24,6 +24,12 @@ import type {
 import { ApiError, publicApiOrigin } from "@/lib/api";
 import type { AdminContactMessage, AdminEventInquiry } from "@/lib/api";
 
+export type AdminReservationWithNotify = AdminReservation & {
+  telegram_notified?: boolean;
+  staff_email_notified?: boolean;
+};
+
+
 const BASE = `${publicApiOrigin()}/api/v1`;
 
 function getCookie(name: string): string | null {
@@ -222,4 +228,10 @@ export async function adminListContactMessages() {
 
 export async function adminListEventInquiries() {
   return request<AdminEventInquiry[]>("/admin/inquiries/events/");
+}
+
+export async function adminResendReservationNotifications(id: number) {
+  return request<AdminReservationWithNotify>(`/admin/reservations/${id}/resend-notifications/`, {
+    method: "POST",
+  });
 }

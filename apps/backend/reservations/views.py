@@ -124,8 +124,14 @@ class ReservationCreateView(APIView):
             reservation.confirmation_email_sent = True
             reservation.save(update_fields=["confirmation_email_sent"])
 
-        schedule_reservation_notifications(reservation)
+        # create_reservation already committed, so on_commit usually runs now and
+        # returns real channel results for the response (still never fails HTTP).
+        staff_notifications = schedule_reservation_notifications(reservation)
 
         body = ReservationSerializer(reservation).data
         body["email_sent"] = email_sent
+        body["notifications"] = {
+            "telegram": bool(staff_notifications.get("telegram")),
+            "staff_email": bool(staff_notifications.get("email")),
+        }
         return Response(body, status=status.HTTP_201_CREATED)

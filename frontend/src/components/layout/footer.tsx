@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { GoldDivider } from "@/components/brand/gold-divider";
 import { Logo } from "@/components/brand/logo";
-import { business, fullAddress } from "@/config/business";
+import { business, fullAddress, shortAddress } from "@/config/business";
 import { loadHours } from "@/lib/public-data";
 import { formatDayHours } from "@/lib/hours";
 
@@ -84,9 +84,23 @@ export async function Footer() {
       </div>
 
       <div className="border-t border-riva-cream/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-riva-muted md:flex-row md:items-center md:justify-between md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-xs text-riva-muted md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} Riva Bistro</p>
-          <p>Hornsbergs Strand · Stockholm</p>
+          <nav aria-label="Juridiska sidor" className="flex flex-wrap gap-x-4 gap-y-2">
+            <Link href="/integritetspolicy" className="transition-riva hover:text-riva-cream">
+              Integritet
+            </Link>
+            <Link href="/cookies" className="transition-riva hover:text-riva-cream">
+              Cookies
+            </Link>
+            <Link href="/villkor" className="transition-riva hover:text-riva-cream">
+              Villkor
+            </Link>
+            <Link href="/bokningspolicy" className="transition-riva hover:text-riva-cream">
+              Bokningspolicy
+            </Link>
+          </nav>
+          <p>{shortAddress()}</p>
         </div>
       </div>
     </footer>

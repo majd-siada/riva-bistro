@@ -73,6 +73,11 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm run test
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://rivabistro.se
+          NEXT_PUBLIC_API_URL: https://api.rivabistro.se
       - name: Typecheck generated API client
         working-directory: frontend/packages/api-client
         run: |

@@ -110,3 +110,7 @@ fi
 
 ok "Next: place a TEST booking on https://rivabistro.se/boka"
 ok "Expect Telegram staff alert + staff email + guest confirmation email"
+ok "API create body should include notifications.telegram / notifications.staff_email"
+ok "Admin reservation row should show telegram_notified + staff_email_notified true"
+info "If an old booking missed alerts, retry safely:"
+echo "  docker compose -f ${COMPOSE_FILE} exec ${SERVICE} python manage.py resend_reservation_notifications --unsent"

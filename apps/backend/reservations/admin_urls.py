@@ -7,6 +7,7 @@ from reservations.admin_views import (
     AdminReservationDetailView,
     AdminReservationListView,
     AdminReservationOverviewView,
+    AdminReservationResendNotificationsView,
     AdminSettingsView,
 )
 
@@ -17,6 +18,11 @@ urlpatterns = [
         "reservations/<int:pk>/",
         AdminReservationDetailView.as_view(),
         name="admin-reservation-detail",
+    ),
+    path(
+        "reservations/<int:pk>/resend-notifications/",
+        AdminReservationResendNotificationsView.as_view(),
+        name="admin-reservation-resend-notifications",
     ),
     path("hours/", AdminHoursView.as_view(), name="admin-hours"),
     path("closures/", AdminClosureListView.as_view(), name="admin-closures"),

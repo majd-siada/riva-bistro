@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import localFont from "next/font/local";
 
-import { CookieNotice } from "@/components/brand/cookie-notice";
 import { AppShell } from "@/components/layout/app-shell";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -10,6 +10,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 import "./globals.css";
+
+/** Non-critical consent UI — separate client chunk from the root shell. */
+const CookieNotice = dynamic(() =>
+  import("@/components/brand/cookie-notice").then((mod) => ({
+    default: mod.CookieNotice,
+  })),
+);
 
 const display = localFont({
   variable: "--font-display",
@@ -25,6 +32,8 @@ const sans = localFont({
   display: "swap",
 });
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
   title: {
     default: `${SITE_NAME} — Goda smaker, äkta upplevelser`,
@@ -33,7 +42,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
-  alternates: { canonical: "/" },
+  // Canonicals are set per page via createPageMetadata — do not pin all routes to "/".
   openGraph: {
     type: "website",
     locale: "sv_SE",
@@ -56,6 +65,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ["/og-image.jpg"],
   },
+  ...(googleVerification
+    ? { verification: { google: googleVerification } }
+    : {}),
 };
 
 export const viewport: Viewport = {

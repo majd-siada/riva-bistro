@@ -288,7 +288,7 @@ export function ReservationForm() {
                         aria-pressed={time === s.time}
                         onClick={() => setTime(s.time)}
                         className={
-                          "rounded-md border px-2 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
+                          "inline-flex min-h-11 min-w-[3rem] items-center justify-center rounded-md border px-3 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
                           (time === s.time
                             ? "border-riva-gold bg-riva-gold text-riva-black"
                             : s.available
@@ -317,10 +317,15 @@ export function ReservationForm() {
               value={contact.name}
               error={Boolean(errors.name)}
               aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "res-name-error" : undefined}
               onChange={(e) => setContact({ ...contact, name: e.target.value })}
               className="mt-1.5"
             />
-            {errors.name && <p className="mt-1.5 text-xs text-riva-error">{errors.name}</p>}
+            {errors.name && (
+              <p id="res-name-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+                {errors.name}
+              </p>
+            )}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -331,10 +336,15 @@ export function ReservationForm() {
                 value={contact.phone}
                 error={Boolean(errors.phone)}
                 aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "res-phone-error" : undefined}
                 onChange={(e) => setContact({ ...contact, phone: e.target.value })}
                 className="mt-1.5"
               />
-              {errors.phone && <p className="mt-1.5 text-xs text-riva-error">{errors.phone}</p>}
+              {errors.phone && (
+                <p id="res-phone-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+                  {errors.phone}
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="res-email">E-post</Label>
@@ -344,10 +354,15 @@ export function ReservationForm() {
                 value={contact.email}
                 error={Boolean(errors.email)}
                 aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "res-email-error" : undefined}
                 onChange={(e) => setContact({ ...contact, email: e.target.value })}
                 className="mt-1.5"
               />
-              {errors.email && <p className="mt-1.5 text-xs text-riva-error">{errors.email}</p>}
+              {errors.email && (
+                <p id="res-email-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+                  {errors.email}
+                </p>
+              )}
             </div>
           </div>
           <div>

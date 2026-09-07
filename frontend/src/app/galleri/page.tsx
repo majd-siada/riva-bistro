@@ -2,10 +2,15 @@ import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { Section } from "@/components/layout/section";
 import { loadGallery } from "@/lib/public-data";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Galleri",
-  description: "Bilder från Riva Bistro — matsalen, köket och kvällens stämning.",
-};
+  absoluteTitle: "Galleri — Riva Bistro Kungsholmen",
+  description:
+    "Bilder från Riva Bistro på Kungsholmen — matsalen, köket och stämningen vid Hornsbergs Strand.",
+  path: "/galleri",
+});
 
 export default async function GalleryPage() {
   const items = await loadGallery();

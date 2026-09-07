@@ -6,11 +6,15 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { EventInquiryForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Privata event",
+  absoluteTitle: "Privata event & företagsmiddagar — Riva Bistro",
   description:
-    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro.",
-};
+    "Företagsmiddagar, möten, firanden och slutna sällskap på Riva Bistro, Kungsholmen. Förfrågan för privata event.",
+  path: "/privata-event",
+});
 
 const WHY = [
   {
@@ -21,7 +25,7 @@ const WHY = [
   {
     icon: Building2,
     label: "Flexibelt",
-    text: "Hela eller delar av restaurangen — från affärslunch till galakväll.",
+    text: "Hela eller delar av restaurangen — från affärslunch till galakväll. Fråga oss om upplägg som passar er grupp.",
   },
   {
     icon: Heart,
@@ -65,8 +69,9 @@ export default function PrivateEventsPage() {
               Privata event
             </h1>
             <p className="mt-6 max-w-md leading-relaxed text-riva-muted">
-              Företagsmiddagar, möten, firanden och slutna sällskap. Berätta om
-              ert tillfälle så formar vi en kväll som känns som er.
+              Privata event och företagsmiddagar på Kungsholmen — möten, firanden och
+              slutna sällskap. Berätta om ert tillfälle så formar vi mat och upplägg
+              efter er. Hela eller delar av restaurangen går att boka.
             </p>
           </div>
           <RestaurantImage
@@ -104,7 +109,7 @@ export default function PrivateEventsPage() {
           <SectionHeading
             eyebrow="Förfrågan"
             title="Låt oss forma er kväll"
-            description="Fyll i formuläret så återkommer vi med förslag på upplägg."
+            description="Skicka en förfrågan så återkommer vi med förslag på meny och upplägg för ert privata event eller er företagsmiddag."
           />
           <EventInquiryForm />
         </div>

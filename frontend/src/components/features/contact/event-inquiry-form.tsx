@@ -135,10 +135,15 @@ export function EventInquiryForm() {
             value={values.name}
             error={Boolean(errors.name)}
             aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "ev-name-error" : undefined}
             onChange={(e) => update("name", e.target.value)}
             className="mt-1.5"
           />
-          {errors.name && <p className="mt-1.5 text-xs text-riva-error">{errors.name}</p>}
+          {errors.name && (
+            <p id="ev-name-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+              {errors.name}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="ev-email">E-post</Label>
@@ -148,10 +153,15 @@ export function EventInquiryForm() {
             value={values.email}
             error={Boolean(errors.email)}
             aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "ev-email-error" : undefined}
             onChange={(e) => update("email", e.target.value)}
             className="mt-1.5"
           />
-          {errors.email && <p className="mt-1.5 text-xs text-riva-error">{errors.email}</p>}
+          {errors.email && (
+            <p id="ev-email-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+              {errors.email}
+            </p>
+          )}
         </div>
       </div>
 
@@ -213,11 +223,16 @@ export function EventInquiryForm() {
           value={values.message}
           error={Boolean(errors.message)}
           aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "ev-message-error" : undefined}
           placeholder="Tillfälle, önskemål, upplägg…"
           onChange={(e) => update("message", e.target.value)}
           className="mt-1.5"
         />
-        {errors.message && <p className="mt-1.5 text-xs text-riva-error">{errors.message}</p>}
+        {errors.message && (
+          <p id="ev-message-error" className="mt-1.5 text-xs text-riva-error" role="alert">
+            {errors.message}
+          </p>
+        )}
       </div>
 
       {serverError && (

@@ -1,13 +1,22 @@
+import Link from "next/link";
+
+import { PageBreadcrumbs } from "@/components/seo/page-breadcrumbs";
+
 import { RestaurantImage } from "@/components/brand/restaurant-image";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { ReservationForm } from "@/components/features/booking";
 import { Section } from "@/components/layout/section";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
   title: "Boka bord",
-  description: "Boka bord på Riva Bistro — välj datum, tid och antal gäster.",
-};
+  absoluteTitle: "Boka bord — Riva Bistro Kungsholmen",
+  description:
+    "Boka bord på Riva Bistro, Kungsholmen — välj datum, tid och antal gäster online. Lunch eller middag vid Hornsbergs Strand.",
+  path: "/boka",
+});
 
 const GOOD_TO_KNOW = [
   {
@@ -30,10 +39,17 @@ export default function BookingPage() {
       <section className="relative overflow-hidden bg-riva-black">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-8 md:py-20">
           <div>
+            <PageBreadcrumbs
+              items={[
+                { name: "Hem", path: "/" },
+                { name: "Boka bord", path: "/boka" },
+              ]}
+            />
             <p className="riva-label">Reservation</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Boka bord</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Välj dag, tid och sällskap — du får en direkt bekräftelse.
+              Boka bord på Riva Bistro på Kungsholmen — välj dag, tid och sällskap
+              online. Du får en direkt bekräftelse när bokningen är klar.
             </p>
           </div>
           <RestaurantImage
@@ -47,7 +63,10 @@ export default function BookingPage() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1fr_340px]">
           <div>
-            <SectionHeading title="Din bokning" />
+            <SectionHeading
+              title="Din bokning"
+              description="Fyll i formuläret så reserverar vi bordet. Adress och öppettider hittar du under Kontakt."
+            />
             <div className="mt-8">
               <ReservationForm />
             </div>
@@ -65,6 +84,16 @@ export default function BookingPage() {
                   </CardContent>
                 </Card>
               ))}
+              <p className="pt-2 text-sm text-riva-muted">
+                Hitta hit:{" "}
+                <Link
+                  href="/kontakt"
+                  className="text-riva-cream underline-offset-4 hover:underline"
+                >
+                  adress, karta och öppettider
+                </Link>
+                .
+              </p>
             </div>
           </aside>
         </div>

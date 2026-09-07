@@ -8,30 +8,34 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { ContactForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
-import { business, fullAddress } from "@/config/business";
+import { business, fullAddress, mapsEmbedUrl } from "@/config/business";
 import { formatDayHours } from "@/lib/hours";
 import { loadHours } from "@/lib/public-data";
+import { createPageMetadata } from "@/lib/seo";
+import { FaqJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Kontakt",
-  description: "Kontakta Riva Bistro — adress, öppettider, karta och meddelandeformulär.",
-};
+  absoluteTitle: "Kontakt & hitta hit — Hornsbergs Strand, Kungsholmen",
+  description:
+    "Hitta Riva Bistro på Hornsbergs Strand 57, Kungsholmen — adress, öppettider, karta och kontaktformulär.",
+  path: "/kontakt",
+});
 
 const FAQ_ITEMS = [
   {
     question: "Hur bokar jag bord?",
     answer:
-      "Använd vår bokningssida för att välja datum, tid och antal gäster. Du får en direkt bekräftelse med bokningsnummer.",
+      "Använd sidan Boka bord för att välja datum, tid och antal gäster. När onlinebokning är aktiverad får du en bekräftelse med bokningsreferens. Annars når du oss via telefon eller formuläret på den här sidan.",
   },
   {
     question: "Kan jag boka för större sällskap?",
     answer:
-      "Ja — för grupper större än tolv personer rekommenderar vi att ni kontaktar oss via formuläret eller telefon så vi kan anpassa upplägget.",
+      "För större sällskap — särskilt över tolv personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
   },
   {
-    question: "Erbjuder ni vegetariska alternativ?",
-    answer:
-      "Absolut. Menyn innehåller flera vegetariska rätter och vår kock kan ofta anpassa rätter efter önskemål — meddela gärna vid bokning.",
+    question: "Hur når jag er?",
+    answer: `Ring ${business.phone}, mejla ${business.email}, eller skriv via formuläret. Adress: ${fullAddress()}.`,
   },
   {
     question: "Var finns ni?",
@@ -50,7 +54,8 @@ export default async function ContactPage() {
             <p className="riva-label">Hör av dig</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Kontakt</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Frågor, feedback eller specialönskemål — vi svarar så snart vi kan.
+              Hitta Riva Bistro på Hornsbergs Strand 57, Kungsholmen — vid vattnet i
+              Stockholm. Här finns adress, öppettider, karta och formulär.
             </p>
           </div>
           <RestaurantImage
@@ -70,6 +75,10 @@ export default async function ContactPage() {
               <p className="mt-3 flex items-start gap-2 text-lg text-riva-cream">
                 <MapPin className="mt-1 h-4 w-4 shrink-0 text-riva-gold" strokeWidth={1.25} />
                 {fullAddress()}
+              </p>
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-riva-muted">
+                Vi ligger på Kungsholmen vid Hornsbergs Strand, med utsikt över vattnet
+                och uteservering när vädret tillåter.
               </p>
             </div>
             <div>
@@ -143,8 +152,8 @@ export default async function ContactPage() {
         <SectionHeading title="Hitta hit" align="center" className="mx-auto" />
         <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-lg border border-riva-cream/10">
           <iframe
-            title="Karta till Riva Bistro på Hornsbergs Strand 57, Stockholm"
-            src="https://maps.google.com/maps?q=Hornsbergs+Strand+57+112+16+Stockholm&output=embed"
+            title={`Karta till Riva Bistro på ${business.address.street}, ${business.address.city}`}
+            src={mapsEmbedUrl()}
             className="aspect-[16/9] w-full border-0 bg-riva-card"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -163,6 +172,7 @@ export default async function ContactPage() {
         <SectionHeading title="Vanliga frågor" align="center" className="mx-auto" />
         <FAQ items={FAQ_ITEMS} className="mx-auto mt-8 max-w-3xl" />
       </Section>
+      <FaqJsonLd items={FAQ_ITEMS} />
     </>
   );
 }

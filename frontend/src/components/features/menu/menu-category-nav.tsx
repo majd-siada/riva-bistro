@@ -91,8 +91,8 @@ function NavChip({
   subtle?: boolean;
 }) {
   const className = cn(
-    "shrink-0 rounded-full border px-4 transition-riva",
-    subtle ? "py-1.5 text-xs" : "py-2 text-sm",
+    "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 transition-riva",
+    subtle ? "min-h-10 py-2 text-xs" : "py-2.5 text-sm",
     active
       ? "border-riva-gold/50 bg-riva-gold/15 text-riva-gold"
       : "border-riva-gold/25 text-riva-muted hover:border-riva-gold/40 hover:text-riva-cream",

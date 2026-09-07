@@ -90,14 +90,34 @@ def send_telegram_message(text: str, *, parse_mode: str | None = None) -> bool:
     )
     try:
         with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+            http_status = getattr(response, "status", None) or response.getcode()
             payload = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as exc:
+    except urllib.error.HTTPError as exc:
+        # Read error body for error_code only — never log URL (embeds token).
+        error_code = None
+        try:
+            err_payload = json.loads(exc.read().decode("utf-8"))
+            error_code = err_payload.get("error_code")
+        except (ValueError, UnicodeDecodeError, AttributeError):
+            error_code = None
+        logger.error(
+            "Telegram sendMessage failed: %s http_status=%s error_code=%s",
+            _safe_http_error(exc),
+            exc.code,
+            error_code,
+        )
+        return False
+    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
         # Do not logger.exception — the URL embeds the bot token.
         logger.error("Telegram sendMessage failed: %s", _safe_http_error(exc))
         return False
 
     if not payload.get("ok"):
-        # Do not echo Telegram description (may include chat details).
-        logger.warning("Telegram sendMessage returned not-ok")
+        # Log Telegram error_code only — descriptions can include chat details.
+        logger.warning(
+            "Telegram sendMessage returned not-ok http_status=%s error_code=%s",
+            http_status,
+            payload.get("error_code"),
+        )
         return False
     return True
