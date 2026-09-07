@@ -43,6 +43,74 @@ describe("isolateMenuHierarchy", () => {
     expect(rivas?.children?.map((c) => c.slug)).toEqual([...RIVAS_MENY_COURSE_SLUGS]);
     expect(nav.find((n) => n.slug === "take-away")?.children).toBeUndefined();
   });
+
+  it("preserves Django admin names and sort_order on existing sections", () => {
+    const fromAdmin = [
+      {
+        name: "Lunch special",
+        slug: "dagens-lunch",
+        description: "From admin",
+        sortOrder: 50,
+        parentSlug: null,
+      },
+      {
+        name: "RIVAS MENY",
+        slug: "rivas-meny",
+        description: "",
+        sortOrder: 10,
+        parentSlug: null,
+      },
+      {
+        name: "TAKE AWAY",
+        slug: "take-away",
+        description: "",
+        sortOrder: 20,
+        parentSlug: null,
+      },
+      {
+        name: "STORA SÄLLSKAPSMENY",
+        slug: "stora-sallskapsmeny",
+        description: "",
+        sortOrder: 30,
+        parentSlug: null,
+      },
+      {
+        name: "SNACKS & DRINKAR",
+        slug: "snacks-drinkar",
+        description: "",
+        sortOrder: 40,
+        parentSlug: null,
+      },
+      {
+        name: "DRYCK",
+        slug: "dryck",
+        description: "",
+        sortOrder: 60,
+        parentSlug: null,
+      },
+      {
+        name: "Förrätter",
+        slug: "forratter",
+        description: "",
+        sortOrder: 1,
+        parentSlug: "rivas-meny",
+      },
+    ];
+
+    const isolated = isolateMenuHierarchy(fromAdmin);
+    const nav = buildMenuNav(isolated);
+
+    expect(nav.map((n) => n.slug)).toEqual([
+      "rivas-meny",
+      "take-away",
+      "stora-sallskapsmeny",
+      "snacks-drinkar",
+      "dagens-lunch",
+      "dryck",
+    ]);
+    expect(nav.find((n) => n.slug === "dagens-lunch")?.name).toBe("Lunch special");
+    expect(isolated.find((c) => c.slug === "dagens-lunch")?.description).toBe("From admin");
+  });
 });
 
 describe("buildMenuPanels", () => {

@@ -168,6 +168,11 @@ After `seed_menu_sections`, `GET /api/v1/menu/categories/` should include
 `dagens-lunch`, `rivas-meny`, `take-away`, `stora-sallskapsmeny`, `snacks-drinkar`,
 `dryck`, plus course categories with `parent_slug: "rivas-meny"`.
 
+Public `/meny` **Kategorier** chips use these top-level Categories (`parent`
+empty). Rename or reorder in Django Admin **CATALOG → Categories** (`name`,
+`sort_order`, `is_active`); the seed never overwrites admin names/order after
+create.
+
 ---
 
 ## Frontend verification

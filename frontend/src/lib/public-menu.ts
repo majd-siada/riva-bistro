@@ -109,27 +109,36 @@ export function catalogHasMenuSections(
  * - six isolated top-level sections
  * - Förrätter…Desserter nested only under RIVAS MENY
  *
- * Merges missing section shells from the static catalog so a flat API
- * response cannot leak course categories into the top level.
+ * Django Admin (CATALOG → Categories) owns name and sort_order for rows that
+ * already exist in the API. Static shells are only filled in when a section is
+ * missing (legacy flat catalogs), so the Kategorier bar matches administration.
  */
 export function isolateMenuHierarchy(categories: PublicCategory[]): PublicCategory[] {
   const bySlug = new Map<string, PublicCategory>();
+  const fromCatalog = new Set<string>();
 
   for (const category of categories) {
     bySlug.set(category.slug, { ...category });
+    fromCatalog.add(category.slug);
   }
 
-  // Ensure the six section shells exist (names/order from static defaults).
+  // Ensure the six section shells exist; keep admin name/sort_order when present.
   for (const section of staticMenu().categories.filter((c) => c.parentSlug == null)) {
     const existing = bySlug.get(section.slug);
     if (!existing) {
       bySlug.set(section.slug, { ...section });
+    } else if (fromCatalog.has(section.slug)) {
+      bySlug.set(section.slug, {
+        ...existing,
+        parentSlug: null,
+        name: existing.name.trim() ? existing.name : section.name,
+      });
     } else {
       bySlug.set(section.slug, {
         ...existing,
         parentSlug: null,
         sortOrder: section.sortOrder,
-        name: existing.name || section.name,
+        name: existing.name.trim() ? existing.name : section.name,
       });
     }
   }
@@ -139,12 +148,18 @@ export function isolateMenuHierarchy(categories: PublicCategory[]): PublicCatego
     const existing = bySlug.get(course.slug);
     if (!existing) {
       bySlug.set(course.slug, { ...course, parentSlug: "rivas-meny" });
+    } else if (fromCatalog.has(course.slug)) {
+      bySlug.set(course.slug, {
+        ...existing,
+        parentSlug: "rivas-meny",
+        name: existing.name.trim() ? existing.name : course.name,
+      });
     } else {
       bySlug.set(course.slug, {
         ...existing,
         parentSlug: "rivas-meny",
-        sortOrder: existing.sortOrder || course.sortOrder,
-        name: existing.name || course.name,
+        sortOrder: course.sortOrder,
+        name: existing.name.trim() ? existing.name : course.name,
         description: existing.description || course.description,
       });
     }
