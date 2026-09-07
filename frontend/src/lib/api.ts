@@ -128,15 +128,32 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Next.js fetch cache policy for public read-only content.
+ * Writes, availability, auth, and health stay no-store (default).
+ */
+export const CACHE_REVALIDATE_SECONDS = {
+  catalog: 60,
+  hours: 300,
+  news: 120,
+  gallery: 300,
+} as const;
+
+/** Mirrors apiFetch cache option selection — exported for unit tests. */
+export function resolveFetchCacheOptions(opts?: {
+  revalidate?: number;
+}): { next: { revalidate: number } } | { cache: "no-store" } {
+  return opts?.revalidate != null
+    ? { next: { revalidate: opts.revalidate } }
+    : { cache: "no-store" };
+}
+
 async function apiFetch<T>(
   path: string,
   init?: RequestInit,
   opts?: { revalidate?: number },
 ): Promise<T> {
-  const cacheOpts =
-    opts?.revalidate != null
-      ? { next: { revalidate: opts.revalidate } }
-      : { cache: "no-store" as const };
+  const cacheOpts = resolveFetchCacheOptions(opts);
   const res = await fetch(`${getApiBase()}/api/v1${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
@@ -178,24 +195,34 @@ export async function fetchHealth(): Promise<{ status: string }> {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  return apiFetch("/menu/categories/");
+  return apiFetch("/menu/categories/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.catalog,
+  });
 }
 
 export async function fetchProducts(category?: string): Promise<Product[]> {
   const q = category ? `?category=${encodeURIComponent(category)}` : "";
-  return apiFetch(`/menu/products/${q}`);
+  return apiFetch(`/menu/products/${q}`, undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.catalog,
+  });
 }
 
 export async function fetchFeatured(): Promise<Product[]> {
-  return apiFetch("/menu/featured/");
+  return apiFetch("/menu/featured/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.catalog,
+  });
 }
 
 export async function fetchProduct(slug: string): Promise<ProductDetail> {
-  return apiFetch(`/menu/products/${slug}/`);
+  return apiFetch(`/menu/products/${slug}/`, undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.catalog,
+  });
 }
 
 export async function fetchHours(): Promise<OpeningHour[]> {
-  return apiFetch("/hours/", undefined, { revalidate: 300 });
+  return apiFetch("/hours/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.hours,
+  });
 }
 
 export async function fetchAvailability(date: string): Promise<Availability> {
@@ -267,9 +294,13 @@ export type AdminEventInquiry = {
 };
 
 export async function fetchNews(): Promise<NewsItem[]> {
-  return apiFetch("/news/", undefined, { revalidate: 120 });
+  return apiFetch("/news/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.news,
+  });
 }
 
 export async function fetchGallery(): Promise<GalleryItem[]> {
-  return apiFetch("/gallery/", undefined, { revalidate: 300 });
+  return apiFetch("/gallery/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.gallery,
+  });
 }

@@ -55,7 +55,7 @@ export default async function HomePage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <RestaurantImage
               src={signature.imageUrl || "/scenes/menu-tabletop.jpg"}
-              alt={signature.name}
+              alt={`${signature.name} — rätt från Riva Bistro`}
               aspectRatio="wide"
             />
             <FeaturedDish

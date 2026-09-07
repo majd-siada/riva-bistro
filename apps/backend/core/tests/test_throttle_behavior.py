@@ -79,3 +79,25 @@ def test_reservations_throttle_returns_429(monkeypatch):
     assert statuses[0] != 429
     assert statuses[1] != 429
     assert statuses[2] == 429, statuses
+
+
+@pytest.mark.django_db
+def test_inquiries_throttle_returns_429(monkeypatch):
+    framework = copy.deepcopy(settings.REST_FRAMEWORK)
+    rates = {
+        **framework.get("DEFAULT_THROTTLE_RATES", {}),
+        "inquiries": "2/min",
+    }
+    framework["DEFAULT_THROTTLE_RATES"] = rates
+    monkeypatch.setattr(ScopedRateThrottle, "THROTTLE_RATES", rates)
+
+    client = APIClient()
+    payload = {"name": "Erik", "email": "erik@example.com", "message": "Hej"}
+    with override_settings(REST_FRAMEWORK=framework):
+        statuses = [
+            client.post("/api/v1/contact/", payload, format="json").status_code
+            for _ in range(3)
+        ]
+    assert statuses[0] != 429
+    assert statuses[1] != 429
+    assert statuses[2] == 429, statuses

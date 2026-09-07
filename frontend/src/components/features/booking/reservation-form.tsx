@@ -288,7 +288,7 @@ export function ReservationForm() {
                         aria-pressed={time === s.time}
                         onClick={() => setTime(s.time)}
                         className={
-                          "rounded-md border px-2 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
+                          "inline-flex min-h-11 min-w-[3rem] items-center justify-center rounded-md border px-3 py-2 text-sm tabular-nums transition-riva focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-riva-gold " +
                           (time === s.time
                             ? "border-riva-gold bg-riva-gold text-riva-black"
                             : s.available

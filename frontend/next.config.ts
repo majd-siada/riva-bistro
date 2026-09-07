@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 import path from "node:path";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+  openAnalyzer: false,
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -8,6 +14,10 @@ const nextConfig: NextConfig = {
   // Monorepo: production deps (e.g. next) are hoisted to the repository root.
   outputFileTracingRoot: path.join(__dirname, ".."),
   transpilePackages: ["@riva-bistro/api-client"],
+  // Tree-shake icon imports instead of pulling the full lucide-react barrel.
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "localhost", port: "8000" },
@@ -52,4 +62,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

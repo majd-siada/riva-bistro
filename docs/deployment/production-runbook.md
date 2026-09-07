@@ -97,6 +97,9 @@ docker compose -f docker-compose.production.yml ps
 
 ### Rollback
 
+See also the accepted **manual-deploy / non-ZDD** limitation:
+[zero-downtime-limitation.md](./zero-downtime-limitation.md).
+
 ```bash
 git log --oneline -n 10
 git checkout <known-good-sha>

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 
 import { formatPrice } from "@/lib/format";
@@ -26,7 +24,7 @@ export function FoodCard({
         <div className="relative aspect-[16/10] bg-riva-surface">
           <Image
             src={imageSrc}
-            alt={name}
+            alt={`${name} — Riva Bistro`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover"

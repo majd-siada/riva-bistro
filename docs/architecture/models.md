@@ -24,11 +24,18 @@ No separate ERD tool is required for MVP; this file plus migrations are the sche
 
 ## Caching strategy (MVP)
 
-| Layer | Behavior |
-|-------|----------|
-| Public catalog API | Django responses are not long-cached at the app layer; Next.js `fetch` uses short `revalidate` (e.g. meny `revalidate = 60`). |
-| Booking / auth / inquiries | No-store semantics; DRF throttles protect write endpoints. |
-| Static frontend | Hostinger/CDN serves the Next build; image optimization via `next/image`. |
-| Django cache | Default cache backs DRF throttle counters (cleared between tests). |
+Source of truth: `frontend/src/lib/api.ts` (`CACHE_REVALIDATE_SECONDS` + `resolveFetchCacheOptions`).
 
-Do not invent a separate Redis/CDN product solely for checklist completion — Hostinger + short ISR is the intentional MVP posture.
+| Data | Next.js fetch behavior |
+|------|------------------------|
+| Menu catalog (`/menu/categories/`, `/menu/products/`, `/menu/featured/`, product by slug) | `revalidate: 60` (aligned with `/meny` page `revalidate = 60`) |
+| Opening hours | `revalidate: 300` |
+| News | `revalidate: 120` |
+| Gallery | `revalidate: 300` |
+| Availability, health, auth, reservation/contact/event **writes** | `cache: "no-store"` (default when `revalidate` omitted) |
+
+- Django does **not** long-cache public JSON at the app layer; freshness is controlled by Next fetch revalidation.
+- Django’s default cache backs **DRF throttle counters** only.
+- Static site assets are served by Hostinger; images use `next/image` (no Redis/CDN product invented for MVP).
+
+Do not claim catalog caching unless catalog fetches pass an explicit `revalidate` (as above).
