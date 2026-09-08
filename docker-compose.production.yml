@@ -30,10 +30,11 @@ services:
     volumes:
       - riva_media_data:/app/media
     healthcheck:
+      # ALLOWED_HOSTS is the public API host only; local URL must send that Host.
       test:
         [
           "CMD-SHELL",
-          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/')\"",
+          "python -c \"import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/api/v1/health/', headers={'Host': 'api.rivabistro.se'}))\"",
         ]
       interval: 15s
       timeout: 5s

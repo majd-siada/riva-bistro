@@ -136,6 +136,14 @@ def _send_via_hostinger(
 
 
 def _send_via_django(*, to: str, subject: str, text: str, html: str) -> bool:
+    backend = (getattr(settings, "EMAIL_BACKEND", "") or "").strip()
+    if "smtp.EmailBackend" in backend and not (
+        getattr(settings, "EMAIL_HOST", "") or ""
+    ).strip():
+        logger.warning(
+            "Django staff reservation email skipped: EMAIL_HOST not configured"
+        )
+        return False
     try:
         message = EmailMultiAlternatives(
             subject=subject,

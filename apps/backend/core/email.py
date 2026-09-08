@@ -8,6 +8,14 @@ from django.core.mail import EmailMessage
 logger = logging.getLogger("riva.email")
 
 
+def _smtp_ready() -> bool:
+    """True when SMTP can be attempted, or when not using the SMTP backend."""
+    backend = (getattr(settings, "EMAIL_BACKEND", "") or "").strip()
+    if "smtp.EmailBackend" not in backend:
+        return True
+    return bool((getattr(settings, "EMAIL_HOST", "") or "").strip())
+
+
 def _send(subject: str, body: str, to: list[str], reply_to: str | None = None) -> bool:
     """Send one email. Returns True only if the backend accepted it.
 
@@ -19,6 +27,12 @@ def _send(subject: str, body: str, to: list[str], reply_to: str | None = None) -
     recipients = [addr for addr in to if addr]
     if not recipients:
         logger.warning("Email '%s' skipped: no recipient configured", subject)
+        return False
+    if not _smtp_ready():
+        logger.warning(
+            "Email '%s' skipped: EMAIL_HOST not configured for SMTP backend",
+            subject,
+        )
         return False
     try:
         message = EmailMessage(
