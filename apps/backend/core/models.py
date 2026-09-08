@@ -127,7 +127,7 @@ class RestaurantProfile(models.Model):
         pass
 
     @classmethod
-    def load(cls) -> "RestaurantProfile":
+    def load(cls) -> RestaurantProfile:
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
@@ -183,7 +183,7 @@ class SiteContent(models.Model):
         pass
 
     @classmethod
-    def load(cls) -> "SiteContent":
+    def load(cls) -> SiteContent:
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
