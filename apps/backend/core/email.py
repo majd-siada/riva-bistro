@@ -50,7 +50,45 @@ def _send(subject: str, body: str, to: list[str], reply_to: str | None = None) -
 
 
 def _notification_recipient() -> str:
-    return getattr(settings, "RESTAURANT_NOTIFICATION_EMAIL", "") or ""
+    return (getattr(settings, "RESTAURANT_NOTIFICATION_EMAIL", "") or "").strip()
+
+
+def _send_via_hostinger_or_smtp(
+    *,
+    subject: str,
+    body: str,
+    to: str,
+    reply_to: str | None = None,
+) -> bool:
+    """Deliver mail using the same Hostinger → SMTP stack as staff alerts.
+
+    Prefer Hostinger Mail API when configured (production path). Fall back to
+    Django EMAIL_* / SMTP. Used by contact + private-event inquiries so they
+    reach the restaurant inbox even when EMAIL_HOST is empty.
+    """
+    to = (to or "").strip()
+    if not to:
+        logger.warning("Email '%s' skipped: no recipient", subject)
+        return False
+
+    from core.notifications.staff_email import (
+        hostinger_api_configured,
+        send_email_via_hostinger,
+    )
+
+    if hostinger_api_configured():
+        html = (
+            "<pre style='font-family:system-ui,sans-serif;white-space:pre-wrap'>"
+            f"{body}</pre>"
+        )
+        if send_email_via_hostinger(to=to, subject=subject, text=body, html=html):
+            return True
+        logger.warning(
+            "Hostinger Mail API failed for '%s'; falling back to Django email",
+            subject,
+        )
+
+    return _send(subject, body, [to], reply_to=reply_to)
 
 
 def send_reservation_confirmation(reservation) -> bool:
@@ -112,15 +150,22 @@ def send_contact_message(
         f"Ämne: {subject.strip() or '-'}\n\n"
         f"Meddelande:\n{message}\n"
     )
-    restaurant_ok = _send(
-        mail_subject, body, [_notification_recipient()], reply_to=email
+    restaurant_ok = _send_via_hostinger_or_smtp(
+        subject=mail_subject,
+        body=body,
+        to=_notification_recipient(),
+        reply_to=email,
     )
     ack = (
         f"Hej {name},\n\n"
         "Tack för ditt meddelande till Riva Bistro. Vi återkommer så snart vi kan.\n\n"
         "Vänliga hälsningar\nRiva Bistro\n"
     )
-    _send("Tack för ditt meddelande — Riva Bistro", ack, [email])
+    _send_via_hostinger_or_smtp(
+        subject="Tack för ditt meddelande — Riva Bistro",
+        body=ack,
+        to=email,
+    )
     return restaurant_ok
 
 
@@ -144,13 +189,20 @@ def send_event_inquiry(
         f"Önskat datum: {date or '-'}\n\n"
         f"Meddelande:\n{message}\n"
     )
-    restaurant_ok = _send(
-        subject, body, [_notification_recipient()], reply_to=email
+    restaurant_ok = _send_via_hostinger_or_smtp(
+        subject=subject,
+        body=body,
+        to=_notification_recipient(),
+        reply_to=email,
     )
     ack = (
         f"Hej {name},\n\n"
         "Vi har tagit emot er förfrågan om privat event och återkommer så snart vi kan.\n\n"
         "Vänliga hälsningar\nRiva Bistro\n"
     )
-    _send("Tack för er förfrågan — Riva Bistro", ack, [email])
+    _send_via_hostinger_or_smtp(
+        subject="Tack för er förfrågan — Riva Bistro",
+        body=ack,
+        to=email,
+    )
     return restaurant_ok

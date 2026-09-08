@@ -56,6 +56,68 @@ def test_event_inquiry_persists(api, settings, mailoutbox):
 
 
 @pytest.mark.django_db
+def test_contact_uses_hostinger_when_smtp_unset(api, settings):
+    """Contact → restaurant uses Hostinger Mail API when EMAIL_HOST is empty."""
+    from unittest.mock import patch
+
+    settings.RESTAURANT_NOTIFICATION_EMAIL = "info@rivabistro.se"
+    settings.EMAIL_HOST = ""
+    settings.HOSTINGER_MAIL_API_TOKEN = "hostinger-token"
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = "mailbox-id"
+
+    with patch(
+        "core.notifications.staff_email.send_email_via_hostinger",
+        return_value=True,
+    ) as hostinger:
+        resp = api.post(
+            "/api/v1/contact/",
+            {
+                "name": "Erik",
+                "email": "erik@example.com",
+                "message": "Hej, en fråga om bokning.",
+            },
+            format="json",
+        )
+    assert resp.status_code == 200
+    assert resp.json()["email_sent"] is True
+    assert ContactMessage.objects.filter(email_sent=True).exists()
+    # Restaurant notification + guest acknowledgement
+    assert hostinger.call_count == 2
+    assert hostinger.call_args_list[0].kwargs["to"] == "info@rivabistro.se"
+    assert hostinger.call_args_list[1].kwargs["to"] == "erik@example.com"
+
+
+@pytest.mark.django_db
+def test_event_inquiry_uses_hostinger_when_smtp_unset(api, settings):
+    from unittest.mock import patch
+
+    settings.RESTAURANT_NOTIFICATION_EMAIL = "info@rivabistro.se"
+    settings.EMAIL_HOST = ""
+    settings.HOSTINGER_MAIL_API_TOKEN = "hostinger-token"
+    settings.HOSTINGER_MAIL_MAILBOX_RESOURCE_ID = "mailbox-id"
+
+    with patch(
+        "core.notifications.staff_email.send_email_via_hostinger",
+        return_value=True,
+    ) as hostinger:
+        resp = api.post(
+            "/api/v1/events/inquiry/",
+            {
+                "name": "Bolag AB",
+                "email": "event@bolag.se",
+                "guests": "20",
+                "message": "Vi vill boka för 20 personer.",
+            },
+            format="json",
+        )
+    assert resp.status_code == 200
+    assert resp.json()["email_sent"] is True
+    assert EventInquiry.objects.filter(email_sent=True).exists()
+    assert hostinger.call_count == 2
+    assert hostinger.call_args_list[0].kwargs["to"] == "info@rivabistro.se"
+
+
+@pytest.mark.django_db
 def test_contact_validation_error(api):
     resp = api.post(
         "/api/v1/contact/",
