@@ -16,6 +16,11 @@ from core.images import (
     MAX_IMAGE_BYTES,
     sniff_image_kind,
 )
+from core.revalidate import trigger_frontend_revalidation
+
+
+def _revalidate_menu() -> None:
+    trigger_frontend_revalidation(["/", "/meny"])
 
 
 class AdminCategoryListCreateView(generics.ListCreateAPIView):
@@ -23,11 +28,23 @@ class AdminCategoryListCreateView(generics.ListCreateAPIView):
     serializer_class = AdminCategorySerializer
     queryset = Category.objects.all()
 
+    def perform_create(self, serializer):
+        serializer.save()
+        _revalidate_menu()
+
 
 class AdminCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = AdminCategorySerializer
     queryset = Category.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        _revalidate_menu()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        _revalidate_menu()
 
 
 class AdminProductListCreateView(generics.ListCreateAPIView):
@@ -38,6 +55,10 @@ class AdminProductListCreateView(generics.ListCreateAPIView):
     def get_serializer_context(self):
         return {"request": self.request}
 
+    def perform_create(self, serializer):
+        serializer.save()
+        _revalidate_menu()
+
 
 class AdminProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
@@ -46,6 +67,14 @@ class AdminProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_serializer_context(self):
         return {"request": self.request}
+
+    def perform_update(self, serializer):
+        serializer.save()
+        _revalidate_menu()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        _revalidate_menu()
 
 
 class AdminProductImageView(APIView):
@@ -95,5 +124,6 @@ class AdminProductImageView(APIView):
             )
         product.image = image
         product.save(update_fields=["image", "updated_at"])
+        trigger_frontend_revalidation(["/", "/meny"])
         serializer = AdminProductSerializer(product, context={"request": request})
         return Response(serializer.data)

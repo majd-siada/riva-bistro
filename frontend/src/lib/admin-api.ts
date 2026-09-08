@@ -235,3 +235,178 @@ export async function adminResendReservationNotifications(id: number) {
     method: "POST",
   });
 }
+
+/* --- Content CMS (news, gallery, offers, site, restaurant) --- */
+
+export type AdminNewsItem = {
+  id: number;
+  title: string;
+  slug: string;
+  body: string;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AdminGalleryItem = {
+  id: number;
+  title: string;
+  alt: string;
+  image?: string | null;
+  image_url: string;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+};
+
+export type AdminOffer = {
+  id: number;
+  title: string;
+  description: string;
+  image?: string | null;
+  image_url: string;
+  src: string;
+  price_label: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RestaurantProfile = {
+  name: string;
+  tagline: string;
+  street: string;
+  postal_code: string;
+  city: string;
+  country: string;
+  area: string;
+  phone: string;
+  phone_e164: string;
+  email: string;
+  map_url: string;
+  social_instagram: string;
+  social_facebook: string;
+  social_verified: boolean;
+  kitchen_hours: string;
+  updated_at?: string;
+};
+
+export type SiteContent = {
+  hero_title: string;
+  hero_body: string;
+  hero_image?: string | null;
+  hero_image_url: string;
+  hero_src: string;
+  primary_cta_label: string;
+  primary_cta_href: string;
+  secondary_cta_label: string;
+  secondary_cta_href: string;
+  about_title: string;
+  about_body: string;
+  about_image?: string | null;
+  about_image_url: string;
+  about_src: string;
+  updated_at?: string;
+};
+
+export async function adminListNews() {
+  return request<AdminNewsItem[]>("/admin/news/");
+}
+
+export async function adminCreateNews(data: Partial<AdminNewsItem>) {
+  return request<AdminNewsItem>("/admin/news/", { method: "POST", body: data });
+}
+
+export async function adminUpdateNews(id: number, data: Partial<AdminNewsItem>) {
+  return request<AdminNewsItem>(`/admin/news/${id}/`, { method: "PATCH", body: data });
+}
+
+export async function adminDeleteNews(id: number) {
+  return request<void>(`/admin/news/${id}/`, { method: "DELETE" });
+}
+
+export async function adminListGallery() {
+  return request<AdminGalleryItem[]>("/admin/gallery/");
+}
+
+export async function adminCreateGallery(data: FormData | Partial<AdminGalleryItem>) {
+  if (data instanceof FormData) {
+    return request<AdminGalleryItem>("/admin/gallery/", {
+      method: "POST",
+      body: data,
+      isForm: true,
+    });
+  }
+  return request<AdminGalleryItem>("/admin/gallery/", { method: "POST", body: data });
+}
+
+export async function adminUpdateGallery(
+  id: number,
+  data: FormData | Partial<AdminGalleryItem>,
+) {
+  if (data instanceof FormData) {
+    return request<AdminGalleryItem>(`/admin/gallery/${id}/`, {
+      method: "PATCH",
+      body: data,
+      isForm: true,
+    });
+  }
+  return request<AdminGalleryItem>(`/admin/gallery/${id}/`, { method: "PATCH", body: data });
+}
+
+export async function adminDeleteGallery(id: number) {
+  return request<void>(`/admin/gallery/${id}/`, { method: "DELETE" });
+}
+
+export async function adminListOffers() {
+  return request<AdminOffer[]>("/admin/offers/");
+}
+
+export async function adminCreateOffer(data: FormData | Partial<AdminOffer>) {
+  if (data instanceof FormData) {
+    return request<AdminOffer>("/admin/offers/", { method: "POST", body: data, isForm: true });
+  }
+  return request<AdminOffer>("/admin/offers/", { method: "POST", body: data });
+}
+
+export async function adminUpdateOffer(id: number, data: FormData | Partial<AdminOffer>) {
+  if (data instanceof FormData) {
+    return request<AdminOffer>(`/admin/offers/${id}/`, {
+      method: "PATCH",
+      body: data,
+      isForm: true,
+    });
+  }
+  return request<AdminOffer>(`/admin/offers/${id}/`, { method: "PATCH", body: data });
+}
+
+export async function adminDeleteOffer(id: number) {
+  return request<void>(`/admin/offers/${id}/`, { method: "DELETE" });
+}
+
+export async function adminGetRestaurantProfile() {
+  return request<RestaurantProfile>("/admin/restaurant/");
+}
+
+export async function adminUpdateRestaurantProfile(data: Partial<RestaurantProfile>) {
+  return request<RestaurantProfile>("/admin/restaurant/", { method: "PATCH", body: data });
+}
+
+export async function adminGetSiteContent() {
+  return request<SiteContent>("/admin/site-content/");
+}
+
+export async function adminUpdateSiteContent(data: FormData | Partial<SiteContent>) {
+  if (data instanceof FormData) {
+    return request<SiteContent>("/admin/site-content/", {
+      method: "PATCH",
+      body: data,
+      isForm: true,
+    });
+  }
+  return request<SiteContent>("/admin/site-content/", { method: "PATCH", body: data });
+}

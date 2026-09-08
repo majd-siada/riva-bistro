@@ -8,9 +8,13 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { ContactForm } from "@/components/features/contact";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
-import { business, fullAddress, mapsEmbedUrl } from "@/config/business";
 import { formatDayHours } from "@/lib/hours";
-import { loadHours } from "@/lib/public-data";
+import { loadHours, loadRestaurantBusiness } from "@/lib/public-data";
+import {
+  fullAddressFrom,
+  mapsEmbedUrlFrom,
+  type PublicBusiness,
+} from "@/lib/public-business";
 import { createPageMetadata } from "@/lib/seo";
 import { FaqJsonLd } from "@/components/seo/json-ld";
 
@@ -22,29 +26,37 @@ export const metadata: Metadata = createPageMetadata({
   path: "/kontakt",
 });
 
-const FAQ_ITEMS = [
-  {
-    question: "Hur bokar jag bord?",
-    answer:
-      "Använd sidan Boka bord för att välja datum, tid och antal gäster. När onlinebokning är aktiverad får du en bekräftelse med bokningsreferens. Annars når du oss via telefon eller formuläret på den här sidan.",
-  },
-  {
-    question: "Kan jag boka för större sällskap?",
-    answer:
-      "För större sällskap — särskilt över tolv personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
-  },
-  {
-    question: "Hur når jag er?",
-    answer: `Ring ${business.phone}, mejla ${business.email}, eller skriv via formuläret. Adress: ${fullAddress()}.`,
-  },
-  {
-    question: "Var finns ni?",
-    answer: `Vi finns på ${fullAddress()} på Kungsholmen i Stockholm. Använd kartan nedan för vägbeskrivning.`,
-  },
-];
+function contactFaqs(business: PublicBusiness) {
+  const address = fullAddressFrom(business);
+  return [
+    {
+      question: "Hur bokar jag bord?",
+      answer:
+        "Använd sidan Boka bord för att välja datum, tid och antal gäster. När onlinebokning är aktiverad får du en bekräftelse med bokningsreferens. Annars når du oss via telefon eller formuläret på den här sidan.",
+    },
+    {
+      question: "Kan jag boka för större sällskap?",
+      answer:
+        "För större sällskap — särskilt över tolv personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
+    },
+    {
+      question: "Hur når jag er?",
+      answer: `Ring ${business.phone}, mejla ${business.email}, eller skriv via formuläret. Adress: ${address}.`,
+    },
+    {
+      question: "Var finns ni?",
+      answer: `Vi finns på ${address} på Kungsholmen i Stockholm. Använd kartan nedan för vägbeskrivning.`,
+    },
+  ];
+}
 
 export default async function ContactPage() {
-  const hours = await loadHours();
+  const [hours, business] = await Promise.all([
+    loadHours(),
+    loadRestaurantBusiness(),
+  ]);
+  const faqItems = contactFaqs(business);
+  const address = fullAddressFrom(business);
 
   return (
     <>
@@ -54,7 +66,7 @@ export default async function ContactPage() {
             <p className="riva-label">Hör av dig</p>
             <h1 className="mt-4 font-display text-5xl text-riva-cream md:text-6xl">Kontakt</h1>
             <p className="mt-4 max-w-md text-riva-muted">
-              Hitta Riva Bistro på Hornsbergs Strand 57, Kungsholmen — vid vattnet i
+              Hitta {business.name} på {business.street}, {business.area} — vid vattnet i
               Stockholm. Här finns adress, öppettider, karta och formulär.
             </p>
           </div>
@@ -74,7 +86,7 @@ export default async function ContactPage() {
               <h2 className="riva-label">Besök oss</h2>
               <p className="mt-3 flex items-start gap-2 text-lg text-riva-cream">
                 <MapPin className="mt-1 h-4 w-4 shrink-0 text-riva-gold" strokeWidth={1.25} />
-                {fullAddress()}
+                {address}
               </p>
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-riva-muted">
                 Vi ligger på Kungsholmen vid Hornsbergs Strand, med utsikt över vattnet
@@ -152,8 +164,8 @@ export default async function ContactPage() {
         <SectionHeading title="Hitta hit" align="center" className="mx-auto" />
         <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-lg border border-riva-cream/10">
           <iframe
-            title={`Karta till Riva Bistro på ${business.address.street}, ${business.address.city}`}
-            src={mapsEmbedUrl()}
+            title={`Karta till ${business.name} på ${business.street}, ${business.city}`}
+            src={mapsEmbedUrlFrom(business)}
             className="aspect-[16/9] w-full border-0 bg-riva-card"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -170,9 +182,9 @@ export default async function ContactPage() {
 
       <Section>
         <SectionHeading title="Vanliga frågor" align="center" className="mx-auto" />
-        <FAQ items={FAQ_ITEMS} className="mx-auto mt-8 max-w-3xl" />
+        <FAQ items={faqItems} className="mx-auto mt-8 max-w-3xl" />
       </Section>
-      <FaqJsonLd items={FAQ_ITEMS} />
+      <FaqJsonLd items={faqItems} />
     </>
   );
 }

@@ -1,28 +1,34 @@
 import { Clock, MapPin, Phone } from "lucide-react";
 
-import { business, fullAddress } from "@/config/business";
+import { business as fallbackBusiness, fullAddress as fallbackFullAddress } from "@/config/business";
 import type { OpeningHour } from "@/lib/api";
 import { todayHoursLabel } from "@/lib/hours";
+import {
+  fullAddressFrom,
+  type PublicBusiness,
+} from "@/lib/public-business";
 import { cn } from "@/lib/utils";
 
 export function HoursStrip({
   hours,
   className,
+  business,
 }: {
   hours: OpeningHour[];
   className?: string;
+  business?: PublicBusiness;
 }) {
+  const address = business ? fullAddressFrom(business) : fallbackFullAddress();
+  const mapUrl = business?.mapUrl ?? fallbackBusiness.mapUrl;
+  const phone = business?.phone ?? fallbackBusiness.phone;
+  const phoneHref = business?.phoneHref ?? fallbackBusiness.phoneHref;
+
   return (
-    <div
-      className={cn(
-        "grid gap-3 sm:grid-cols-3",
-        className,
-      )}
-    >
+    <div className={cn("grid gap-3 sm:grid-cols-3", className)}>
       <InfoChip icon={Clock} label="Öppettider" value={todayHoursLabel(hours)} />
-      <InfoChip icon={MapPin} label="Adress" value={fullAddress()} href={business.mapUrl} />
-      {business.phone ? (
-        <InfoChip icon={Phone} label="Telefon" value={business.phone} href={business.phoneHref} />
+      <InfoChip icon={MapPin} label="Adress" value={address} href={mapUrl} />
+      {phone ? (
+        <InfoChip icon={Phone} label="Telefon" value={phone} href={phoneHref} />
       ) : null}
     </div>
   );

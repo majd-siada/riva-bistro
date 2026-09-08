@@ -69,6 +69,12 @@ describe("AdminShell QA smoke", () => {
       "page",
     );
     expect(screen.getByRole("link", { name: "Meny" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Lunch" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Nyheter" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Galleri" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Erbjudanden" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Startsida" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Restaurang" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Öppettider" })).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Inställningar" }),

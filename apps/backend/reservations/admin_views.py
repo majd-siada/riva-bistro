@@ -119,6 +119,9 @@ class AdminHoursView(APIView):
                     "is_closed": row.get("is_closed", False),
                 },
             )
+        from core.revalidate import trigger_frontend_revalidation
+
+        trigger_frontend_revalidation(["/", "/kontakt", "/boka", "/meny"])
         return Response(OpeningHoursSerializer(OpeningHours.objects.all(), many=True).data)
 
 

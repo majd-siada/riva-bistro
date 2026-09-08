@@ -2,12 +2,15 @@ import Link from "next/link";
 
 import { GoldDivider } from "@/components/brand/gold-divider";
 import { Logo } from "@/components/brand/logo";
-import { business, fullAddress, shortAddress } from "@/config/business";
-import { loadHours } from "@/lib/public-data";
+import { loadHours, loadRestaurantBusiness } from "@/lib/public-data";
 import { formatDayHours } from "@/lib/hours";
+import { fullAddressFrom, shortAddressFrom } from "@/lib/public-business";
 
 export async function Footer() {
-  const hours = await loadHours();
+  const [hours, business] = await Promise.all([
+    loadHours(),
+    loadRestaurantBusiness(),
+  ]);
 
   return (
     <footer className="border-t border-riva-cream/10 bg-riva-black">
@@ -15,8 +18,8 @@ export async function Footer() {
         <div>
           <Logo />
           <p className="mt-6 max-w-xs text-sm leading-relaxed text-riva-muted">
-            {business.tagline}. Svensk gastronomi i en stillsam, cinematisk miljö på
-            Kungsholmen.
+            {business.tagline}. Svensk gastronomi i en stillsam, cinematisk miljö på{" "}
+            {business.area}.
           </p>
           <GoldDivider className="mt-6 max-w-[80px] opacity-40" variant="short" />
         </div>
@@ -44,10 +47,13 @@ export async function Footer() {
         <div>
           <h2 className="riva-label">Besök oss</h2>
           <address className="mt-4 space-y-2.5 text-sm not-italic text-riva-muted">
-            <p>{fullAddress()}</p>
+            <p>{fullAddressFrom(business)}</p>
             {business.phone ? (
               <p>
-                <a href={business.phoneHref} className="transition-riva hover:text-riva-cream">
+                <a
+                  href={business.phoneHref}
+                  className="transition-riva hover:text-riva-cream"
+                >
                   {business.phone}
                 </a>
               </p>
@@ -75,7 +81,9 @@ export async function Footer() {
               ))}
             </ul>
           ) : (
-            <p className="mt-4 text-sm text-riva-muted">{business.restaurantHoursLabel}</p>
+            <p className="mt-4 text-sm text-riva-muted">
+              {business.restaurantHoursLabel}
+            </p>
           )}
           {business.kitchenHours ? (
             <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
@@ -85,7 +93,7 @@ export async function Footer() {
 
       <div className="border-t border-riva-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-xs text-riva-muted md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© {new Date().getFullYear()} Riva Bistro</p>
+          <p>© {new Date().getFullYear()} {business.name}</p>
           <nav aria-label="Juridiska sidor" className="flex flex-wrap gap-x-4 gap-y-2">
             <Link href="/integritetspolicy" className="transition-riva hover:text-riva-cream">
               Integritet
@@ -100,7 +108,7 @@ export async function Footer() {
               Bokningspolicy
             </Link>
           </nav>
-          <p>{shortAddress()}</p>
+          <p>{shortAddressFrom(business)}</p>
         </div>
       </div>
     </footer>

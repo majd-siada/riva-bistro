@@ -137,6 +137,9 @@ export const CACHE_REVALIDATE_SECONDS = {
   hours: 300,
   news: 120,
   gallery: 300,
+  site: 60,
+  offers: 60,
+  restaurant: 120,
 } as const;
 
 /** Mirrors apiFetch cache option selection — exported for unit tests. */
@@ -302,5 +305,67 @@ export async function fetchNews(): Promise<NewsItem[]> {
 export async function fetchGallery(): Promise<GalleryItem[]> {
   return apiFetch("/gallery/", undefined, {
     revalidate: CACHE_REVALIDATE_SECONDS.gallery,
+  });
+}
+
+export type RestaurantProfile = {
+  name: string;
+  tagline: string;
+  street: string;
+  postal_code: string;
+  city: string;
+  country: string;
+  area: string;
+  phone: string;
+  phone_e164: string;
+  email: string;
+  map_url: string;
+  social_instagram: string;
+  social_facebook: string;
+  social_verified: boolean;
+  kitchen_hours: string;
+};
+
+export type SiteContent = {
+  hero_title: string;
+  hero_body: string;
+  hero_image_url: string;
+  hero_src: string;
+  primary_cta_label: string;
+  primary_cta_href: string;
+  secondary_cta_label: string;
+  secondary_cta_href: string;
+  about_title: string;
+  about_body: string;
+  about_image_url: string;
+  about_src: string;
+};
+
+export type PublicOffer = {
+  id: number;
+  title: string;
+  description: string;
+  src: string;
+  price_label: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  sort_order: number;
+};
+
+export async function fetchRestaurantProfile(): Promise<RestaurantProfile> {
+  return apiFetch("/restaurant/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.restaurant,
+  });
+}
+
+export async function fetchSiteContent(): Promise<SiteContent> {
+  return apiFetch("/site-content/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.site,
+  });
+}
+
+export async function fetchOffers(): Promise<PublicOffer[]> {
+  return apiFetch("/offers/", undefined, {
+    revalidate: CACHE_REVALIDATE_SECONDS.offers,
   });
 }
