@@ -44,6 +44,23 @@ describe("isolateMenuHierarchy", () => {
     expect(nav.find((n) => n.slug === "take-away")?.children).toBeUndefined();
   });
 
+  it("nests children for any section that has categories in the catalog", () => {
+    const withTakeawayKids = isolateMenuHierarchy([
+      ...MENU_CATEGORIES,
+      {
+        name: "Burgare",
+        slug: "takeaway-burgare",
+        description: "",
+        sortOrder: 1,
+        parentSlug: "take-away",
+      },
+    ]);
+    const nav = buildMenuNav(withTakeawayKids);
+    expect(nav.find((n) => n.slug === "take-away")?.children?.map((c) => c.slug)).toEqual([
+      "takeaway-burgare",
+    ]);
+  });
+
   it("preserves Django admin names and sort_order on existing sections", () => {
     const fromAdmin = [
       {
@@ -135,5 +152,35 @@ describe("buildMenuPanels", () => {
     ]);
     expect(starters?.items.length).toBeGreaterThan(0);
     expect(starters?.subsections).toBeUndefined();
+  });
+
+  it("builds subsections for non-RIVAS sections that have child categories", () => {
+    const categories = isolateMenuHierarchy([
+      ...MENU_CATEGORIES,
+      {
+        name: "Burgare",
+        slug: "takeaway-burgare",
+        description: "",
+        sortOrder: 1,
+        parentSlug: "take-away",
+      },
+    ]);
+    const items = [
+      ...MENU_ITEMS,
+      {
+        categorySlug: "takeaway-burgare",
+        name: "Classic",
+        slug: "classic-ta",
+        description: "",
+        priceIncVat: 129,
+      },
+    ];
+    const panels = buildMenuPanels(categories, items);
+    const takeaway = panels.find((p) => p.slug === "take-away");
+    expect(takeaway?.subsections?.map((s) => s.category.slug)).toEqual([
+      "takeaway-burgare",
+    ]);
+    expect(takeaway?.subsections?.[0]?.items.map((i) => i.slug)).toEqual(["classic-ta"]);
+    expect(panels.find((p) => p.slug === "takeaway-burgare")?.items).toHaveLength(1);
   });
 });
