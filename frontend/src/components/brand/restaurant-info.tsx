@@ -1,25 +1,43 @@
-import { business, fullAddress } from "@/config/business";
+import { business as fallbackBusiness, fullAddress as fallbackFullAddress } from "@/config/business";
 import type { OpeningHour } from "@/lib/api";
 import { formatDayHours } from "@/lib/hours";
+import {
+  fullAddressFrom,
+  type PublicBusiness,
+} from "@/lib/public-business";
 
-export function RestaurantInfo({ hours }: { hours: OpeningHour[] }) {
+export function RestaurantInfo({
+  hours,
+  business,
+}: {
+  hours: OpeningHour[];
+  business?: PublicBusiness;
+}) {
+  const address = business ? fullAddressFrom(business) : fallbackFullAddress();
+  const phone = business?.phone ?? fallbackBusiness.phone;
+  const phoneHref = business?.phoneHref ?? fallbackBusiness.phoneHref;
+  const email = business?.email ?? fallbackBusiness.email;
+  const kitchenHours = business?.kitchenHours ?? fallbackBusiness.kitchenHours;
+  const hoursLabel =
+    business?.restaurantHoursLabel ?? fallbackBusiness.restaurantHoursLabel;
+
   return (
     <div className="grid gap-10 md:grid-cols-2">
       <div>
         <p className="riva-label">Hitta hit</p>
         <h2 className="mt-3 font-display text-3xl text-riva-cream">Besök oss</h2>
         <address className="mt-6 space-y-2 not-italic text-riva-muted">
-          <p>{fullAddress()}</p>
-          {business.phone ? (
+          <p>{address}</p>
+          {phone ? (
             <p>
-              <a href={business.phoneHref} className="hover:text-riva-cream">
-                {business.phone}
+              <a href={phoneHref} className="hover:text-riva-cream">
+                {phone}
               </a>
             </p>
           ) : null}
           <p>
-            <a href={`mailto:${business.email}`} className="hover:text-riva-cream">
-              {business.email}
+            <a href={`mailto:${email}`} className="hover:text-riva-cream">
+              {email}
             </a>
           </p>
         </address>
@@ -37,10 +55,10 @@ export function RestaurantInfo({ hours }: { hours: OpeningHour[] }) {
             ))}
           </ul>
         ) : (
-          <p className="mt-6 text-riva-muted">{business.restaurantHoursLabel}</p>
+          <p className="mt-6 text-riva-muted">{hoursLabel}</p>
         )}
-        {business.kitchenHours ? (
-          <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
+        {kitchenHours ? (
+          <p className="mt-4 text-xs text-riva-muted/80">{kitchenHours}</p>
         ) : null}
       </div>
     </div>

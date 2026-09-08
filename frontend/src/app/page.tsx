@@ -8,9 +8,17 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { FeaturedDish, FoodCard } from "@/components/features/menu";
 import { Section } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
-import { business } from "@/config/business";
 import { loadFeaturedItems } from "@/lib/public-menu";
-import { loadGallery, loadHours, loadNews } from "@/lib/public-data";
+import {
+  loadGallery,
+  loadHours,
+  loadNews,
+  loadOffers,
+  loadRestaurantBusiness,
+  loadSiteContent,
+} from "@/lib/public-data";
+import type { SiteContent } from "@/lib/api";
+import type { PublicBusiness } from "@/lib/public-business";
 import { createPageMetadata } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
@@ -21,19 +29,54 @@ export const metadata = createPageMetadata({
   path: "/",
 });
 
+export const revalidate = 60;
+
 export default async function HomePage() {
-  const [featured, hours, news, gallery] = await Promise.all([
+  const [featured, hours, news, gallery, site, offers, biz] = await Promise.all([
     loadFeaturedItems(),
     loadHours(),
     loadNews(),
     loadGallery(),
+    loadSiteContent(),
+    loadOffers(),
+    loadRestaurantBusiness(),
   ]);
   const signature = featured[0];
 
   return (
     <>
-      <Hero hours={hours} />
-      <AboutSplit />
+      <Hero hours={hours} site={site} biz={biz} />
+      <AboutSplit site={site} />
+      {offers.length > 0 && (
+        <Section className="bg-riva-surface/40">
+          <SectionHeading eyebrow="Erbjudanden" title="Just nu hos oss" align="center" />
+          <ul className="mt-10 grid gap-6 md:grid-cols-2">
+            {offers.map((offer) => (
+              <li key={offer.id} className="riva-card overflow-hidden">
+                {offer.src ? (
+                  <RestaurantImage
+                    src={offer.src}
+                    alt={offer.title}
+                    aspectRatio="wide"
+                    className="rounded-none"
+                  />
+                ) : null}
+                <div className="p-6">
+                  <h3 className="font-display text-2xl text-riva-cream">{offer.title}</h3>
+                  {offer.price_label ? (
+                    <p className="mt-2 text-sm text-riva-gold">{offer.price_label}</p>
+                  ) : null}
+                  {offer.description ? (
+                    <p className="mt-3 whitespace-pre-line text-sm text-riva-muted">
+                      {offer.description}
+                    </p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
       {featured.length > 0 && (
         <Section>
           <SectionHeading eyebrow="Från köket" title="Säsongens favoriter" align="center" />
@@ -121,7 +164,7 @@ export default async function HomePage() {
         </Section>
       )}
       <Section className="bg-riva-surface/40">
-        <RestaurantInfo hours={hours} />
+        <RestaurantInfo hours={hours} business={biz} />
       </Section>
       <CTASection
         title="Boka ett bord"
@@ -131,13 +174,21 @@ export default async function HomePage() {
   );
 }
 
-function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
+function Hero({
+  hours,
+  site,
+  biz,
+}: {
+  hours: Awaited<ReturnType<typeof loadHours>>;
+  site: SiteContent;
+  biz: PublicBusiness;
+}) {
   return (
     <section className="relative min-h-[88vh] overflow-hidden bg-riva-black">
       <div className="absolute inset-0">
         <RestaurantImage
-          src="/scenes/hero-food.jpg"
-          alt="Grillad entrecôte på mörk tallrik — Riva Bistro"
+          src={site.hero_src || "/scenes/hero-food.jpg"}
+          alt={`${biz.name} — ${site.hero_title}`}
           aspectRatio="fill"
           priority
           className="h-full min-h-[88vh] rounded-none"
@@ -147,48 +198,52 @@ function Hero({ hours }: { hours: Awaited<ReturnType<typeof loadHours>> }) {
       <div className="absolute inset-0 bg-gradient-to-t from-riva-black via-riva-black/70 to-riva-black/30" />
       <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end gap-10 px-5 pb-16 pt-28 md:px-8 md:pb-20">
         <div className="max-w-2xl">
-          <p className="riva-label">Kungsholmen · {business.tagline}</p>
+          <p className="riva-label">
+            {biz.area} · {biz.tagline}
+          </p>
           <h1 className="mt-5 font-display text-5xl leading-[1.05] text-riva-cream md:text-7xl">
-            Goda smaker, äkta upplevelser
+            {site.hero_title}
           </h1>
           <p className="mt-6 max-w-md text-pretty leading-relaxed text-riva-muted">
-            Riva Bistro är en restaurang på Kungsholmen i Stockholm — skandinavisk mat i
-            stillsam miljö vid vattnet, med utsikt och uteservering. Vi dukar för lunch,
-            långa middagar och minnesvärda kvällar.
+            {site.hero_body}
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="gold">
-              <Link href="/boka">Boka bord</Link>
+              <Link href={site.primary_cta_href || "/boka"}>
+                {site.primary_cta_label || "Boka bord"}
+              </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/meny">Se vår meny</Link>
+              <Link href={site.secondary_cta_href || "/meny"}>
+                {site.secondary_cta_label || "Se menyn"}
+              </Link>
             </Button>
             <Button asChild size="lg" variant="ghost">
               <Link href="/kontakt">Hitta hit</Link>
             </Button>
           </div>
         </div>
-        <HoursStrip hours={hours} />
+        <HoursStrip hours={hours} business={biz} />
       </div>
     </section>
   );
 }
 
-function AboutSplit() {
+function AboutSplit({ site }: { site: SiteContent }) {
   return (
     <Section>
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <RestaurantImage
-          src="/scenes/home-interior.jpg"
-          alt="Interiör på Riva Bistro — mörk elegant matsal med varm belysning"
+          src={site.about_src || "/scenes/home-interior.jpg"}
+          alt={site.about_title}
           aspectRatio="wide"
           className="reveal"
         />
         <div className="reveal">
           <SectionHeading
             eyebrow="Om Riva"
-            title="En bistro där råvaran får tala"
-            description="Vi lagar mat med omsorg och serverar den utan krångel. Skandinavisk enkelhet möter mediterran värme — i en miljö som är lika bekväm för en vardagsmiddag som för det stora firandet. På Kungsholmen, vid Hornsbergs Strand, bjuder vi på middag med utsikt och plats utomhus när vädret tillåter."
+            title={site.about_title}
+            description={site.about_body}
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild variant="outline">
