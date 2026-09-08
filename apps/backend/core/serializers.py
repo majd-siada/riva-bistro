@@ -104,6 +104,8 @@ class AdminEventInquirySerializer(serializers.ModelSerializer):
 
 
 class AdminNewsItemSerializer(serializers.ModelSerializer):
+    slug = serializers.SlugField(required=False, allow_blank=True, max_length=220)
+
     class Meta:
         model = NewsItem
         fields = [
@@ -117,6 +119,16 @@ class AdminNewsItemSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def create(self, validated_data):
+        if not validated_data.get("slug"):
+            validated_data.pop("slug", None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        if validated_data.get("slug") == "":
+            validated_data.pop("slug")
+        return super().update(instance, validated_data)
 
 
 class AdminGalleryItemSerializer(serializers.ModelSerializer):
