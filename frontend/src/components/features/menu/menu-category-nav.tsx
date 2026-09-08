@@ -22,10 +22,10 @@ export function MenuCategoryNav({
   onSelect,
   className,
 }: MenuCategoryNavProps) {
-  const rivas = categories.find((c) => c.slug === "rivas-meny");
-  const rivasActive =
-    activeSlug === "rivas-meny" ||
-    Boolean(rivas?.children?.some((c) => c.slug === activeSlug));
+  const activeSection =
+    categories.find((c) => c.slug === activeSlug) ??
+    categories.find((c) => c.children?.some((child) => child.slug === activeSlug));
+  const showChildChips = Boolean(activeSection?.children?.length);
 
   return (
     <nav
@@ -50,16 +50,16 @@ export function MenuCategoryNav({
         })}
       </div>
 
-      {rivasActive && rivas?.children?.length ? (
+      {showChildChips && activeSection?.children?.length ? (
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin]">
           <NavChip
-            slug="rivas-meny"
+            slug={activeSection.slug}
             name="Alla"
-            active={activeSlug === "rivas-meny"}
+            active={activeSlug === activeSection.slug}
             onSelect={onSelect}
             subtle
           />
-          {rivas.children.map((child) => (
+          {activeSection.children.map((child) => (
             <NavChip
               key={child.slug}
               slug={child.slug}

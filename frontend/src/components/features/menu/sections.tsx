@@ -36,8 +36,20 @@ function ItemGrid({ items }: { items: PublicItem[] }) {
   );
 }
 
-/** Generic top-level section: heading + direct items (no nested courses). */
-export function MenuSection({ category, items, isolated = false }: MenuSectionProps) {
+/**
+ * Generic top-level section: heading + direct items, or nested category
+ * blocks when Django Admin has added child categories under the section.
+ */
+export function MenuSection({
+  category,
+  items,
+  subsections = [],
+  isolated = false,
+}: MenuSectionProps) {
+  const hasSubsections = subsections.length > 0;
+  const hasAnyItems =
+    items.length > 0 || subsections.some((s) => s.items.length > 0);
+
   return (
     <section
       id={category.slug}
@@ -53,7 +65,34 @@ export function MenuSection({ category, items, isolated = false }: MenuSectionPr
         titleId={`${category.slug}-heading`}
         description={category.description || undefined}
       />
-      {items.length ? <ItemGrid items={items} /> : <EmptyState label={category.name} />}
+      {!hasAnyItems ? (
+        <EmptyState label={category.name} />
+      ) : hasSubsections ? (
+        <div className="mt-10 space-y-14">
+          {items.length ? <ItemGrid items={items} /> : null}
+          {subsections.map(({ category: sub, items: subItems }) => (
+            <div
+              key={sub.slug}
+              id={sub.slug}
+              className="scroll-mt-28 border-t border-riva-gold/10 pt-10 first:border-t-0 first:pt-0"
+            >
+              <h3 className="font-display text-2xl text-riva-cream md:text-3xl">
+                {sub.name}
+              </h3>
+              {sub.description ? (
+                <p className="mt-2 text-sm text-riva-muted">{sub.description}</p>
+              ) : null}
+              {subItems.length ? (
+                <ItemGrid items={subItems} />
+              ) : (
+                <EmptyState label={sub.name} />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ItemGrid items={items} />
+      )}
     </section>
   );
 }

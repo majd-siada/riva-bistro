@@ -185,23 +185,21 @@ export async function loadPublicMenu(): Promise<{
 }> {
   try {
     const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
-    if (!categories.length || !products.length) {
+    // Use API data whenever categories exist — empty product lists are valid
+    // (e.g. TAKE AWAY / DRYCK shells with no dishes yet). Never invent dishes.
+    if (!categories.length) {
       return {
         categories: isolateMenuHierarchy(staticMenu().categories),
         items: staticMenu().items,
       };
     }
 
-    const mappedCategories = categories.map(mapCategory);
-    const mappedItems = products.map(mapProduct);
-
-    // Flat production catalogs still win for dish data; hierarchy is isolated
-    // onto the six sections + RIVAS MENY courses regardless of parent_slug.
     return {
-      categories: isolateMenuHierarchy(mappedCategories),
-      items: mappedItems,
+      categories: isolateMenuHierarchy(categories.map(mapCategory)),
+      items: products.map(mapProduct),
     };
   } catch {
+    // Network / API failure only — last-resort static shells + seed dishes.
     return {
       categories: isolateMenuHierarchy(staticMenu().categories),
       items: staticMenu().items,
@@ -212,15 +210,12 @@ export async function loadPublicMenu(): Promise<{
 export async function loadFeaturedItems(): Promise<PublicItem[]> {
   try {
     const featured = await fetchFeatured();
-    if (featured.length) {
-      return featured.map(mapProduct);
-    }
+    return featured.map(mapProduct);
   } catch {
-    /* fall through */
+    const { items } = staticMenu();
+    const featuredSlugs = new Set<string>(FEATURED_MENU_SLUGS);
+    return items.filter((item) => featuredSlugs.has(item.slug));
   }
-  const { items } = staticMenu();
-  const featuredSlugs = new Set<string>(FEATURED_MENU_SLUGS);
-  return items.filter((item) => featuredSlugs.has(item.slug));
 }
 
 /** Top-level sections only (never RIVAS MENY courses), ordered by sortOrder. */
@@ -250,21 +245,22 @@ export type MenuNavEntry = {
   children?: Array<{ slug: string; name: string }>;
 };
 
-/** Sidebar/mobile nav: six sections, with RIVAS MENY courses nested underneath. */
+/** Top nav: six sections; nest child categories when a section has any. */
 export function buildMenuNav(
   categories: PublicCategory[],
 ): MenuNavEntry[] {
   return topLevelCategories(categories).map((section) => {
-    if (section.slug !== "rivas-meny") {
+    const children = childCategories(categories, section.slug).map((c) => ({
+      slug: c.slug,
+      name: c.name,
+    }));
+    if (!children.length) {
       return { slug: section.slug, name: section.name };
     }
     return {
       slug: section.slug,
       name: section.name,
-      children: childCategories(categories, section.slug).map((c) => ({
-        slug: c.slug,
-        name: c.name,
-      })),
+      children,
     };
   });
 }
@@ -277,8 +273,10 @@ export type MenuPanelData = {
 };
 
 /**
- * One panel per top-level section, plus one panel per RIVAS MENY course so the
- * browser can show a single category at a time.
+ * One panel per top-level section. Sections with child categories get
+ * subsections (and, for RIVAS MENY, also one panel per course so the browser
+ * can show a single category at a time). Other sections keep flat item lists
+ * when they have no children.
  */
 export function buildMenuPanels(
   categories: PublicCategory[],
@@ -286,22 +284,23 @@ export function buildMenuPanels(
 ): MenuPanelData[] {
   const panels: MenuPanelData[] = [];
   for (const section of topLevelCategories(categories)) {
-    if (section.slug === "rivas-meny") {
-      const courses = childCategories(categories, "rivas-meny");
+    const children = childCategories(categories, section.slug);
+    if (children.length > 0) {
       panels.push({
-        slug: "rivas-meny",
+        slug: section.slug,
         category: section,
-        items: [],
-        subsections: courses.map((sub) => ({
+        items: itemsForCategory(items, section.slug),
+        subsections: children.map((sub) => ({
           category: sub,
           items: itemsForCategory(items, sub.slug),
         })),
       });
-      for (const course of courses) {
+      // Individual child panels (hash / chip navigation) — used by RIVAS MENY.
+      for (const child of children) {
         panels.push({
-          slug: course.slug,
-          category: course,
-          items: itemsForCategory(items, course.slug),
+          slug: child.slug,
+          category: child,
+          items: itemsForCategory(items, child.slug),
         });
       }
     } else {
