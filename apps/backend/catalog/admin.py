@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from catalog.models import Category, ModifierGroup, ModifierOption, Product
+from catalog.models import Category, Product
 from catalog.pricing import price_from_ex_vat
 from catalog.section_proxies import (
     SECTION_ADMIN_MODELS,
@@ -308,13 +308,3 @@ class ProductAdmin(admin.ModelAdmin):
         return "—"
 
 
-@admin.register(ModifierGroup)
-class ModifierGroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "product", "required", "min_selections", "max_selections")
-    search_fields = ("name", "product__name")
-
-
-@admin.register(ModifierOption)
-class ModifierOptionAdmin(admin.ModelAdmin):
-    list_display = ("name", "group", "price_delta", "is_available")
-    list_filter = ("is_available",)

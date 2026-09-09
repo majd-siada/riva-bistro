@@ -6,8 +6,8 @@ Practical guide for restaurant staff. Describes **what exists today** — not pl
 
 | Tool | URL | Use for |
 |------|-----|---------|
-| **Next admin (preferred day-to-day)** | `https://rivabistro.se/admin` | Login, overview, bookings, inquiries, menu, gallery, homepage/news/offers, restaurant NAP, hours/closures, reservation settings |
-| **Django Admin** | `https://api.rivabistro.se/admin/` | Modifiers, low-level model edits, emergency overrides, user staff flags |
+| **Next admin (preferred day-to-day)** | `https://rivabistro.se/admin` | Login, overview, bookings, inquiries, menu, gallery, hours/closures, reservation settings |
+| **Django Admin** | `https://api.rivabistro.se/admin/` | Menu section catalogs, gallery, inquiries, reservations/hours/settings, user staff flags |
 
 Only **Django staff** users can sign in. Ask Majd/ops to create accounts — do not share one password across the team long-term.
 
@@ -16,10 +16,12 @@ Only **Django staff** users can sign in. Ask Majd/ops to create accounts — do 
 | Group | Links |
 |-------|-------|
 | **Översikt** | Översikt, Bokningar, Förfrågningar |
-| **Innehåll** | Meny, Startsida, Restaurang, Galleri, Nyheter, Erbjudanden |
+| **Innehåll** | Meny, Galleri |
 | **Drift** | Öppettider, Inställningar |
 
 Lunch lives under **Meny → Dagens lunch** (deep link `/admin/lunch`), not as a separate top-level nav item.
+
+**Removed from staff UI (by design):** Startsida, Restaurang, Nyheter, Erbjudanden (Next), plus Django Admin for modifiers, news, restaurant profile, site content, and offers. Public pages still read existing DB/API data and code fallbacks — there is no day-to-day editor for those fields.
 
 ## Sign in (Next admin)
 
@@ -71,27 +73,9 @@ Tabs match the six public sections on `/meny` (same Swedish labels):
 - Tip: hide a dish with availability off rather than deleting if it returns seasonally.
 - Deep link `/admin/lunch` opens the same Dagens lunch editor (not a separate menu).
 
-**Not in Next admin:** product **modifier** groups/options — use Django Admin → Modifier groups/options.
-
 ### Galleri (`/admin/galleri`)
 
 - Publish gallery images (alt text, sort order, active).
-
-### Startsida (`/admin/startsida`)
-
-- Homepage hero and about copy/images used on `/`.
-
-### Nyheter (`/admin/nyheter`)
-
-- Publish news items shown on the homepage when present.
-
-### Erbjudanden (`/admin/erbjudanden`)
-
-- Publish offers shown on the homepage when present.
-
-### Restaurang (`/admin/restaurang`)
-
-- NAP (name, address, phone, email) and social links used on the public site and JSON-LD.
 
 ### Öppettider (`/admin/oppettider`)
 
@@ -113,12 +97,14 @@ Log in at the API `/admin/` with the same staff account (Django session).
 
 | Model | Typical use |
 |-------|-------------|
-| Modifier groups & options | Extra choices on dishes (no Next UI) |
-| Catalog / reservations / hours / settings | Emergency edits if Next admin is unavailable |
+| Per-section menu categories / rätter | Parallel to Next Meny tabs |
+| Categories / Products (full) | Emergency catalog edits |
+| Opening hours / closures / reservation settings / reservations | Emergency if Next admin is unavailable |
+| Gallery items | Parallel to Next Galleri |
 | Contact / event inquiries | Readonly archive |
 | Users | Staff flags |
 
-There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) — those are code/config. Do not invent UI controls that are not listed above.
+There is **no** staff UI for homepage copy, NAP profile, news, offers, or dish modifiers. Legal pages (`/integritetspolicy`, `/cookies`, …) stay code/config. Do not invent UI controls that are not listed above.
 
 ## Operational workflows
 
@@ -152,7 +138,8 @@ There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) — 
 | Enable `production_ready` early | Guests can book before you are ready | Owner confirmation first |
 | Delete products casually | Broken references / rework | Mark unavailable |
 | Upload huge/non-image files | Rejected upload | Resize; use JPG/PNG/WebP ≤5MB |
-| Expect Next admin to edit modifiers | No screen there | Use Django Admin → Modifier groups |
+| Expect a Startsida / Restaurang / Nyheter / Erbjudanden screen | Those editors were removed | Change code/seed or ask ops |
+| Expect Django Admin modifiers / news / profile / offers | Unregistered from Django Admin | Not staff-editable |
 | Commit or paste `.env` secrets into chat | Security incident | Ops rotates secrets |
 | Hammer login/booking after errors | HTTP 429 throttle | Wait and retry sparingly |
 

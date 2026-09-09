@@ -26,11 +26,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Innehåll",
     items: [
       { href: "/admin/meny", label: "Meny" },
-      { href: "/admin/startsida", label: "Startsida" },
-      { href: "/admin/restaurang", label: "Restaurang" },
       { href: "/admin/galleri", label: "Galleri" },
-      { href: "/admin/nyheter", label: "Nyheter" },
-      { href: "/admin/erbjudanden", label: "Erbjudanden" },
     ],
   },
   {

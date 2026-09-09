@@ -1,14 +1,6 @@
 from django.contrib import admin
 
-from core.models import (
-    ContactMessage,
-    EventInquiry,
-    GalleryItem,
-    NewsItem,
-    Offer,
-    RestaurantProfile,
-    SiteContent,
-)
+from core.models import ContactMessage, EventInquiry, GalleryItem
 
 
 @admin.register(ContactMessage)
@@ -33,30 +25,7 @@ class EventInquiryAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(NewsItem)
-class NewsItemAdmin(admin.ModelAdmin):
-    list_display = ("title", "is_published", "published_at")
-    prepopulated_fields = {"slug": ("title",)}
-
-
 @admin.register(GalleryItem)
 class GalleryItemAdmin(admin.ModelAdmin):
     list_display = ("alt", "sort_order", "is_published")
     list_editable = ("sort_order", "is_published")
-
-
-@admin.register(RestaurantProfile)
-class RestaurantProfileAdmin(admin.ModelAdmin):
-    list_display = ("name", "phone", "email", "updated_at")
-
-
-@admin.register(SiteContent)
-class SiteContentAdmin(admin.ModelAdmin):
-    list_display = ("hero_title", "updated_at")
-
-
-@admin.register(Offer)
-class OfferAdmin(admin.ModelAdmin):
-    list_display = ("title", "is_active", "starts_at", "ends_at", "sort_order")
-    list_editable = ("is_active", "sort_order")
-    list_filter = ("is_active",)

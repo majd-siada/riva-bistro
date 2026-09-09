@@ -4,8 +4,8 @@
 
 | Context | Authoritative source | Notes |
 |---------|----------------------|-------|
-| **Operational / public marketing** (footer, kontakt, JSON-LD, hours strip) | Django `RestaurantProfile` via `/api/v1/restaurant/` → `loadRestaurantBusiness()` | Staff edit under Admin → Restaurang |
-| **Legal / policy pages** (`/villkor`, `/integritetspolicy`, `/bokningspolicy`) | Static [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts) | Intentional build-time constants — no runtime API on legal pages |
+| **Operational / public marketing** (footer, kontakt, JSON-LD, hours strip) | Django `RestaurantProfile` via `/api/v1/restaurant/` → `loadRestaurantBusiness()` | No day-to-day Admin editor — change via seed/ops if needed |
+| **Legal / policy pages** (`/villkor`, `/integritetspolicy`, `/bokningspolicy`) | Static [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts) | Intentional build-time constants |
 | **Client booking form contact copy** | Same `business.ts` mirror | Must match profile; unit-tested |
 
 `business.ts` is a **static legal/build-time mirror**, not a competing CMS. Values must stay identical to the live profile.
@@ -56,7 +56,7 @@ Those must be corrected **outside** the repo.
 
 ## Rules for future code changes
 
-- Edit operational NAP in Admin → Restaurang (`RestaurantProfile`), then sync `business.ts` to match.
+- Edit NAP in [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts) and keep `RestaurantProfile` (seed/ops) aligned.
 - Never hardcode a second street address in pages, embeds, or schema.
 - Do not invent geo coordinates, price range, or social `sameAs` until confirmed.
 - Keep `business.verified = false` / profile `verified=false` until social URLs are owner-confirmed (JSON-LD `sameAs` gate).
