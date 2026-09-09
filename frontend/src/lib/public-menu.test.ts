@@ -167,6 +167,7 @@ describe("loadPublicMenu", () => {
         parent: null,
         parent_slug: c.parentSlug,
         sort_order: c.sortOrder,
+        product_count: 0,
       })),
     );
     vi.mocked(fetchProducts).mockResolvedValue([]);
