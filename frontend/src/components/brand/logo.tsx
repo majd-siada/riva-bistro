@@ -29,6 +29,7 @@ export function Logo({
         width={size}
         height={size}
         className="shrink-0"
+        unoptimized
         priority
       />
       {showWordmark && (
