@@ -106,8 +106,8 @@ There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) or N
 
 ### Menu update
 
-1. Edit in Meny (or Django for modifiers/gallery/news).
-2. Wait up to ~1 minute for public menu cache revalidation, then hard-refresh `/meny`.
+1. Edit in Meny (pick the tab that matches the public `/meny` section).
+2. Public `/meny` refreshes via on-demand revalidation when `FRONTEND_REVALIDATE_URL` + `FRONTEND_REVALIDATE_SECRET` are set; otherwise wait up to ~1 minute (ISR) and hard-refresh.
 3. Confirm the dish shows with correct price and image.
 
 ### Holiday closure

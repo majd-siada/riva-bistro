@@ -35,6 +35,9 @@ services:
     environment:
       POSTGRES_HOST: postgres
       DATABASE_URL: postgres://${POSTGRES_USER:-riva}:${POSTGRES_PASSWORD:-riva_dev_password}@postgres:5432/${POSTGRES_DB:-riva_bistro}
+      # Local ISR sync: admin menu writes revalidate the Next public pages.
+      FRONTEND_REVALIDATE_URL: ${FRONTEND_REVALIDATE_URL:-http://web:3000/api/revalidate}
+      FRONTEND_REVALIDATE_SECRET: ${FRONTEND_REVALIDATE_SECRET:-local-dev-revalidate}
     # Local hot-reload; image default is gunicorn for production.
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     ports:
@@ -68,6 +71,7 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
       INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:8000}
       WATCHPACK_POLLING: "true"
+      FRONTEND_REVALIDATE_SECRET: ${FRONTEND_REVALIDATE_SECRET:-local-dev-revalidate}
     ports:
       - "3000:3000"
     volumes:
