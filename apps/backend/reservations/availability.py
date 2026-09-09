@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import date as date_cls
 from datetime import datetime, time, timedelta
 
-from django.conf import settings
 from django.db.models import Sum
 from django.utils import timezone
 
@@ -16,17 +15,15 @@ from reservations.models import (
 
 
 def instant_booking_enabled(config: ReservationSettings | None = None) -> bool:
-    """Instant confirmation is only allowed when we are confident the capacity
-    is real: always in DEBUG (dev placeholder), and in production only once
-    staff have explicitly flipped ``production_ready`` on.
+    """Instant confirmation is allowed only when staff have flipped
+    ``production_ready`` on. ``DEBUG`` must never bypass this gate — a
+    mis-set DEBUG on a production host must not silently enable bookings.
 
     This gate drives AvailabilityResponse.enabled only. It must never set
     closed=True — that field means the restaurant is shut for the date.
     """
-    if settings.DEBUG:
-        return True
     config = config or ReservationSettings.load()
-    return config.production_ready
+    return bool(config.production_ready)
 
 
 def opening_for_date(target: date_cls) -> tuple[bool, time | None, time | None]:

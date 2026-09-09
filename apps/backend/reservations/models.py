@@ -63,6 +63,7 @@ class ReservationSettings(models.Model):
     # Instant confirmation only goes live in production once staff have set a
     # real capacity and flipped this on. In DEBUG we always allow it (dev
     # placeholder capacity). See reservations.availability.instant_booking_enabled.
+    # Gate is production_ready only — DEBUG never bypasses.
     production_ready = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
