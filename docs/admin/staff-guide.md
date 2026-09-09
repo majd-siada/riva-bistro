@@ -11,6 +11,16 @@ Practical guide for restaurant staff. Describes **what exists today** — not pl
 
 Only **Django staff** users can sign in. Ask Majd/ops to create accounts — do not share one password across the team long-term.
 
+## Navigation groups (Next admin)
+
+| Group | Links |
+|-------|-------|
+| **Översikt** | Översikt, Bokningar, Förfrågningar |
+| **Innehåll** | Meny, Startsida, Restaurang, Galleri, Nyheter, Erbjudanden |
+| **Drift** | Öppettider, Inställningar |
+
+Lunch lives under **Meny → Dagens lunch** (deep link `/admin/lunch`), not as a separate top-level nav item.
+
 ## Sign in (Next admin)
 
 1. Open `/admin/login`.
@@ -93,9 +103,9 @@ Official baseline hours live in code (`official_hours`) and seeds; day-to-day co
 ### Inställningar (`/admin/installningar`)
 
 - Capacity-related settings: max guests/slot, party size, booking horizon, lead time, etc.
-- **`production_ready`:** controls whether **online booking is enabled** in production (`DJANGO_DEBUG=false`).
+- **`production_ready`:** the **only** gate for online booking. Status shows Live / Avstängd. `DEBUG` does not bypass this.
 
-**Safety:** Do **not** set `production_ready=true` until the owner confirms real capacity and notify channels. Deploys must not flip this automatically.
+**Safety:** Confirm real capacity and notify channels before enabling. Deploys must not flip this automatically. Turning it off immediately stops new online bookings.
 
 ## What you do in Django Admin (when needed)
 

@@ -10,18 +10,36 @@ import { Button } from "@/components/ui/button";
 import { adminLogout, adminMe, type AdminSession } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/admin", label: "Översikt" },
-  { href: "/admin/bokningar", label: "Bokningar" },
-  { href: "/admin/forfragningar", label: "Förfrågningar" },
-  { href: "/admin/meny", label: "Meny" },
-  { href: "/admin/galleri", label: "Galleri" },
-  { href: "/admin/startsida", label: "Startsida" },
-  { href: "/admin/nyheter", label: "Nyheter" },
-  { href: "/admin/erbjudanden", label: "Erbjudanden" },
-  { href: "/admin/restaurang", label: "Restaurang" },
-  { href: "/admin/oppettider", label: "Öppettider" },
-  { href: "/admin/installningar", label: "Inställningar" },
+type NavItem = { href: string; label: string };
+type NavGroup = { label: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Översikt",
+    items: [
+      { href: "/admin", label: "Översikt" },
+      { href: "/admin/bokningar", label: "Bokningar" },
+      { href: "/admin/forfragningar", label: "Förfrågningar" },
+    ],
+  },
+  {
+    label: "Innehåll",
+    items: [
+      { href: "/admin/meny", label: "Meny" },
+      { href: "/admin/startsida", label: "Startsida" },
+      { href: "/admin/restaurang", label: "Restaurang" },
+      { href: "/admin/galleri", label: "Galleri" },
+      { href: "/admin/nyheter", label: "Nyheter" },
+      { href: "/admin/erbjudanden", label: "Erbjudanden" },
+    ],
+  },
+  {
+    label: "Drift",
+    items: [
+      { href: "/admin/oppettider", label: "Öppettider" },
+      { href: "/admin/installningar", label: "Inställningar" },
+    ],
+  },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -85,23 +103,32 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <nav
-          className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-3 md:px-6"
+          className="mx-auto flex max-w-7xl items-end gap-4 overflow-x-auto px-3 md:gap-6 md:px-6"
           aria-label="Adminnavigering"
         >
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={cn(
-                "whitespace-nowrap border-b-2 px-4 py-3 text-sm transition-riva",
-                isActive(item.href)
-                  ? "border-riva-gold text-riva-cream"
-                  : "border-transparent text-riva-muted hover:text-riva-cream",
-              )}
-            >
-              {item.label}
-            </Link>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className="flex shrink-0 flex-col gap-1">
+              <span className="px-4 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-riva-muted/80">
+                {group.label}
+              </span>
+              <div className="flex gap-1">
+                {group.items.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    className={cn(
+                      "whitespace-nowrap border-b-2 px-4 py-2 text-sm transition-riva",
+                      isActive(item.href)
+                        ? "border-riva-gold text-riva-cream"
+                        : "border-transparent text-riva-muted hover:text-riva-cream",
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </header>

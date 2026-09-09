@@ -75,10 +75,18 @@ export default function AdminSettingsPage() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
           <div className="flex-1">
-            <p className="font-medium text-riva-cream">Produktionsläge</p>
+            <p className="font-medium text-riva-cream">Onlinebokning</p>
             <p className="mt-1 text-sm text-riva-muted">
-              Aktivera först när kapaciteten ovan speglar restaurangens verkliga
-              förmåga. I produktion ges inga bokningsbekräftelser förrän detta är på.
+              Denna växel är den enda grinden för onlinebokning — även om DEBUG
+              råkar vara på. Aktivera först när kapaciteten ovan speglar
+              restaurangens verkliga förmåga. När växeln är av kan gäster inte
+              boka online.
+            </p>
+            <p className="mt-2 text-sm text-riva-cream">
+              Status:{" "}
+              <strong className="font-medium">
+                {settings.production_ready ? "Live" : "Avstängd"}
+              </strong>
             </p>
             <label className="mt-3 inline-flex items-center gap-2 text-sm text-riva-cream">
               <input
@@ -89,7 +97,7 @@ export default function AdminSettingsPage() {
                 }
                 className="h-5 w-5 accent-riva-gold"
               />
-              Aktivera onlinebokning i produktion
+              Aktivera onlinebokning
             </label>
           </div>
         </div>

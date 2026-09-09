@@ -36,12 +36,18 @@ describe("createPageMetadata", () => {
 });
 
 describe("business NAP helpers", () => {
-  it("keeps full and short address consistent with Hornsbergs Strand 57", () => {
+  it("keeps the canonical legal/build-time NAP mirror stable", () => {
+    expect(business.name).toBe("Riva Bistro");
     expect(business.address.street).toBe("Hornsbergs Strand 57");
-    expect(fullAddress()).toContain("Hornsbergs Strand 57");
-    expect(fullAddress()).toContain("112 16");
+    expect(business.address.postalCode).toBe("112 16");
+    expect(business.address.city).toBe("Stockholm");
+    expect(business.phone).toBe("087042050");
+    expect(business.phoneE164).toBe("+4687042050");
+    expect(business.email).toBe("info@rivabistro.se");
+    expect(fullAddress()).toBe("Hornsbergs Strand 57, 112 16 Stockholm");
     expect(shortAddress()).toContain("57");
     expect(shortAddress()).toContain("Stockholm");
+    expect(fullAddress().toLowerCase()).not.toContain("strandvägen");
   });
 
   it("builds maps embed from the same NAP", () => {

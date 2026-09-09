@@ -16,39 +16,47 @@ Architecture:
 
 Update only after the restaurant confirms real facts. **Do not invent values.**
 
-### NAP / hours / social — [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts)
+### NAP / hours / social
+
+**Operational SoT:** Admin → Restaurang (`RestaurantProfile`) → public site + Restaurant JSON-LD.  
+**Legal/build-time mirror:** [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts) — keep identical to profile.
 
 While `verified: false` (current):
 
-- Site may still **display** NAP/hours in UI.
-- **Restaurant JSON-LD is not emitted** (`RestaurantJsonLd` returns `null`).
+- Site **displays** NAP/hours in UI.
+- Restaurant JSON-LD **is emitted** for NAP/hours/menu/reservations.
+- Social `sameAs` stays off until `verified: true`.
 
-**Already applied from owner Google listing (keep verified=false until phone/email/social confirmed):**
+**Canonical NAP (keep in sync):**
 
 - Address: Hornsbergs Strand 57, 112 16 Stockholm
-- Official weekly hours via `official_hours.py` / `seed_reservations` +
+- Phone: 087042050 / +4687042050
+- Email: info@rivabistro.se
+- Official weekly hours via `official_hours.py` / Admin → Öppettider +
   `restaurantHoursLabel` fallback:
   Mon–Thu 10:30–21:00, Fri 11:30–00:00, Sat 10:30–23:00, Sun 10:30–21:00
 
 Still required before `verified: true`:
 
-1. `phone`, `phoneHref`, `phoneE164`
-2. `email`
-3. `kitchenHours` (optional — leave empty if unused)
-4. `social.instagram`, `social.facebook` (or clear if unused)
-5. Set **`verified: true`** only after the above are confirmed
+1. Confirm social Instagram/Facebook URLs (or clear if unused)
+2. Optional `kitchenHours`
+3. Set **`verified: true`** on profile and mirror in `business.ts` only after confirmed
 
 Live hours API source of truth: Admin → Öppettider (or re-run `python manage.py seed_reservations`).
 
 ### Booking capacity (Admin → Inställningar)
 
-Before flipping live booking:
+Online booking is gated **only** by `production_ready` (`DEBUG` cannot bypass).
 
-1. Set real `max_guests_per_slot`, lead time, horizon, buffers
+Audit 2026-09-09: live booking was verified (`RB-X7UM7D` + notifications). Treat production as **live** unless the owner intentionally turns the toggle off.
+
+Before changing capacity or flipping the toggle:
+
+1. Confirm real `max_guests_per_slot`, lead time, horizon, buffers
 2. Confirm hours + special closures
-3. Only then set **`production_ready = true`**
+3. Keep `DJANGO_DEBUG=false` on the VPS
 
-With `DJANGO_DEBUG=false` and `production_ready=false`, reservation create returns **503** `not_enabled`. Do **not** enable until capacity is real.
+With `production_ready=false`, reservation create returns **503** `not_enabled`.
 
 ### Admin account
 

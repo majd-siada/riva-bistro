@@ -7,19 +7,11 @@ Product scope: **brochure site + table reservations** (commerce intentionally ou
 
 1. Security & configuration → 2. Reservations & notifications → 3. Menu CMS → 4. SEO/content → 5. Legal scaffolding → 6. Ops/backups → 7. Live launch verification (human)
 
-## Summary (Phase 3 security/a11y/QA batch 2026-09-07)
+## Summary (handoff closure 2026-09-09)
 
-| Status | Count |
-|--------|------:|
-| DONE | 190 |
-| PARTIAL | 69 |
-| NOT DONE | 5 |
-| BLOCKED — HUMAN ACTION REQUIRED | 61 |
-| **Total** | **325** |
+PR #32 merged; handoff branch hardens booking gate (no DEBUG bypass), groups Admin nav, expands menu/NAP/hours tests, reconciles docs with live booking verification (`RB-X7UM7D`).
 
-Completion percentage (DONE only): **58.5%**
-
-**Phase 3 (authorized):** security tests + repo audit docs (#166/#251/#300/#315), reservation edge inventory (#168 DONE), a11y touch/keyboard/focus/ARIA/automated findings (#134/#142/#144/#149/#253), public production audit (#256), admin shell QA smoke (#235), browser policy docs only (#139). #209/#234 untouched. No Playwright/BrowserStack/Lighthouse CI/CD/S3/Redis/SIEM/GA.
+Prior Phase 3 batch counts below are historical; prefer per-row statuses for truth.
 
 
 ## Status legend
@@ -103,7 +95,7 @@ Completion percentage (DONE only): **58.5%**
 | 51 | Opening Hours Management | DONE — CODE VERIFIED | Admin öppettider + API; JSON-LD uses loadHours() | reservations; json-ld.tsx |  |  |  |  |
 | 52 | Restaurant Information Management | DONE — CODE VERIFIED | Next /admin/restaurang CMS for NAP/social; public + JSON-LD consume API | restaurang/page.tsx; RestaurantProfile |  | Owner confirms verified/social | Owner confirms verified=true | HUMAN ACTION REQUIRED |
 | 53 | Contact Management | DONE | Contact inquiry API + admin inbox |  |  |  |  |  |
-| 54 | Reservation System | DONE — CODE VERIFIED | Availability + create with locks; production_ready gate | reservations/ |  | reservation tests incl. DEBUG bypass | Live E2E booking | HUMAN ACTION REQUIRED |
+| 54 | Reservation System | DONE — CODE VERIFIED | Availability + create with locks; production_ready-only gate (DEBUG cannot bypass) | reservations/ | reservation tests | Live E2E booking audit RB-X7UM7D | Owner capacity policy ongoing | HUMAN ACTION REQUIRED |
 | 55 | Reservation Management | DONE — CODE VERIFIED | Admin bokningar list/detail + Notiser column | bokningar/page.tsx |  |  |  |  |
 | 56 | Order System | DONE | N/A — commerce out of scope per mvp.md | docs/product/mvp.md |  |  |  |  |
 | 57 | Cart System | DONE | N/A — commerce out of scope |  |  |  |  |  |
@@ -165,7 +157,7 @@ Completion percentage (DONE only): **58.5%**
 | 98 | Internal Linking | DONE | Header/footer/CTAs |  |  |  |  |  |
 | 99 | Structured Data | DONE — CODE VERIFIED | Restaurant+WebSite JSON-LD (hours via loadHours); Menu+Breadcrumb JSON-LD. Social sameAs gated by verified. | frontend/src/components/seo/json-ld.tsx | json-ld.test.tsx; seo.test.ts | vitest | Owner verify + Rich Results after verified=true | Confirm social URLs before verified=true |
 | 100 | Local SEO | PARTIAL | NAP consistent in code; GBP external | business.ts; nap-consistency.md |  |  | GBP ownership | BLOCKED — HUMAN ACTION REQUIRED |
-| 101 | NAP Consistency | DONE | Hornsbergs Strand 57 everywhere in code; Strandvägen scrubbed | business.ts; docs/seo/nap-consistency.md |  |  |  |  |
+| 101 | NAP Consistency | DONE — CODE VERIFIED | Hornsbergs Strand 57; Profile operational SoT; business.ts legal mirror + tests | business.ts; public-business; nap-consistency.md | seo.test.ts |  | Sync business.ts if Profile changes |  |
 | 102 | Open Graph | DONE | OG in createPageMetadata |  |  |  |  |  |
 | 103 | Twitter/X Cards | DONE | Twitter cards in createPageMetadata |  |  |  |  |  |
 | 104 | Breadcrumbs | DONE | Visible breadcrumbs + BreadcrumbList JSON-LD via PageBreadcrumbs on /meny, /boka, and legal pages. | frontend/src/components/seo/page-breadcrumbs.tsx; json-ld.tsx | json-ld.test.tsx | vitest BreadcrumbJsonLd |  |  |
@@ -429,7 +421,7 @@ Completion percentage (DONE only): **58.5%**
 | 287 | Production Database Verification | BLOCKED — HUMAN ACTION REQUIRED | Public API health reports DB ok in production-check. Direct production DB shell/connectivity verification needs VPS credentials. |  |  | Ops notes from VPS DB check | Verify DB from VPS (migrate status, connections) | Majd: VPS DB verification |
 | 288 | Production API Verification | BLOCKED — HUMAN ACTION REQUIRED | Public API smoke passes. Authenticated admin API verification needs staff credentials on live host. |  |  | Staff session works against production API | Log in as staff and verify admin API actions on production | Majd: authenticated production API verification |
 | 289 | Payment Verification | DONE | N/A |  |  |  |  |  |
-| 290 | Reservation Verification | BLOCKED — HUMAN ACTION REQUIRED | Booking code exists but `production_ready` must remain false until capacity is owner-confirmed. Live booking verification requires that business decision. |  |  | Successful live test booking + admin visibility | Confirm capacity; set production_ready; place test reservation | Majd: capacity confirmation then enable booking |
+| 290 | Reservation Verification | DONE — LIVE VERIFIED | Audit 2026-09-09: live create `RB-X7UM7D` → 201 + guest email + Telegram + staff email. Gate is `production_ready` only. | reservations/; notifications | pytest | Live create + notify flags | Owner may cancel probe; confirm capacity ongoing | Cancel probe if unwanted; re-confirm VPS DEBUG=false |
 | 291 | Email Verification | BLOCKED — HUMAN ACTION REQUIRED | Email notification code paths exist. Live staff email delivery proof needs VPS SMTP env + inbox access. |  | verify-notifications | Staff inbox receives test notification | Configure SMTP and run verify-notifications / inbox check | Majd: live email verification |
 | 292 | Analytics Verification | DONE | N/A policy |  |  |  |  |  |
 | 293 | Search Console Verification | BLOCKED — HUMAN ACTION REQUIRED | Cannot verify GSC without owner Google account. |  |  | GSC shows verified property | Complete GSC verification flow | Majd: Search Console verification |

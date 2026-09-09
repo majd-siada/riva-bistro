@@ -37,7 +37,16 @@ export default function AdminDashboardPage() {
         <p className="mt-1 text-riva-muted">Dagens läge och kommande bokningar.</p>
       </div>
 
-      {!data.production_ready && (
+      {data.production_ready ? (
+        <div className="rounded-lg border border-riva-cream/15 bg-riva-surface/40 p-4 text-sm text-riva-muted">
+          Onlinebokning är <strong className="font-medium text-riva-cream">live</strong>.
+          Ändra kapacitet eller stäng av under{" "}
+          <Link href="/admin/installningar" className="underline text-riva-cream">
+            Inställningar
+          </Link>
+          .
+        </div>
+      ) : (
         <div className="flex items-start gap-3 rounded-lg border border-riva-gold/40 bg-riva-gold/10 p-4 text-sm text-riva-cream">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
           <p>
@@ -46,7 +55,7 @@ export default function AdminDashboardPage() {
             <Link href="/admin/installningar" className="underline">
               Inställningar
             </Link>{" "}
-            och aktiverar produktionsläge. Gäster kan inte boka online under tiden.
+            och aktiverar onlinebokning. Gäster kan inte boka online under tiden.
           </p>
         </div>
       )}

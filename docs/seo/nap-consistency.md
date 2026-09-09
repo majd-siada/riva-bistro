@@ -1,8 +1,16 @@
 # NAP consistency — Riva Bistro
 
-**Authoritative address (source of truth):**  
-`Hornsbergs Strand 57, 112 16 Stockholm`  
-Defined in [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts).
+## Sources of truth
+
+| Context | Authoritative source | Notes |
+|---------|----------------------|-------|
+| **Operational / public marketing** (footer, kontakt, JSON-LD, hours strip) | Django `RestaurantProfile` via `/api/v1/restaurant/` → `loadRestaurantBusiness()` | Staff edit under Admin → Restaurang |
+| **Legal / policy pages** (`/villkor`, `/integritetspolicy`, `/bokningspolicy`) | Static [`frontend/src/config/business.ts`](../../frontend/src/config/business.ts) | Intentional build-time constants — no runtime API on legal pages |
+| **Client booking form contact copy** | Same `business.ts` mirror | Must match profile; unit-tested |
+
+`business.ts` is a **static legal/build-time mirror**, not a competing CMS. Values must stay identical to the live profile.
+
+**Canonical NAP (owner-confirmed):**
 
 | Field | Value |
 |-------|--------|
@@ -20,10 +28,11 @@ Defined in [`frontend/src/config/business.ts`](../../frontend/src/config/busines
 | Check | Result |
 |-------|--------|
 | `business.ts` address | Hornsbergs Strand 57 |
+| RestaurantProfile API (live) | Same NAP when populated |
 | Live homepage NAP | Hornsbergs Strand 57 (verified against production) |
-| Maps embed / `mapUrl` | Derived from the same `business` address |
+| Maps embed / `mapUrl` | Derived from the same address fields |
 
-**Conclusion:** The website and codebase use a single NAP. Keep one street address only—do not add alternate or “disprove” copy on the site; fix wrong third-party citations instead.
+**Conclusion:** Public site and legal mirror share one NAP. Do not introduce a second street address.
 
 ## External citation consistency
 
@@ -47,7 +56,7 @@ Those must be corrected **outside** the repo.
 
 ## Rules for future code changes
 
-- Edit NAP only in `frontend/src/config/business.ts` (and backend hours sync if needed).
+- Edit operational NAP in Admin → Restaurang (`RestaurantProfile`), then sync `business.ts` to match.
 - Never hardcode a second street address in pages, embeds, or schema.
 - Do not invent geo coordinates, price range, or social `sameAs` until confirmed.
-- Keep `business.verified = false` until social URLs are owner-confirmed (JSON-LD `sameAs` gate).
+- Keep `business.verified = false` / profile `verified=false` until social URLs are owner-confirmed (JSON-LD `sameAs` gate).

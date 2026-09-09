@@ -13,7 +13,8 @@ const SCHEMA_DAYS = [
   "Sunday",
 ] as const;
 
-function openingHoursSpecification(hours: OpeningHour[]) {
+/** Shared by RestaurantJsonLd and tests — maps CMS hours into schema.org. */
+export function openingHoursSpecification(hours: OpeningHour[]) {
   return hours
     .filter(
       (d): d is OpeningHour & { opens_at: string; closes_at: string } =>

@@ -209,8 +209,8 @@ def test_production_guard_blocks_when_not_ready(api, settings):
 
 
 @pytest.mark.django_db
-def test_debug_bypasses_production_ready_gate(api, settings):
-    """Documented escape hatch: DEBUG=True ignores production_ready=False."""
+def test_debug_does_not_bypass_production_ready_gate(api, settings):
+    """DEBUG=True must not enable bookings when production_ready is False."""
     settings.DEBUG = True
     _open_all_week()
     config = ReservationSettings.load()
@@ -221,7 +221,7 @@ def test_debug_bypasses_production_ready_gate(api, settings):
     availability = api.get(
         f"/api/v1/reservations/availability/?date={target.isoformat()}"
     )
-    assert availability.json()["enabled"] is True
+    assert availability.json()["enabled"] is False
 
     resp = api.post(
         "/api/v1/reservations/",
@@ -235,8 +235,9 @@ def test_debug_bypasses_production_ready_gate(api, settings):
         },
         format="json",
     )
-    assert resp.status_code == 201
-    assert Reservation.objects.filter(email="dev@example.com").exists()
+    assert resp.status_code == 503
+    assert resp.json()["code"] == "not_enabled"
+    assert not Reservation.objects.filter(email="dev@example.com").exists()
 
 
 @pytest.mark.django_db

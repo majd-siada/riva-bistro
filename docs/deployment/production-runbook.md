@@ -12,9 +12,12 @@ Architecture (unchanged):
 | `https://rivabistro.se` | Hostinger Node | Next.js |
 | `https://api.rivabistro.se` | Ubuntu VPS | Docker + gunicorn + Nginx + Let's Encrypt + host PostgreSQL |
 
-Reservations stay **disabled** until an operator intentionally sets
-`production_ready=true` in admin **after** confirming capacity settings.
-Official weekly hours (single source: `apps/backend/reservations/official_hours.py`):
+Online booking is controlled **only** by Admin → Inställningar → `production_ready`
+(`DEBUG` never bypasses). Audit 2026-09-09 live-verified a successful create
+(`RB-X7UM7D`) with guest email, Telegram, and staff email — treat production as
+**live** unless the owner intentionally turns the toggle off.
+
+Official weekly hours baseline (`apps/backend/reservations/official_hours.py`):
 
 | Day | Hours |
 |-----|-------|
@@ -23,8 +26,8 @@ Official weekly hours (single source: `apps/backend/reservations/official_hours.
 | Saturday | 10:30–23:00 |
 | Sunday | 10:30–21:00 |
 
-`seed_reservations` fills missing/blank weekdays from that module and always leaves
-`production_ready=false`. Do not invent hours or flip that flag from this runbook.
+`seed_reservations` fills missing/blank weekdays from that module and never flips
+`production_ready`. Do not invent hours or change that flag from this runbook.
 
 ---
 
