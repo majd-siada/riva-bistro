@@ -174,20 +174,126 @@ describe("isolateMenuHierarchy", () => {
   });
 });
 
+function apiCategory(
+  c: (typeof modernSections)[number],
+  overrides: Partial<{
+    id: number;
+    name: string;
+    description: string;
+    sort_order: number;
+    product_count: number;
+  }> = {},
+) {
+  return {
+    id: overrides.id ?? 1,
+    name: overrides.name ?? c.name,
+    slug: c.slug,
+    description: overrides.description ?? c.description,
+    parent: null,
+    parent_slug: c.parentSlug,
+    sort_order: overrides.sort_order ?? c.sortOrder,
+    product_count: overrides.product_count ?? 0,
+  };
+}
+
+function apiProduct(overrides: {
+  id?: number;
+  name: string;
+  slug: string;
+  category_slug: string;
+  price_inc_vat: number;
+  description?: string;
+  is_featured?: boolean;
+}) {
+  return {
+    id: overrides.id ?? 1,
+    name: overrides.name,
+    slug: overrides.slug,
+    description: overrides.description ?? "",
+    image_url: "",
+    is_available: true,
+    is_featured: overrides.is_featured ?? false,
+    category_name: overrides.category_slug,
+    category_slug: overrides.category_slug,
+    pricing: {
+      price_ex_vat: String(overrides.price_inc_vat),
+      vat_amount: "0",
+      vat_rate: "0.12",
+      price_inc_vat: String(overrides.price_inc_vat),
+    },
+  };
+}
+
 describe("loadPublicMenu", () => {
-  it("keeps live categories when the product list is empty", async () => {
+  it("uses the populated API catalog as the dish source of truth", async () => {
+    vi.mocked(fetchCategories).mockResolvedValue(modernSections.map((c) => apiCategory(c)));
+    vi.mocked(fetchProducts).mockResolvedValue([
+      apiProduct({
+        name: "Toast Skagen",
+        slug: "toast-skagen",
+        category_slug: "forratter",
+        price_inc_vat: 145,
+        description: "From CMS",
+      }),
+    ]);
+
+    const menu = await loadPublicMenu();
+    expect(menu.items).toHaveLength(1);
+    expect(menu.items[0]).toMatchObject({
+      name: "Toast Skagen",
+      slug: "toast-skagen",
+      categorySlug: "forratter",
+      priceIncVat: "145",
+      description: "From CMS",
+    });
+    expect(menu.items.map((i) => i.slug)).not.toContain(MENU_ITEMS[0]?.slug);
+  });
+
+  it("reflects product price updates from the API", async () => {
+    vi.mocked(fetchCategories).mockResolvedValue(modernSections.map((c) => apiCategory(c)));
+    vi.mocked(fetchProducts).mockResolvedValue([
+      apiProduct({
+        name: "Pasta",
+        slug: "pasta-riva",
+        category_slug: "pasta",
+        price_inc_vat: 199,
+      }),
+    ]);
+
+    const first = await loadPublicMenu();
+    expect(first.items[0]?.priceIncVat).toBe("199");
+
+    vi.mocked(fetchProducts).mockResolvedValue([
+      apiProduct({
+        name: "Pasta",
+        slug: "pasta-riva",
+        category_slug: "pasta",
+        price_inc_vat: 219,
+      }),
+    ]);
+    const second = await loadPublicMenu();
+    expect(second.items[0]?.priceIncVat).toBe("219");
+  });
+
+  it("reflects category name and sort changes from the API", async () => {
     vi.mocked(fetchCategories).mockResolvedValue(
-      modernSections.map((c) => ({
-        id: 1,
-        name: c.name,
-        slug: c.slug,
-        description: c.description,
-        parent: null,
-        parent_slug: c.parentSlug,
-        sort_order: c.sortOrder,
-        product_count: 0,
-      })),
+      modernSections.map((c) =>
+        c.slug === "dagens-lunch"
+          ? apiCategory(c, { name: "Lunch idag", sort_order: 1 })
+          : apiCategory(c),
+      ),
     );
+    vi.mocked(fetchProducts).mockResolvedValue([]);
+
+    const menu = await loadPublicMenu();
+    const lunch = menu.categories.find((c) => c.slug === "dagens-lunch");
+    expect(lunch?.name).toBe("Lunch idag");
+    expect(lunch?.sortOrder).toBe(1);
+    expect(buildMenuNav(menu.categories)[0]?.slug).toBe("dagens-lunch");
+  });
+
+  it("keeps live categories when the product list is empty", async () => {
+    vi.mocked(fetchCategories).mockResolvedValue(modernSections.map((c) => apiCategory(c)));
     vi.mocked(fetchProducts).mockResolvedValue([]);
 
     const menu = await loadPublicMenu();
@@ -217,6 +323,25 @@ describe("loadPublicMenu", () => {
 });
 
 describe("loadFeaturedItems", () => {
+  it("returns featured products from the API", async () => {
+    vi.mocked(fetchFeatured).mockResolvedValue([
+      apiProduct({
+        name: "Featured dish",
+        slug: "featured-dish",
+        category_slug: "varmratter",
+        price_inc_vat: 255,
+        is_featured: true,
+      }),
+    ]);
+    const featured = await loadFeaturedItems();
+    expect(featured).toHaveLength(1);
+    expect(featured[0]).toMatchObject({
+      name: "Featured dish",
+      slug: "featured-dish",
+      priceIncVat: "255",
+    });
+  });
+
   it("returns empty when featured API fails", async () => {
     vi.mocked(fetchFeatured).mockRejectedValue(new Error("network"));
     expect(await loadFeaturedItems()).toEqual([]);

@@ -1,20 +1,18 @@
 /**
- * Central, editable source of the restaurant's real-world facts.
+ * Static legal / build-time NAP mirror for Riva Bistro.
  *
- * Address and phone are owner-confirmed (Google Business listing + public number).
- * Social URLs may still be placeholders — do not publish them as JSON-LD `sameAs`
- * until `verified` is true.
+ * Operational source of truth for public marketing NAP is RestaurantProfile
+ * (Admin → Restaurang) via `loadRestaurantBusiness()`. This file is the
+ * intentional static fallback and the contact block for legal/policy pages
+ * and the client booking form — values MUST stay identical to the live profile.
  *
- * Behaviour:
- * - Core Restaurant JSON-LD (NAP, hours, menu, reservations) publishes from
- *   confirmed fields.
- * - `sameAs` (social) only when `verified === true`.
+ * Social URLs may still be placeholders — do not publish them as JSON-LD
+ * `sameAs` until `verified` is true.
  *
  * Opening hours: prefer Admin → Öppettider / GET /api/v1/hours/ at runtime.
- * `restaurantHoursLabel` is a static fallback from `opening-hours.ts`
- * (must match backend official hours).
+ * `restaurantHoursLabel` is a static fallback from `opening-hours.ts`.
  *
- * Cutover checklist: docs/deployment/production-checklist.md section A.
+ * See docs/seo/nap-consistency.md.
  */
 import { OFFICIAL_HOURS_LABEL } from "@/config/opening-hours";
 

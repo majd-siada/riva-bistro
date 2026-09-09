@@ -17,24 +17,25 @@ Short operational guide for the restaurant owner (Majd). Technical deploy detail
 
 ## Daily operations
 
-1. **Reservations:** Admin → Bokningar (Notiser column + resend in detail).
-2. **Menu:** Admin → Meny (six section tabs). Public `/meny` reads Django catalog only.
-3. **Hours / closures:** Admin → Öppettider (also feeds JSON-LD).
-4. **Homepage / news / offers / NAP:** Admin → Startsida, Nyheter, Erbjudanden, Restaurang, Galleri.
-5. **Enable online booking:** only after capacity is real → Inställningar → `production_ready=true` (requires `DJANGO_DEBUG=false` on the API).
+1. **Reservations:** Admin → Bokningar (Notiser column + resend in detail). Online booking is controlled only by Inställningar → onlinebokning (`production_ready`).
+2. **Menu:** Admin → Meny (six section tabs). Public `/meny` reads Django catalog only — never silent static dishes.
+3. **Hours / closures:** Admin → Öppettider (also feeds Restaurant JSON-LD).
+4. **Homepage / news / offers / NAP:** Admin → Startsida, Nyheter, Erbjudanden, Restaurang, Galleri (nav groups: Översikt / Innehåll / Drift).
+5. **Toggle online booking:** Inställningar → Aktivera onlinebokning. Keep `DJANGO_DEBUG=false` on the API. Booking was live-verified in the 2026-09-09 audit; do not turn off without an owner decision.
 6. **Missed staff alerts:** open booking → Skicka om notiser, or  
    `python manage.py resend_reservation_notifications --unsent`
 
 ## Before calling the site “fully live”
 
-- [ ] Confirm social URLs / kitchen hours → set `verified: true` in `frontend/src/config/business.ts` and redeploy frontend (enables social `sameAs` in JSON-LD).
+- [ ] Confirm social URLs / kitchen hours → set profile/`business.verified` true and redeploy (enables social `sameAs` in JSON-LD).
 - [ ] Recreate backend after any `.env` change:  
   `docker compose -f docker-compose.production.yml up -d --force-recreate backend`
-- [ ] `./scripts/verify-notifications.sh --send-test` → Telegram OK + staff email OK
-- [ ] Place a test booking on `/boka`
+- [ ] Re-confirm VPS: `DJANGO_DEBUG=false`, cookie domain, CORS/CSRF, notify credentials
+- [ ] Optional: cancel audit probe reservation if still present
 - [ ] Have counsel review `/integritetspolicy`, `/cookies`, `/villkor`, `/bokningspolicy`
 - [ ] Schedule DB backups: `./scripts/backup-postgres.sh` (cron daily)
 - [ ] Optional: set `SENTRY_DSN` after installing `sentry-sdk`
+- [ ] Google Business Profile + Search Console (external — not done from this repo)
 
 ## Support posture
 
