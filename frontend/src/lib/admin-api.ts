@@ -176,6 +176,16 @@ export async function adminListCategories() {
   return request<AdminCategory[]>("/admin/menu/categories/");
 }
 
+/** Create the six public meny section shells if they are missing (idempotent). */
+export async function adminEnsureMenuSections() {
+  return request<{
+    ok: boolean;
+    created_sections: number;
+    upgraded_names: number;
+    linked: number;
+  }>("/admin/menu/ensure-sections/", { method: "POST" });
+}
+
 export async function adminCreateCategory(data: Partial<AdminCategory>) {
   return request<AdminCategory>("/admin/menu/categories/", { method: "POST", body: data });
 }

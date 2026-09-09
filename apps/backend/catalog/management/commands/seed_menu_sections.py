@@ -39,6 +39,52 @@ RIVAS_MENY_CHILDREN = (
 )
 
 
+def ensure_menu_sections() -> dict[str, int]:
+    """Create missing top-level section shells and nest known RIVAS courses.
+
+    Safe to call from management commands and the admin API.
+    """
+    created_sections = 0
+    upgraded_names = 0
+    for sort_order, slug, name in TOP_LEVEL_SECTIONS:
+        obj, created = Category.objects.get_or_create(
+            slug=slug,
+            defaults={
+                "name": name,
+                "description": "",
+                "sort_order": sort_order,
+                "is_active": True,
+                "parent": None,
+            },
+        )
+        if created:
+            created_sections += 1
+        else:
+            legacy = LEGACY_SECTION_NAMES.get(slug, ())
+            if obj.name in legacy and obj.name != name:
+                obj.name = name
+                obj.save(update_fields=["name", "updated_at"])
+                upgraded_names += 1
+
+    linked = 0
+    rivas = Category.objects.filter(slug="rivas-meny").first()
+    if rivas is not None:
+        for child_slug in RIVAS_MENY_CHILDREN:
+            child = Category.objects.filter(slug=child_slug).first()
+            if child is None:
+                continue
+            if child.parent_id != rivas.id:
+                child.parent = rivas
+                child.save(update_fields=["parent", "updated_at"])
+                linked += 1
+
+    return {
+        "created_sections": created_sections,
+        "upgraded_names": upgraded_names,
+        "linked": linked,
+    }
+
+
 class Command(BaseCommand):
     help = (
         "Seed six top-level menu sections and nest course categories under "
@@ -46,62 +92,20 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        created_sections = 0
-        upgraded_names = 0
-        for sort_order, slug, name in TOP_LEVEL_SECTIONS:
-            obj, created = Category.objects.get_or_create(
-                slug=slug,
-                defaults={
-                    "name": name,
-                    "description": "",
-                    "sort_order": sort_order,
-                    "is_active": True,
-                    "parent": None,
-                },
-            )
-            if created:
-                created_sections += 1
-                self.stdout.write(f"Created section {slug} (sort_order={sort_order})")
-            else:
-                legacy = LEGACY_SECTION_NAMES.get(slug, ())
-                if obj.name in legacy and obj.name != name:
-                    obj.name = name
-                    obj.save(update_fields=["name", "updated_at"])
-                    upgraded_names += 1
-                    self.stdout.write(f"Upgraded section name {slug} → {name!r}")
-                else:
-                    self.stdout.write(
-                        f"Section {slug} already exists — leaving name/order intact"
-                    )
+        result = ensure_menu_sections()
+        for _sort_order, slug, _name in TOP_LEVEL_SECTIONS:
+            if Category.objects.filter(slug=slug).exists():
+                self.stdout.write(f"Section {slug} ready")
 
-        rivas = Category.objects.filter(slug="rivas-meny").first()
-        if rivas is None:
+        if Category.objects.filter(slug="rivas-meny").first() is None:
             self.stderr.write(self.style.ERROR("rivas-meny missing after seed"))
             return
 
-        linked = 0
-        for child_slug in RIVAS_MENY_CHILDREN:
-            child = Category.objects.filter(slug=child_slug).first()
-            if child is None:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Course category {child_slug} not found — skip parent link "
-                        "(run seed_menu first if expected)."
-                    )
-                )
-                continue
-            if child.parent_id != rivas.id:
-                child.parent = rivas
-                child.save(update_fields=["parent", "updated_at"])
-                linked += 1
-                self.stdout.write(f"Linked {child_slug} → rivas-meny")
-            else:
-                self.stdout.write(f"{child_slug} already under rivas-meny")
-
         self.stdout.write(
             self.style.SUCCESS(
-                f"Menu sections ready "
-                f"(created={created_sections}, upgraded_names={upgraded_names}, "
-                f"linked={linked})."
+                "Menu sections ready "
+                f"(created={result['created_sections']}, "
+                f"upgraded_names={result['upgraded_names']}, "
+                f"linked={result['linked']})."
             )
         )

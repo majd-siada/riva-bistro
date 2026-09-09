@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalog.admin_serializers import AdminCategorySerializer, AdminProductSerializer
+from catalog.management.commands.seed_menu_sections import ensure_menu_sections
 from catalog.models import Category, Product
 from core.images import (
     ALLOWED_IMAGE_EXTENSIONS,
@@ -21,6 +22,19 @@ from core.revalidate import trigger_frontend_revalidation
 
 def _revalidate_menu() -> None:
     trigger_frontend_revalidation(["/", "/meny"])
+
+
+class AdminEnsureMenuSectionsView(APIView):
+    """Idempotently create the six public meny section shells if missing."""
+
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=["admin-menu"], responses={200: dict})
+    def post(self, request: Request) -> Response:
+        result = ensure_menu_sections()
+        if result["created_sections"] or result["linked"] or result["upgraded_names"]:
+            _revalidate_menu()
+        return Response({"ok": True, **result})
 
 
 class AdminCategoryListCreateView(generics.ListCreateAPIView):
