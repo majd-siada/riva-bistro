@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { GoldDivider } from "@/components/brand/gold-divider";
 import { cn } from "@/lib/utils";
 
@@ -14,14 +16,23 @@ export function Logo({
   showDivider = true,
   showWordmark = true,
   className,
+  size = 40,
 }: LogoProps) {
   const wordColor = tone === "gold" ? "text-riva-gold" : "text-riva-cream";
   const subColor = "text-riva-muted";
 
   return (
-    <span className={cn("inline-flex flex-col", className)}>
+    <span className={cn("inline-flex items-center gap-3", className)}>
+      <Image
+        src="/brand/riva-logo.svg"
+        alt={showWordmark ? "" : "Riva Bistro"}
+        width={size}
+        height={size}
+        className="shrink-0"
+        priority
+      />
       {showWordmark && (
-        <span className="flex flex-col leading-none">
+        <span className="inline-flex flex-col leading-none">
           <span className={cn("font-display text-[1.65rem] tracking-[0.28em]", wordColor)}>
             RIVA
           </span>
@@ -33,10 +44,10 @@ export function Logo({
           >
             BISTRO
           </span>
+          {showDivider && (
+            <GoldDivider variant="short" className="mt-2.5 opacity-70" />
+          )}
         </span>
-      )}
-      {showDivider && showWordmark && (
-        <GoldDivider variant="short" className="mt-2.5 opacity-70" />
       )}
     </span>
   );

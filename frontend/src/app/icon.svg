@@ -1,8 +1,16 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="7" fill="#0F1418" />
-  <rect x="1" y="1" width="30" height="30" rx="6" stroke="#BFA06A" stroke-width="1" stroke-opacity="0.5" />
+<svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="19" fill="#0F1418" stroke="#BFA06A" stroke-width="1.25" />
+  <circle cx="20" cy="20" r="15.5" stroke="#BFA06A" stroke-width="0.5" stroke-opacity="0.4" />
   <path
-    d="M10.4 24V8h6.3c1.7 0 3 .44 3.96 1.32.95.87 1.42 2.07 1.42 3.6 0 1.1-.28 2.05-.83 2.82-.55.78-1.32 1.32-2.3 1.66L23 24h-2.9l-3.46-6.3H13V24h-2.6Zm2.6-8.55h3.3c.94 0 1.66-.24 2.17-.72.5-.48.76-1.15.76-2 0-.87-.25-1.53-.75-2-.5-.46-1.22-.7-2.16-.7H13v5.42Z"
+    d="M15.1 28V12.4h6.05c1.63 0 2.9.42 3.8 1.26.9.83 1.35 1.98 1.35 3.44 0 1.06-.26 1.96-.79 2.7-.52.73-1.26 1.26-2.2 1.58L27 28h-2.62l-3.3-6.02h-3.3V28h-2.68Zm2.68-8.2h3.13c.9 0 1.6-.23 2.08-.68.49-.46.73-1.1.73-1.92 0-.83-.24-1.46-.72-1.9-.47-.45-1.16-.67-2.06-.67h-3.16v5.17Z"
     fill="#BFA06A"
+  />
+  <path
+    d="M13 30.5c4.7 1.8 9.3 1.8 14 0"
+    stroke="#5E8B8B"
+    stroke-width="0.75"
+    stroke-linecap="round"
+    stroke-opacity="0.7"
+    fill="none"
   />
 </svg>
