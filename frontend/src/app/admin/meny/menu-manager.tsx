@@ -29,6 +29,7 @@ import {
   adminCreateProduct,
   adminDeleteCategory,
   adminDeleteProduct,
+  adminEnsureMenuSections,
   adminListCategories,
   adminListProducts,
   adminUpdateCategory,
@@ -114,6 +115,7 @@ export default function AdminMenuManager({
   });
 
   const reload = async () => {
+    await adminEnsureMenuSections();
     const [p, c] = await Promise.all([adminListProducts(), adminListCategories()]);
     setProducts(p);
     setCategories(c);
@@ -124,6 +126,16 @@ export default function AdminMenuManager({
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
+
+  const createMissingSection = async () => {
+    try {
+      await adminEnsureMenuSections();
+      await reload();
+      toast.success("Menysektioner skapades.");
+    } catch {
+      toast.error("Kunde inte skapa sektionen.");
+    }
+  };
 
   const sectionRoot = useMemo(
     () => categories.find((c) => c.slug === sectionSlug) ?? null,
@@ -377,11 +389,16 @@ export default function AdminMenuManager({
       )}
 
       {!sectionRoot ? (
-        <StateMessage
-          variant="error"
-          title="Sektionen saknas"
-          description={`Ingen kategori med slug “${sectionSlug}” hittades. Kör seed eller skapa den i Django Admin.`}
-        />
+        <div className="space-y-4">
+          <StateMessage
+            variant="error"
+            title="Sektionen saknas"
+            description={`Ingen kategori med slug “${sectionSlug}” hittades.`}
+          />
+          <Button variant="gold" onClick={() => void createMissingSection()}>
+            Skapa menysektioner
+          </Button>
+        </div>
       ) : (
         <section className="rounded-lg border border-riva-cream/10 bg-riva-card p-5">
           <h2 className="font-display text-2xl text-riva-cream">Sektion</h2>

@@ -156,3 +156,25 @@ def test_seed_menu_does_not_prune_top_level_sections(seeded_menu):
     )
     assert after == set(SECTION_SLUGS)
     assert Product.objects.count() == 33
+
+
+@pytest.mark.django_db
+def test_admin_ensure_sections_creates_missing_rivas_meny(db):
+    """Admin Meny can recover when section shells were never seeded."""
+    from django.contrib.auth import get_user_model
+
+    assert not Category.objects.filter(slug="rivas-meny").exists()
+
+    user = get_user_model().objects.create_user("ensure-staff", password="x", is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    resp = client.post("/api/v1/admin/menu/ensure-sections/")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["ok"] is True
+    assert body["created_sections"] >= 1
+    assert Category.objects.filter(slug="rivas-meny", parent__isnull=True).exists()
+    assert set(
+        Category.objects.filter(slug__in=SECTION_SLUGS).values_list("slug", flat=True)
+    ) == set(SECTION_SLUGS)
