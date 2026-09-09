@@ -78,6 +78,8 @@ describe("AdminShell QA smoke", () => {
     expect(
       screen.getByRole("link", { name: "Inställningar" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Innehåll")).toBeInTheDocument();
+    expect(screen.getByText("Drift")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Lunch" })).not.toBeInTheDocument();
     expect(screen.getByText("Översikt innehåll")).toBeInTheDocument();
   });
