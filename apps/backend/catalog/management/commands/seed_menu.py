@@ -90,6 +90,11 @@ FEATURED = {
     "rivas-kottbullar": 3,
 }
 
+# Named stock photos under frontend/public (served same-origin by Next).
+PRODUCT_IMAGES = {
+    "entrecote": "/menu/entrecote.jpg",
+}
+
 
 class Command(BaseCommand):
     help = "Seed the real Riva Bistro menu (idempotent)."
@@ -103,22 +108,26 @@ class Command(BaseCommand):
 
         for i, (cat_slug, name, slug, desc, price) in enumerate(PRODUCTS):
             category = Category.objects.get(slug=cat_slug)
-            Product.objects.update_or_create(
-                slug=slug,
-                defaults={
-                    "category": category,
-                    "name": name,
-                    "description": desc,
-                    "base_price": ex_vat(price),
-                    "vat_rate": FOOD_VAT,
-                    "image_url": "",
-                    "is_available": True,
-                    "is_featured": slug in FEATURED,
-                    "featured_order": FEATURED.get(slug, 0),
-                    "sort_order": i,
-                    "inventory_count": 999,
-                },
-            )
+            defaults = {
+                "category": category,
+                "name": name,
+                "description": desc,
+                "base_price": ex_vat(price),
+                "vat_rate": FOOD_VAT,
+                "is_available": True,
+                "is_featured": slug in FEATURED,
+                "featured_order": FEATURED.get(slug, 0),
+                "sort_order": i,
+                "inventory_count": 999,
+            }
+            # Only seed stock images when the product has none — never wipe
+            # staff uploads from Admin → Meny.
+            if slug in PRODUCT_IMAGES:
+                existing = Product.objects.filter(slug=slug).only("image_url").first()
+                if existing is None or not (existing.image_url or "").strip():
+                    defaults["image_url"] = PRODUCT_IMAGES[slug]
+
+            Product.objects.update_or_create(slug=slug, defaults=defaults)
 
         keep_product_slugs = {p[2] for p in PRODUCTS}
         keep_category_slugs = {c[1] for c in CATEGORIES}
