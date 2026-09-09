@@ -17,11 +17,12 @@ Short operational guide for the restaurant owner (Majd). Technical deploy detail
 
 ## Daily operations
 
-1. **Reservations:** Admin → Bokningar (or Django admin).
-2. **Menu:** Admin → Meny. Public site reads the same CMS.
-3. **Hours / closures:** Admin → Öppettider.
-4. **Enable online booking:** only after capacity is real → set `production_ready=true`.
-5. **Missed staff alerts:**  
+1. **Reservations:** Admin → Bokningar (Notiser column + resend in detail).
+2. **Menu:** Admin → Meny (six section tabs). Public `/meny` reads Django catalog only.
+3. **Hours / closures:** Admin → Öppettider (also feeds JSON-LD).
+4. **Homepage / news / offers / NAP:** Admin → Startsida, Nyheter, Erbjudanden, Restaurang, Galleri.
+5. **Enable online booking:** only after capacity is real → Inställningar → `production_ready=true` (requires `DJANGO_DEBUG=false` on the API).
+6. **Missed staff alerts:** open booking → Skicka om notiser, or  
    `python manage.py resend_reservation_notifications --unsent`
 
 ## Before calling the site “fully live”

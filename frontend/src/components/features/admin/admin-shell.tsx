@@ -16,6 +16,10 @@ const NAV = [
   { href: "/admin/forfragningar", label: "Förfrågningar" },
   { href: "/admin/meny", label: "Meny" },
   { href: "/admin/galleri", label: "Galleri" },
+  { href: "/admin/startsida", label: "Startsida" },
+  { href: "/admin/nyheter", label: "Nyheter" },
+  { href: "/admin/erbjudanden", label: "Erbjudanden" },
+  { href: "/admin/restaurang", label: "Restaurang" },
   { href: "/admin/oppettider", label: "Öppettider" },
   { href: "/admin/installningar", label: "Inställningar" },
 ];

@@ -143,7 +143,7 @@ export default async function HomePage() {
           </ul>
         </Section>
       )}
-      {gallery.length > 0 && (
+      {gallery.length > 0 ? (
         <Section>
           <SectionHeading eyebrow="Atmosfär" title="Galleri" align="center" />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -159,6 +159,18 @@ export default async function HomePage() {
           <div className="mt-8 text-center">
             <Button asChild variant="outline">
               <Link href="/galleri">Fler bilder</Link>
+            </Button>
+          </div>
+        </Section>
+      ) : (
+        <Section>
+          <SectionHeading eyebrow="Atmosfär" title="Galleri" align="center" />
+          <p className="mx-auto mt-6 max-w-md text-center text-sm text-riva-muted">
+            Galleriet fylls på med bilder från restaurangen. Titta gärna in snart igen.
+          </p>
+          <div className="mt-8 text-center">
+            <Button asChild variant="outline">
+              <Link href="/galleri">Till galleriet</Link>
             </Button>
           </div>
         </Section>

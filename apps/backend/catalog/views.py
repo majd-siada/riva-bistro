@@ -59,7 +59,7 @@ class ProductListView(APIView):
     )
     def get(self, request: Request) -> Response:
         qs = (
-            Product.objects.filter(is_available=True)
+            Product.objects.filter(is_available=True, category__is_active=True)
             .select_related("category")
             .order_by("sort_order", "id")
         )
@@ -78,7 +78,9 @@ class FeaturedProductListView(APIView):
     @extend_schema(tags=["menu"], responses={200: ProductListSerializer(many=True)})
     def get(self, request: Request) -> Response:
         qs = (
-            Product.objects.filter(is_available=True, is_featured=True)
+            Product.objects.filter(
+                is_available=True, is_featured=True, category__is_active=True
+            )
             .select_related("category")
             .order_by("featured_order", "name")[:8]
         )
@@ -90,9 +92,9 @@ class ProductDetailView(APIView):
     @extend_schema(tags=["menu"], responses={200: ProductDetailSerializer})
     def get(self, request: Request, slug: str) -> Response:
         product = get_object_or_404(
-            Product.objects.filter(is_available=True).prefetch_related(
-                "modifier_groups__options"
-            ),
+            Product.objects.filter(
+                is_available=True, category__is_active=True
+            ).prefetch_related("modifier_groups__options"),
             slug=slug,
         )
         serializer = ProductDetailSerializer(product, context={"request": request})

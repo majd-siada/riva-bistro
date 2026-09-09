@@ -1,14 +1,13 @@
 /**
- * Fallback public menu if the catalog API is unreachable or empty.
+ * Static menu fixtures for hierarchy shells and tests.
  *
- * Kept intentionally for resilience: production prefers Django catalog
- * (admin CMS → GET /api/v1/menu/). This static copy is only used when the
- * API fails so the site still shows dishes instead of an empty menu.
- * Prices inkl. moms (12 %). Do not treat this as the source of truth once
- * the catalog is seeded in production.
+ * Production source of truth is Django Catalog (admin CMS → GET /api/v1/menu/).
+ * Public loaders never invent dishes from this file: empty/unreachable catalog
+ * yields section shells with empty item lists. Dish rows here remain for
+ * hierarchy isolation tests and seed parity reference only.
  *
- * Hierarchy mirrors production: six top-level sections; course-type
- * categories are children of rivas-meny. Items stay on course slugs.
+ * Hierarchy: six top-level sections; course-type categories are children of
+ * rivas-meny. Items stay on course slugs.
  */
 
 export interface MenuCategory {

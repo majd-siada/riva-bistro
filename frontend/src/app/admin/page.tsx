@@ -41,12 +41,12 @@ export default function AdminDashboardPage() {
         <div className="flex items-start gap-3 rounded-lg border border-riva-gold/40 bg-riva-gold/10 p-4 text-sm text-riva-cream">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
           <p>
-            Onlinebokning körs i utvecklingsläge med en platshållarkapacitet. Ange
-            en verklig kapacitet under{" "}
+            Onlinebokning är <strong className="font-medium">avstängd</strong> tills
+            ni anger verklig kapacitet under{" "}
             <Link href="/admin/installningar" className="underline">
               Inställningar
             </Link>{" "}
-            och aktivera produktionsläge innan lansering.
+            och aktiverar produktionsläge. Gäster kan inte boka online under tiden.
           </p>
         </div>
       )}

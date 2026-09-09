@@ -1,7 +1,7 @@
 import { business, fullAddress } from "@/config/business";
-import { OFFICIAL_OPENING_HOURS } from "@/config/opening-hours";
-import { loadRestaurantBusiness } from "@/lib/public-data";
+import { loadHours, loadRestaurantBusiness } from "@/lib/public-data";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import type { OpeningHour } from "@/lib/api";
 
 const SCHEMA_DAYS = [
   "Monday",
@@ -13,21 +13,30 @@ const SCHEMA_DAYS = [
   "Sunday",
 ] as const;
 
-function openingHoursSpecification() {
-  return OFFICIAL_OPENING_HOURS.filter((d) => !d.isClosed).map((d) => ({
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: SCHEMA_DAYS[d.weekday],
-    opens: d.opens,
-    closes: d.closes,
-  }));
+function openingHoursSpecification(hours: OpeningHour[]) {
+  return hours
+    .filter(
+      (d): d is OpeningHour & { opens_at: string; closes_at: string } =>
+        !d.is_closed && Boolean(d.opens_at) && Boolean(d.closes_at),
+    )
+    .map((d) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: SCHEMA_DAYS[d.weekday] ?? SCHEMA_DAYS[0],
+      opens: d.opens_at.slice(0, 5),
+      closes: d.closes_at.slice(0, 5),
+    }));
 }
 
 /**
  * Restaurant + WebSite structured data.
  * NAP from RestaurantProfile API with config fallback.
+ * Opening hours from the same loadHours() path as the public UI.
  */
 export async function RestaurantJsonLd() {
-  const profile = await loadRestaurantBusiness();
+  const [profile, hours] = await Promise.all([
+    loadRestaurantBusiness(),
+    loadHours(),
+  ]);
   const socialLinks: string[] = [profile.social.instagram, profile.social.facebook];
   const sameAs = profile.verified ? socialLinks : [];
 
@@ -52,7 +61,7 @@ export async function RestaurantJsonLd() {
     },
     hasMenu: `${SITE_URL}/meny`,
     acceptsReservations: true,
-    openingHoursSpecification: openingHoursSpecification(),
+    openingHoursSpecification: openingHoursSpecification(hours),
   };
 
   if (sameAs.length > 0) {

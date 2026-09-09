@@ -1,4 +1,4 @@
-import { FEATURED_MENU_SLUGS, MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu";
+import { MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu";
 import {
   fetchCategories,
   fetchFeatured,
@@ -206,12 +206,13 @@ export async function loadPublicMenu(): Promise<{
 }> {
   try {
     const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
-    // Use API data whenever categories exist — empty product lists are valid
-    // (e.g. TAKE AWAY / DRYCK shells with no dishes yet). Never invent dishes.
+    // Django Catalog is the source of truth. Empty product lists are valid
+    // (section shells with no dishes). Never invent dishes from static data.
     if (!categories.length) {
+      // Empty DB / unseeded: keep section shell structure for UX, no dishes.
       return {
         categories: isolateMenuHierarchy(staticMenu().categories),
-        items: staticMenu().items,
+        items: [],
       };
     }
 
@@ -220,10 +221,11 @@ export async function loadPublicMenu(): Promise<{
       items: products.map(mapProduct),
     };
   } catch {
-    // Network / API failure only — last-resort static shells + seed dishes.
+    // API unreachable: show section shells + honest empty items — never
+    // masquerade seed/static prices as live CMS data.
     return {
       categories: isolateMenuHierarchy(staticMenu().categories),
-      items: staticMenu().items,
+      items: [],
     };
   }
 }
@@ -233,9 +235,8 @@ export async function loadFeaturedItems(): Promise<PublicItem[]> {
     const featured = await fetchFeatured();
     return featured.map(mapProduct);
   } catch {
-    const { items } = staticMenu();
-    const featuredSlugs = new Set<string>(FEATURED_MENU_SLUGS);
-    return items.filter((item) => featuredSlugs.has(item.slug));
+    // Do not invent featured dishes when the catalog API is unreachable.
+    return [];
   }
 }
 

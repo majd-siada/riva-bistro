@@ -171,3 +171,22 @@ def test_inactive_section_hidden_from_public_categories(
         format="json",
     )
     assert restore.status_code == 200
+
+
+@pytest.mark.django_db
+def test_public_products_exclude_inactive_category(seeded_menu):
+    """Products under inactive categories must not appear on public product lists."""
+    from rest_framework.test import APIClient
+
+    course = Category.objects.get(slug="forratter")
+    course.is_active = False
+    course.save(update_fields=["is_active", "updated_at"])
+
+    client = APIClient()
+    products = client.get("/api/v1/menu/products/")
+    assert products.status_code == 200
+    assert all(row["category_slug"] != "forratter" for row in products.json())
+
+    featured = client.get("/api/v1/menu/featured/")
+    assert featured.status_code == 200
+    assert all(row["category_slug"] != "forratter" for row in featured.json())

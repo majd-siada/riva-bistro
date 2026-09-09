@@ -9,6 +9,7 @@ import {
   catalogHasAnyMenuSection,
   catalogHasMenuSections,
   isolateMenuHierarchy,
+  loadFeaturedItems,
   loadPublicMenu,
   topLevelCategories,
 } from "@/lib/public-menu";
@@ -20,7 +21,7 @@ vi.mock("@/lib/api", () => ({
   resolveImageUrl: (url: string) => url,
 }));
 
-import { fetchCategories, fetchProducts } from "@/lib/api";
+import { fetchCategories, fetchFeatured, fetchProducts } from "@/lib/api";
 
 const modernSections = [
   {
@@ -193,6 +194,32 @@ describe("loadPublicMenu", () => {
     expect(menu.items).toEqual([]);
     expect(buildMenuNav(menu.categories).map((n) => n.slug)).toContain("rivas-meny");
     expect(buildMenuNav(menu.categories).map((n) => n.slug)).not.toContain("missing");
+  });
+
+  it("does not invent dishes when the catalog has no categories", async () => {
+    vi.mocked(fetchCategories).mockResolvedValue([]);
+    vi.mocked(fetchProducts).mockResolvedValue([]);
+
+    const menu = await loadPublicMenu();
+    expect(menu.items).toEqual([]);
+    expect(buildMenuNav(menu.categories).map((n) => n.slug)).toEqual([
+      ...MENU_SECTION_SLUGS,
+    ]);
+  });
+
+  it("does not invent dishes when the catalog API throws", async () => {
+    vi.mocked(fetchCategories).mockRejectedValue(new Error("network"));
+    vi.mocked(fetchProducts).mockRejectedValue(new Error("network"));
+
+    const menu = await loadPublicMenu();
+    expect(menu.items).toEqual([]);
+  });
+});
+
+describe("loadFeaturedItems", () => {
+  it("returns empty when featured API fails", async () => {
+    vi.mocked(fetchFeatured).mockRejectedValue(new Error("network"));
+    expect(await loadFeaturedItems()).toEqual([]);
   });
 });
 

@@ -209,6 +209,37 @@ def test_production_guard_blocks_when_not_ready(api, settings):
 
 
 @pytest.mark.django_db
+def test_debug_bypasses_production_ready_gate(api, settings):
+    """Documented escape hatch: DEBUG=True ignores production_ready=False."""
+    settings.DEBUG = True
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.production_ready = False
+    config.save()
+    target = _target_date()
+
+    availability = api.get(
+        f"/api/v1/reservations/availability/?date={target.isoformat()}"
+    )
+    assert availability.json()["enabled"] is True
+
+    resp = api.post(
+        "/api/v1/reservations/",
+        {
+            "name": "Dev Guest",
+            "phone": "0700000001",
+            "email": "dev@example.com",
+            "party_size": 2,
+            "date": target.isoformat(),
+            "time": "12:00",
+        },
+        format="json",
+    )
+    assert resp.status_code == 201
+    assert Reservation.objects.filter(email="dev@example.com").exists()
+
+
+@pytest.mark.django_db
 def test_public_booking_ignores_csrf_even_with_authenticated_session():
     # A staff member (or anyone with an authenticated Django session) browsing
     # the public site must still be able to book — the public endpoint has no

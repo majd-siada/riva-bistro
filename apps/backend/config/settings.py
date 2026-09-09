@@ -304,6 +304,19 @@ if _cookie_domain:
     SESSION_COOKIE_DOMAIN = _cookie_domain
     CSRF_COOKIE_DOMAIN = _cookie_domain
 
+if not DEBUG:
+    import logging as _logging
+
+    _sec_log = _logging.getLogger("django.security")
+    if SESSION_COOKIE_SAMESITE != "None" or not _cookie_domain:
+        _sec_log.warning(
+            "Cross-subdomain admin (frontend → api) requires "
+            "DJANGO_COOKIE_SAMESITE=None and DJANGO_COOKIE_DOMAIN=.example.com "
+            "when DEBUG is false. Current SameSite=%s domain=%r",
+            SESSION_COOKIE_SAMESITE,
+            _cookie_domain or "(unset)",
+        )
+
 # --- Email -------------------------------------------------------------------
 # Environment-configurable. In development we default to the console backend so
 # nothing is faked (Django prints the message and reports a real success). In

@@ -70,10 +70,15 @@ describe("AdminShell QA smoke", () => {
     );
     expect(screen.getByRole("link", { name: "Meny" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Galleri" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Startsida" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Nyheter" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Erbjudanden" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Restaurang" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Öppettider" })).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Inställningar" }),
     ).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Lunch" })).not.toBeInTheDocument();
     expect(screen.getByText("Översikt innehåll")).toBeInTheDocument();
   });
 });
