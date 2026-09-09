@@ -131,7 +131,7 @@ export async function adminListReservations(params: {
   if (params.status) qs.set("status", params.status);
   if (params.q) qs.set("q", params.q);
   const suffix = qs.toString() ? `?${qs.toString()}` : "";
-  return request<AdminReservation[]>(`/admin/reservations/${suffix}`);
+  return request<AdminReservationWithNotify[]>(`/admin/reservations/${suffix}`);
 }
 
 export async function adminUpdateReservationStatus(id: number, status: string) {

@@ -6,8 +6,8 @@ Practical guide for restaurant staff. Describes **what exists today** — not pl
 
 | Tool | URL | Use for |
 |------|-----|---------|
-| **Next admin (preferred day-to-day)** | `https://rivabistro.se/admin` | Login, overview, bookings, inquiries inbox, menu, hours/closures, reservation settings |
-| **Django Admin** | `https://api.rivabistro.se/admin/` | News, gallery, modifiers, low-level model edits, contact/event rows (readonly), user staff flags |
+| **Next admin (preferred day-to-day)** | `https://rivabistro.se/admin` | Login, overview, bookings, inquiries, menu, gallery, homepage/news/offers, restaurant NAP, hours/closures, reservation settings |
+| **Django Admin** | `https://api.rivabistro.se/admin/` | Modifiers, low-level model edits, emergency overrides, user staff flags |
 
 Only **Django staff** users can sign in. Ask Majd/ops to create accounts — do not share one password across the team long-term.
 
@@ -29,9 +29,9 @@ Sign out with the control in the admin shell when done on a shared computer.
 ### Bokningar (`/admin/bokningar`)
 
 - List and filter reservations.
-- Update booking **status** (e.g. confirmed / cancelled — use the statuses shown in the UI).
-- Check notification flags (Telegram / staff email).
-- **Skicka om notiser** when a booking exists but flags show notify failed (after ops fixes env if needed).
+- **Notiser** column shows whether staff Telegram/email alerts were sent (Skickad / Delvis / Ej skickad).
+- Open a booking → check Telegram / personal-e-post flags.
+- **Skicka om notiser** when flags show notify failed (after ops fixes env if needed).
 
 ### Förfrågningar (`/admin/forfragningar`)
 
@@ -39,6 +39,8 @@ Sign out with the control in the admin shell when done on a shared computer.
 - Reply to guests via your normal mailbox; this screen does not send replies.
 
 ### Meny (`/admin/meny`)
+
+**Source of truth:** Django Catalog. Public `/meny` shows only catalog API data (or empty sections). Static `menu.ts` is not live CMS data.
 
 Tabs match the six public sections on `/meny` (same Swedish labels):
 
@@ -61,9 +63,29 @@ Tabs match the six public sections on `/meny` (same Swedish labels):
 
 **Not in Next admin:** product **modifier** groups/options — use Django Admin → Modifier groups/options.
 
+### Galleri (`/admin/galleri`)
+
+- Publish gallery images (alt text, sort order, active).
+
+### Startsida (`/admin/startsida`)
+
+- Homepage hero and about copy/images used on `/`.
+
+### Nyheter (`/admin/nyheter`)
+
+- Publish news items shown on the homepage when present.
+
+### Erbjudanden (`/admin/erbjudanden`)
+
+- Publish offers shown on the homepage when present.
+
+### Restaurang (`/admin/restaurang`)
+
+- NAP (name, address, phone, email) and social links used on the public site and JSON-LD.
+
 ### Öppettider (`/admin/oppettider`)
 
-- Weekly opening hours per weekday.
+- Weekly opening hours per weekday (same source as public UI and Restaurant JSON-LD).
 - **Special closures** (date + reason) for holidays or private events.
 
 Official baseline hours live in code (`official_hours`) and seeds; day-to-day corrections belong here.
@@ -71,7 +93,7 @@ Official baseline hours live in code (`official_hours`) and seeds; day-to-day co
 ### Inställningar (`/admin/installningar`)
 
 - Capacity-related settings: max guests/slot, party size, booking horizon, lead time, etc.
-- **`production_ready`:** controls whether **online booking is enabled**.
+- **`production_ready`:** controls whether **online booking is enabled** in production (`DJANGO_DEBUG=false`).
 
 **Safety:** Do **not** set `production_ready=true` until the owner confirms real capacity and notify channels. Deploys must not flip this automatically.
 
@@ -81,14 +103,12 @@ Log in at the API `/admin/` with the same staff account (Django session).
 
 | Model | Typical use |
 |-------|-------------|
-| News items | Publish news posts (`is_published`, body, slug) |
-| Gallery items | Publish gallery images / alt / sort order |
 | Modifier groups & options | Extra choices on dishes (no Next UI) |
-| Reservations / hours / settings | Emergency edits if Next admin is unavailable |
+| Catalog / reservations / hours / settings | Emergency edits if Next admin is unavailable |
 | Contact / event inquiries | Readonly archive |
-| Opening hours / closures / reservation settings | Same data Next admin edits |
+| Users | Staff flags |
 
-There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) or NAP phone/address in admin — those are code/config. Do not invent UI controls that are not listed above.
+There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) — those are code/config. Do not invent UI controls that are not listed above.
 
 ## Operational workflows
 
@@ -122,7 +142,7 @@ There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) or N
 | Enable `production_ready` early | Guests can book before you are ready | Owner confirmation first |
 | Delete products casually | Broken references / rework | Mark unavailable |
 | Upload huge/non-image files | Rejected upload | Resize; use JPG/PNG/WebP ≤5MB |
-| Expect Next admin to edit news/gallery | No screen there | Use Django Admin |
+| Expect Next admin to edit modifiers | No screen there | Use Django Admin → Modifier groups |
 | Commit or paste `.env` secrets into chat | Security incident | Ops rotates secrets |
 | Hammer login/booking after errors | HTTP 429 throttle | Wait and retry sparingly |
 

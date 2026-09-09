@@ -25,7 +25,6 @@ import {
   adminListReservations,
   adminResendReservationNotifications,
   adminUpdateReservationStatus,
-  type AdminReservation,
   type AdminReservationWithNotify,
 } from "@/lib/admin-api";
 
@@ -50,7 +49,7 @@ export default function AdminBookingsPage() {
   const [date, setDate] = useState(todayIso());
   const [status, setStatus] = useState("");
   const [q, setQ] = useState("");
-  const [rows, setRows] = useState<AdminReservation[]>([]);
+  const [rows, setRows] = useState<AdminReservationWithNotify[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState<AdminReservationWithNotify | null>(null);
@@ -173,12 +172,18 @@ export default function AdminBookingsPage() {
                 <th className="px-4 py-3 font-medium">Namn</th>
                 <th className="px-4 py-3 font-medium">Gäster</th>
                 <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Notiser</th>
                 <th className="px-4 py-3 font-medium">Referens</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-riva-cream/10">
-              {rows.map((r) => (
+              {rows.map((r) => {
+                const notifyOk =
+                  r.telegram_notified !== false && r.staff_email_notified !== false;
+                const notifyPartial =
+                  r.telegram_notified === true || r.staff_email_notified === true;
+                return (
                 <tr key={r.id} className="bg-riva-card">
                   <td className="px-4 py-3 tabular-nums">{r.date}</td>
                   <td className="px-4 py-3 tabular-nums">{r.time.slice(0, 5)}</td>
@@ -187,6 +192,15 @@ export default function AdminBookingsPage() {
                   <td className="px-4 py-3">
                     <Badge variant={statusVariant(r.status)}>{r.status_label}</Badge>
                   </td>
+                  <td className="px-4 py-3 text-xs">
+                    {notifyOk ? (
+                      <span className="text-riva-muted">Skickad</span>
+                    ) : notifyPartial ? (
+                      <span className="text-riva-gold">Delvis</span>
+                    ) : (
+                      <span className="text-riva-gold">Ej skickad</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs text-riva-muted">{r.ref}</td>
                   <td className="px-4 py-3 text-right">
                     <Button variant="ghost" size="sm" onClick={() => setSelected(r)}>
@@ -194,7 +208,8 @@ export default function AdminBookingsPage() {
                     </Button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
