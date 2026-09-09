@@ -94,23 +94,23 @@ Completion percentage (DONE only): **58.5%**
 | 42 | Authorization | DONE | IsAdminUser on admin APIs; public endpoints AllowAny by design |  |  |  |  |  |
 | 43 | User Management | DONE | Django auth users for staff only (no customer accounts — N/A) |  |  |  |  |  |
 | 44 | Admin Dashboard | DONE | Next /admin + Django /django-admin/ | frontend/src/app/admin/ |  |  |  |  |
-| 45 | Content Management | PARTIAL | Menu/hours/reservations in Next admin; gallery/news leaner via Django | admin pages |  |  | Gallery/news Next admin polish |  |
-| 46 | Menu Management | DONE | Admin meny CRUD | admin/meny |  |  |  |  |
+| 45 | Content Management | DONE — CODE VERIFIED | Next admin CMS nav includes gallery/news/offers/startsida/restaurang | admin-shell.tsx; admin pages | admin-shell.test.tsx |  | Live content entry |  |
+| 46 | Menu Management | DONE — CODE VERIFIED | Admin meny CRUD; Django catalog SoT; no silent static dish fallback | admin/meny; public-menu.ts | public-menu.test.ts; test_menu_section_coverage.py |  | Seed live catalog if empty |  |
 | 47 | Category Management | DONE | Section admin + seed commands | catalog/ |  |  |  |  |
-| 48 | Product Management | DONE | Product admin API |  |  |  |  |  |
+| 48 | Product Management | DONE — CODE VERIFIED | Product admin API; inactive categories excluded from public products | catalog/views.py | test_menu_section_coverage.py |  |  |  |
 | 49 | Pricing Management | DONE | Product price fields in CMS |  |  |  |  |  |
 | 50 | Image Management | PARTIAL | Product/gallery images via media; local disk not S3 | MEDIA settings |  |  | S3 optional later |  |
-| 51 | Opening Hours Management | DONE | Admin öppettider + API | reservations OpeningHours |  |  |  |  |
-| 52 | Restaurant Information Management | PARTIAL | business.ts + ReservationSettings; not full CMS for NAP | business.ts |  |  | Owner confirms verified=true | BLOCKED — HUMAN ACTION REQUIRED |
+| 51 | Opening Hours Management | DONE — CODE VERIFIED | Admin öppettider + API; JSON-LD uses loadHours() | reservations; json-ld.tsx |  |  |  |  |
+| 52 | Restaurant Information Management | DONE — CODE VERIFIED | Next /admin/restaurang CMS for NAP/social; public + JSON-LD consume API | restaurang/page.tsx; RestaurantProfile |  | Owner confirms verified/social | Owner confirms verified=true | HUMAN ACTION REQUIRED |
 | 53 | Contact Management | DONE | Contact inquiry API + admin inbox |  |  |  |  |  |
-| 54 | Reservation System | DONE | Availability + create with locks | reservations/ |  | reservation tests |  |  |
-| 55 | Reservation Management | DONE | Admin bokningar list/detail |  |  |  |  |  |
+| 54 | Reservation System | DONE — CODE VERIFIED | Availability + create with locks; production_ready gate | reservations/ |  | reservation tests incl. DEBUG bypass | Live E2E booking | HUMAN ACTION REQUIRED |
+| 55 | Reservation Management | DONE — CODE VERIFIED | Admin bokningar list/detail + Notiser column | bokningar/page.tsx |  |  |  |  |
 | 56 | Order System | DONE | N/A — commerce out of scope per mvp.md | docs/product/mvp.md |  |  |  |  |
 | 57 | Cart System | DONE | N/A — commerce out of scope |  |  |  |  |  |
 | 58 | Checkout | DONE | N/A — commerce out of scope |  |  |  |  |  |
 | 59 | Payment Integration | DONE | N/A — no payments; do not invent Stripe |  |  |  |  |  |
 | 60 | Receipt System | DONE | N/A — no payments |  |  |  |  |  |
-| 61 | Notification System | PARTIAL | Telegram+email best-effort with flags/resend; VPS delivery unproven | core/notifications/; resend command | test_notifications.py | verify-notifications.sh on VPS | Confirm live delivery | BLOCKED — HUMAN ACTION REQUIRED |
+| 61 | Notification System | PARTIAL | Telegram+email flags/resend; list Notiser column; VPS delivery unproven | core/notifications/; bokningar/page.tsx | test_notifications.py | verify-notifications.sh on VPS | Confirm live delivery | HUMAN ACTION REQUIRED |
 
 ## PHASE 5 — DATA
 
@@ -163,7 +163,7 @@ Completion percentage (DONE only): **58.5%**
 | 96 | XML Sitemap | DONE | app/sitemap.ts public routes |  |  |  |  |  |
 | 97 | Image SEO | DONE | Source inventory requires alt on Image/RestaurantImage usages; dish cards use dish-name alts; decorative emblem placeholder uses empty alt + aria-hidden. Policy: docs/seo/image-alt-and-optimization.md. CMS gallery alt quality remains owner-controlled content. | docs/seo/image-alt-and-optimization.md; food-card.tsx; product-image.tsx; image-alt-inventory.test.ts | image-alt-inventory.test.ts | vitest image alt inventory | Editorial CMS alt quality (owner content) |  |
 | 98 | Internal Linking | DONE | Header/footer/CTAs |  |  |  |  |  |
-| 99 | Structured Data | PARTIAL | Restaurant+WebSite JSON-LD live; Menu+Breadcrumb JSON-LD added 2026-09-06. Social sameAs still gated by business.verified=false (correct). | frontend/src/components/seo/json-ld.tsx | json-ld.test.tsx; seo.test.ts | vitest | Owner verify + Rich Results after verified=true | Confirm social URLs before verified=true |
+| 99 | Structured Data | DONE — CODE VERIFIED | Restaurant+WebSite JSON-LD (hours via loadHours); Menu+Breadcrumb JSON-LD. Social sameAs gated by verified. | frontend/src/components/seo/json-ld.tsx | json-ld.test.tsx; seo.test.ts | vitest | Owner verify + Rich Results after verified=true | Confirm social URLs before verified=true |
 | 100 | Local SEO | PARTIAL | NAP consistent in code; GBP external | business.ts; nap-consistency.md |  |  | GBP ownership | BLOCKED — HUMAN ACTION REQUIRED |
 | 101 | NAP Consistency | DONE | Hornsbergs Strand 57 everywhere in code; Strandvägen scrubbed | business.ts; docs/seo/nap-consistency.md |  |  |  |  |
 | 102 | Open Graph | DONE | OG in createPageMetadata |  |  |  |  |  |
