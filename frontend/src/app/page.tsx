@@ -97,8 +97,8 @@ export default async function HomePage() {
         <Section className="bg-riva-surface/50">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <RestaurantImage
-              src={signature.imageUrl || "/scenes/menu-tabletop.jpg"}
-              alt={`${signature.name} — rätt från Riva Bistro`}
+              src={signature.imageUrl || "/menu/entrecote.jpg"}
+              alt={`${signature.name} — grillad rätt från Riva Bistro`}
               aspectRatio="wide"
             />
             <FeaturedDish
