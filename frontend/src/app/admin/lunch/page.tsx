@@ -10,7 +10,7 @@ export default function AdminLunchPage() {
       <AdminMenuManager
         lockedSection="dagens-lunch"
         title="Lunch"
-        description="Hantera Dagens lunch — samma data som Meny → Dagens lunch."
+        description="Samma data som Meny → Dagens lunch (publik: /meny#dagens-lunch). Veckonummer sätts i sektionsnamnet."
       />
     </Suspense>
   );

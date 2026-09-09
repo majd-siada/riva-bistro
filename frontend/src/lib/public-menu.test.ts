@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu";
 import {
@@ -6,10 +6,73 @@ import {
   RIVAS_MENY_COURSE_SLUGS,
   buildMenuNav,
   buildMenuPanels,
+  catalogHasAnyMenuSection,
   catalogHasMenuSections,
   isolateMenuHierarchy,
+  loadPublicMenu,
   topLevelCategories,
 } from "@/lib/public-menu";
+
+vi.mock("@/lib/api", () => ({
+  fetchCategories: vi.fn(),
+  fetchProducts: vi.fn(),
+  fetchFeatured: vi.fn(),
+  resolveImageUrl: (url: string) => url,
+}));
+
+import { fetchCategories, fetchProducts } from "@/lib/api";
+
+const modernSections = [
+  {
+    name: "Lunch special",
+    slug: "dagens-lunch",
+    description: "From admin",
+    sortOrder: 50,
+    parentSlug: null,
+  },
+  {
+    name: "RIVAS MENY",
+    slug: "rivas-meny",
+    description: "",
+    sortOrder: 10,
+    parentSlug: null,
+  },
+  {
+    name: "TAKE AWAY",
+    slug: "take-away",
+    description: "",
+    sortOrder: 20,
+    parentSlug: null,
+  },
+  {
+    name: "STORA SÄLLSKAPSMENY",
+    slug: "stora-sallskapsmeny",
+    description: "",
+    sortOrder: 30,
+    parentSlug: null,
+  },
+  {
+    name: "SNACKS & DRINKAR",
+    slug: "snacks-drinkar",
+    description: "",
+    sortOrder: 40,
+    parentSlug: null,
+  },
+  {
+    name: "DRYCK",
+    slug: "dryck",
+    description: "",
+    sortOrder: 60,
+    parentSlug: null,
+  },
+  {
+    name: "Förrätter",
+    slug: "forratter",
+    description: "",
+    sortOrder: 1,
+    parentSlug: "rivas-meny",
+  },
+];
 
 describe("isolateMenuHierarchy", () => {
   it("keeps flat course categories nested under RIVAS MENY", () => {
@@ -62,59 +125,7 @@ describe("isolateMenuHierarchy", () => {
   });
 
   it("preserves Django admin names and sort_order on existing sections", () => {
-    const fromAdmin = [
-      {
-        name: "Lunch special",
-        slug: "dagens-lunch",
-        description: "From admin",
-        sortOrder: 50,
-        parentSlug: null,
-      },
-      {
-        name: "RIVAS MENY",
-        slug: "rivas-meny",
-        description: "",
-        sortOrder: 10,
-        parentSlug: null,
-      },
-      {
-        name: "TAKE AWAY",
-        slug: "take-away",
-        description: "",
-        sortOrder: 20,
-        parentSlug: null,
-      },
-      {
-        name: "STORA SÄLLSKAPSMENY",
-        slug: "stora-sallskapsmeny",
-        description: "",
-        sortOrder: 30,
-        parentSlug: null,
-      },
-      {
-        name: "SNACKS & DRINKAR",
-        slug: "snacks-drinkar",
-        description: "",
-        sortOrder: 40,
-        parentSlug: null,
-      },
-      {
-        name: "DRYCK",
-        slug: "dryck",
-        description: "",
-        sortOrder: 60,
-        parentSlug: null,
-      },
-      {
-        name: "Förrätter",
-        slug: "forratter",
-        description: "",
-        sortOrder: 1,
-        parentSlug: "rivas-meny",
-      },
-    ];
-
-    const isolated = isolateMenuHierarchy(fromAdmin);
+    const isolated = isolateMenuHierarchy(modernSections);
     const nav = buildMenuNav(isolated);
 
     expect(nav.map((n) => n.slug)).toEqual([
@@ -127,6 +138,61 @@ describe("isolateMenuHierarchy", () => {
     ]);
     expect(nav.find((n) => n.slug === "dagens-lunch")?.name).toBe("Lunch special");
     expect(isolated.find((c) => c.slug === "dagens-lunch")?.description).toBe("From admin");
+  });
+
+  it("does not reinject inactive top-level sections omitted from the API", () => {
+    const withoutTakeAway = modernSections.filter((c) => c.slug !== "take-away");
+    expect(catalogHasAnyMenuSection(withoutTakeAway)).toBe(true);
+
+    const isolated = isolateMenuHierarchy(withoutTakeAway);
+    const nav = buildMenuNav(isolated);
+
+    expect(nav.map((n) => n.slug)).not.toContain("take-away");
+    expect(nav.map((n) => n.slug)).toContain("rivas-meny");
+    expect(nav.map((n) => n.slug)).toContain("dryck");
+  });
+
+  it("does not reinject inactive RIVAS course categories omitted from the API", () => {
+    const withoutForratter = modernSections.filter((c) => c.slug !== "forratter");
+    const withVarmratter = [
+      ...withoutForratter,
+      {
+        name: "Varmrätter",
+        slug: "varmratter",
+        description: "",
+        sortOrder: 2,
+        parentSlug: "rivas-meny" as string | null,
+      },
+    ];
+
+    const isolated = isolateMenuHierarchy(withVarmratter);
+    const rivas = buildMenuNav(isolated).find((n) => n.slug === "rivas-meny");
+
+    expect(rivas?.children?.map((c) => c.slug)).toEqual(["varmratter"]);
+    expect(isolated.find((c) => c.slug === "forratter")).toBeUndefined();
+  });
+});
+
+describe("loadPublicMenu", () => {
+  it("keeps live categories when the product list is empty", async () => {
+    vi.mocked(fetchCategories).mockResolvedValue(
+      modernSections.map((c) => ({
+        id: 1,
+        name: c.name,
+        slug: c.slug,
+        description: c.description,
+        parent: null,
+        parent_slug: c.parentSlug,
+        sort_order: c.sortOrder,
+        product_count: 0,
+      })),
+    );
+    vi.mocked(fetchProducts).mockResolvedValue([]);
+
+    const menu = await loadPublicMenu();
+    expect(menu.items).toEqual([]);
+    expect(buildMenuNav(menu.categories).map((n) => n.slug)).toContain("rivas-meny");
+    expect(buildMenuNav(menu.categories).map((n) => n.slug)).not.toContain("missing");
   });
 });
 

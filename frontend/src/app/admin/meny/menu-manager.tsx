@@ -87,7 +87,7 @@ type Props = {
 export default function AdminMenuManager({
   lockedSection,
   title = "Meny",
-  description = "Hantera sektioner, kategorier och rätter.",
+  description = "Flikarna speglar de sex sektionerna på /meny. Välj en flik för att hantera just den publika sektionen.",
 }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -386,7 +386,12 @@ export default function AdminMenuManager({
         <section className="rounded-lg border border-riva-cream/10 bg-riva-card p-5">
           <h2 className="font-display text-2xl text-riva-cream">Sektion</h2>
           <p className="mt-1 text-sm text-riva-muted">
-            Redigera namn, beskrivning och synlighet för den här toppsektionen.
+            Publik sektion:{" "}
+            <span className="font-mono text-riva-cream/80">/meny#{sectionSlug}</span>
+            . Redigera namn, beskrivning och synlighet för den här toppsektionen.
+            {sectionSlug === "dagens-lunch"
+              ? " Veckonummer sätts i Namn (t.ex. Dagens lunch v.36)."
+              : null}
           </p>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
@@ -433,7 +438,7 @@ export default function AdminMenuManager({
                   setSectionDraft({ ...sectionDraft, is_active: e.target.checked })
                 }
               />
-              Aktiv
+              Aktiv (synlig på /meny)
             </label>
           </div>
           <div className="mt-4">

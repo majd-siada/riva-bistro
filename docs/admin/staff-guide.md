@@ -40,9 +40,24 @@ Sign out with the control in the admin shell when done on a shared computer.
 
 ### Meny (`/admin/meny`)
 
-- Create/edit **categories** and **products** (name, price, availability, images, etc. as shown in the form).
+Tabs match the six public sections on `/meny` (same Swedish labels):
+
+| Admin tab | Public URL |
+|-----------|------------|
+| Dagens lunch | `/meny#dagens-lunch` |
+| RIVAS MENY | `/meny#rivas-meny` (courses: Förrätter…Desserter) |
+| TAKE AWAY | `/meny#take-away` |
+| STORA SÄLLSKAPSMENY | `/meny#stora-sallskapsmeny` |
+| SNACKS & DRINKAR | `/meny#snacks-drinkar` |
+| DRYCK | `/meny#dryck` |
+
+- Create/edit **products** under the active tab (name, price, description, availability, featured, sort order, images).
+- Edit the **section** name / description / sort / active flag. Inactive sections disappear from the public Kategorier bar.
+- **Dagens lunch:** set the week in the section **Namn** field (e.g. `Dagens lunch v.36`).
+- **RIVAS MENY:** dishes live under course categories (Förrätter…Desserter); you can add course categories here.
 - Upload images: JPG/PNG/WebP, max **5 MB**. Invalid files are rejected.
 - Tip: hide a dish with availability off rather than deleting if it returns seasonally.
+- Deep link `/admin/lunch` opens the same Dagens lunch editor (not a separate menu).
 
 **Not in Next admin:** product **modifier** groups/options — use Django Admin → Modifier groups/options.
 
@@ -91,8 +106,8 @@ There is **no** CMS for legal pages (`/integritetspolicy`, `/cookies`, …) or N
 
 ### Menu update
 
-1. Edit in Meny (or Django for modifiers/gallery/news).
-2. Wait up to ~1 minute for public menu cache revalidation, then hard-refresh `/meny`.
+1. Edit in Meny (pick the tab that matches the public `/meny` section).
+2. Public `/meny` refreshes via on-demand revalidation when `FRONTEND_REVALIDATE_URL` + `FRONTEND_REVALIDATE_SECRET` are set; otherwise wait up to ~1 minute (ISR) and hard-refresh.
 3. Confirm the dish shows with correct price and image.
 
 ### Holiday closure

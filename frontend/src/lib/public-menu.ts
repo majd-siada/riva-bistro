@@ -105,13 +105,25 @@ export function catalogHasMenuSections(
 }
 
 /**
+ * True when the API returned at least one of the six public section shells.
+ * Modern catalogs omit inactive sections; reinjecting them would break visibility.
+ * Legacy flat catalogs (only Förrätter…Desserter) have none of these slugs.
+ */
+export function catalogHasAnyMenuSection(
+  categories: Array<{ slug: string }>,
+): boolean {
+  return categories.some((c) => SECTION_SET.has(c.slug));
+}
+
+/**
  * Force the public hierarchy the site shows:
- * - six isolated top-level sections
+ * - six isolated top-level sections (legacy) OR only active sections (modern)
  * - Förrätter…Desserter nested only under RIVAS MENY
  *
- * Django Admin (CATALOG → Categories) owns name and sort_order for rows that
- * already exist in the API. Static shells are only filled in when a section is
- * missing (legacy flat catalogs), so the Kategorier bar matches administration.
+ * Django Admin / Next admin owns name and sort_order for rows that already
+ * exist in the API. Static top-level shells are only filled in for legacy flat
+ * catalogs (no section slugs from the API), so deactivating a section in admin
+ * removes it from the public Kategorier bar.
  */
 export function isolateMenuHierarchy(categories: PublicCategory[]): PublicCategory[] {
   const bySlug = new Map<string, PublicCategory>();
@@ -122,18 +134,23 @@ export function isolateMenuHierarchy(categories: PublicCategory[]): PublicCatego
     fromCatalog.add(category.slug);
   }
 
-  // Ensure the six section shells exist; keep admin name/sort_order when present.
+  const isLegacyFlatCatalog = !catalogHasAnyMenuSection(categories);
+
+  // Inject the six section shells only for legacy flat catalogs.
+  // Modern catalogs: keep admin-active sections only (no reinjection of inactive).
   for (const section of staticMenu().categories.filter((c) => c.parentSlug == null)) {
     const existing = bySlug.get(section.slug);
     if (!existing) {
-      bySlug.set(section.slug, { ...section });
+      if (isLegacyFlatCatalog) {
+        bySlug.set(section.slug, { ...section });
+      }
     } else if (fromCatalog.has(section.slug)) {
       bySlug.set(section.slug, {
         ...existing,
         parentSlug: null,
         name: existing.name.trim() ? existing.name : section.name,
       });
-    } else {
+    } else if (isLegacyFlatCatalog) {
       bySlug.set(section.slug, {
         ...existing,
         parentSlug: null,
@@ -144,17 +161,21 @@ export function isolateMenuHierarchy(categories: PublicCategory[]): PublicCatego
   }
 
   // Ensure course categories exist and are always parented under rivas-meny.
+  // Legacy flat catalogs get the full course set. Modern catalogs keep only
+  // courses returned by the API (inactive courses stay hidden).
   for (const course of staticMenu().categories.filter((c) => c.parentSlug === "rivas-meny")) {
     const existing = bySlug.get(course.slug);
     if (!existing) {
-      bySlug.set(course.slug, { ...course, parentSlug: "rivas-meny" });
+      if (isLegacyFlatCatalog) {
+        bySlug.set(course.slug, { ...course, parentSlug: "rivas-meny" });
+      }
     } else if (fromCatalog.has(course.slug)) {
       bySlug.set(course.slug, {
         ...existing,
         parentSlug: "rivas-meny",
         name: existing.name.trim() ? existing.name : course.name,
       });
-    } else {
+    } else if (isLegacyFlatCatalog) {
       bySlug.set(course.slug, {
         ...existing,
         parentSlug: "rivas-meny",
