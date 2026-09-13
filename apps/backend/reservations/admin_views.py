@@ -94,6 +94,38 @@ class AdminReservationDetailView(APIView):
         reservation.save(update_fields=["status", "updated_at"])
         return Response(AdminReservationSerializer(reservation).data)
 
+    @extend_schema(tags=["admin"], responses={204: None})
+    def delete(self, request: Request, pk: int) -> Response:
+        reservation = self.get_object(pk)
+        if not reservation:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        reservation.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AdminReservationBulkDeleteView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=["admin"], request=dict, responses={200: dict})
+    def post(self, request: Request) -> Response:
+        ids = request.data.get("ids")
+        if not isinstance(ids, list) or not ids:
+            return Response(
+                {"detail": "ids måste vara en icke-tom lista."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        clean_ids: list[int] = []
+        for value in ids:
+            try:
+                clean_ids.append(int(value))
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "ids måste vara heltal."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        deleted, _ = Reservation.objects.filter(pk__in=clean_ids).delete()
+        return Response({"deleted": deleted})
+
 
 class AdminHoursView(APIView):
     permission_classes = [IsAdminUser]

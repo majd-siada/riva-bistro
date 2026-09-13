@@ -228,10 +228,21 @@ If Hostinger vars are unset, staff reservation email uses the existing Django `E
 | Gallery seed paths | `/scenes/...` via `image_url` | Frontend origin (idempotent `seed_gallery`) |
 | Django admin static | WhiteNoise after `collectstatic` | API process |
 
-`MEDIA_SERVE=true` (default): Django serves `/media/` when `DEBUG=false`.  
-`MEDIA_SERVE=false`: nginx/CDN must mount `MEDIA_ROOT`.
+`MEDIA_SERVE=true` (default): Django serves `/media/` when `DEBUG=false` (also when `DEBUG=true`). Responses include `Cache-Control: public, max-age=604800` so browsers and Next.js Image can reuse files.  
+`MEDIA_SERVE=false`: nginx/CDN must mount `MEDIA_ROOT` (set your own cache headers there).
 
-**Hostinger / API host:** use a **persistent volume** for `MEDIA_ROOT` so uploads survive container restarts. No S3 required for launch.
+**Hostinger / API host:** use a **persistent volume** for `MEDIA_ROOT` (`riva_media_data` → `/app/media` in compose) so uploads survive container restarts. No S3 required for launch.
+
+**Show uploads quickly on the public site:** set both on the API host:
+
+```bash
+FRONTEND_REVALIDATE_URL=https://rivabistro.se/api/revalidate
+FRONTEND_REVALIDATE_SECRET=<same secret as frontend>
+```
+
+Also ensure frontend build has `NEXT_PUBLIC_API_URL=https://api.rivabistro.se` so `/media/...` resolves to the API.
+
+Owner path: Admin → Meny / Galleri → upload JPG/PNG/WebP ≤5 MB → file on API → public `/meny` and `/galleri` after revalidation (or within ISR TTL if revalidate env is unset).
 
 ---
 

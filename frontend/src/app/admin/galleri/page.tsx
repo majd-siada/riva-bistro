@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StateMessage } from "@/components/ui/state-message";
+import { resolveImageUrl } from "@/lib/api";
 import {
   adminCreateGallery,
   adminDeleteGallery,
@@ -22,6 +23,10 @@ import {
   adminUpdateGallery,
   type AdminGalleryItem,
 } from "@/lib/admin-api";
+
+function galleryPreviewSrc(item: Pick<AdminGalleryItem, "src" | "image" | "image_url">) {
+  return resolveImageUrl(item.src || item.image || item.image_url || "");
+}
 
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<AdminGalleryItem[]>([]);
@@ -83,7 +88,10 @@ export default function AdminGalleryPage() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl text-riva-cream">Galleri</h1>
-          <p className="mt-1 text-riva-muted">Bilder på startsidan och /galleri.</p>
+          <p className="mt-1 text-riva-muted">
+            Ladda upp till servern — bilden visas på startsidan och /galleri (spara med
+            Publicerad).
+          </p>
         </div>
         <Button
           variant="gold"
@@ -95,8 +103,18 @@ export default function AdminGalleryPage() {
         </Button>
       </div>
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (
+        {items.map((item) => {
+          const preview = galleryPreviewSrc(item);
+          return (
           <li key={item.id} className="rounded-lg border border-riva-cream/10 bg-riva-card p-3">
+            {preview ? (
+              // eslint-disable-next-line @next/next/no-img-element -- admin thumb; absolute API URL
+              <img
+                src={preview}
+                alt={item.alt}
+                className="mb-3 aspect-[4/3] w-full rounded-md object-cover"
+              />
+            ) : null}
             <p className="font-medium text-riva-cream">{item.alt}</p>
             <p className="mt-1 text-xs text-riva-muted">
               Ordning {item.sort_order} · {item.is_published ? "Publicerad" : "Dold"}
@@ -115,7 +133,8 @@ export default function AdminGalleryPage() {
               </Button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
 
       <Dialog open={draft !== null} onOpenChange={(o) => !o && setDraft(null)}>
@@ -166,7 +185,10 @@ export default function AdminGalleryPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="g-file">Ladda upp bild</Label>
+                  <Label htmlFor="g-file">Ladda upp bild (JPG, PNG, WebP, max 5 MB)</Label>
+                  <p className="mt-1 text-xs text-riva-muted">
+                    Filen sparas på servern och syns på webbplatsen efter sparning.
+                  </p>
                   <input
                     id="g-file"
                     type="file"

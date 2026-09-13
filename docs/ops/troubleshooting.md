@@ -72,9 +72,9 @@ Related: [production-runbook.md](../deployment/production-runbook.md), [maintena
 | | |
 |--|--|
 | **Symptom** | Broken images on menu or gallery |
-| **Likely cause** | Upload rejected (type/size); `MEDIA` not served; wrong `image_url`; Next `remotePatterns` / API host mismatch |
-| **Check** | Upload error in admin; media URL host; API `/media/` reachability; file magic-byte validation in logs |
-| **Fix** | Re-upload valid JPG/PNG/WebP ≤5MB; fix API media serving; use Django Admin for gallery if Next path unused |
+| **Likely cause** | Upload rejected (type/size); `MEDIA` not served; wrong `image_url`; Next `remotePatterns` / API host mismatch; `NEXT_PUBLIC_API_URL` wrong |
+| **Check** | Upload error in admin; `curl -I https://api.rivabistro.se/media/...` (expect 200 + `Cache-Control`); media URL host; file magic-byte validation in logs |
+| **Fix** | Re-upload valid JPG/PNG/WebP ≤5MB; ensure `MEDIA_SERVE=true` or nginx mounts `MEDIA_ROOT`; rebuild frontend with production `NEXT_PUBLIC_API_URL`; set `FRONTEND_REVALIDATE_*` if pages stay stale |
 | **Escalation** | Ops if Nginx media mapping broken on VPS |
 
 ---

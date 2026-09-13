@@ -123,8 +123,14 @@ There is **no** staff UI for homepage copy, NAP profile, news, offers, or dish m
 ### Menu update
 
 1. Edit in Meny (pick the tab that matches the public `/meny` section).
-2. Public `/meny` refreshes via on-demand revalidation when `FRONTEND_REVALIDATE_URL` + `FRONTEND_REVALIDATE_SECRET` are set; otherwise wait up to ~1 minute (ISR) and hard-refresh.
-3. Confirm the dish shows with correct price and image.
+2. Upload a dish photo (JPG/PNG/WebP, max 5 MB) — it is stored on the API server under `/media/menu/` and shown on `/meny` (and homepage featured cards).
+3. Public `/meny` refreshes via on-demand revalidation when `FRONTEND_REVALIDATE_URL` + `FRONTEND_REVALIDATE_SECRET` are set; otherwise wait up to ~1 minute (ISR) and hard-refresh.
+4. Confirm the dish shows with correct price and image.
+
+### Gallery update
+
+1. Admin → Galleri → Ny bild → upload file (or optional URL) + alt-text → Publicerad.
+2. File is stored on the API under `/media/gallery/` and appears on `/galleri` and the homepage gallery strip after revalidation.
 
 ### Holiday closure
 

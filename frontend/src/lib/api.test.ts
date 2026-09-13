@@ -26,6 +26,12 @@ describe("resolveImageUrl", () => {
     expect(resolved.startsWith("http")).toBe(true);
   });
 
+  it("resolves gallery media paths the same way as menu", () => {
+    const resolved = resolveImageUrl("/media/gallery/room.jpg");
+    expect(resolved).toMatch(/^https?:\/\//);
+    expect(resolved.endsWith("/media/gallery/room.jpg")).toBe(true);
+  });
+
   it("leaves Next.js public asset paths unchanged", () => {
     expect(resolveImageUrl("/scenes/hero-food.jpg")).toBe(
       "/scenes/hero-food.jpg",

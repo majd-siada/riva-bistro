@@ -141,6 +141,17 @@ export async function adminUpdateReservationStatus(id: number, status: string) {
   });
 }
 
+export async function adminDeleteReservation(id: number) {
+  return request<void>(`/admin/reservations/${id}/`, { method: "DELETE" });
+}
+
+export async function adminBulkDeleteReservations(ids: number[]) {
+  return request<{ deleted: number }>("/admin/reservations/bulk-delete/", {
+    method: "POST",
+    body: { ids },
+  });
+}
+
 export async function adminGetHours() {
   return request<AdminOpeningHour[]>("/admin/hours/");
 }
@@ -240,6 +251,24 @@ export async function adminListEventInquiries() {
   return request<AdminEventInquiry[]>("/admin/inquiries/events/");
 }
 
+export async function adminDeleteContactMessage(id: number) {
+  return request<void>(`/admin/inquiries/contact/${id}/`, { method: "DELETE" });
+}
+
+export async function adminDeleteEventInquiry(id: number) {
+  return request<void>(`/admin/inquiries/events/${id}/`, { method: "DELETE" });
+}
+
+export async function adminBulkDeleteInquiries(
+  kind: "contact" | "event",
+  ids: number[],
+) {
+  return request<{ deleted: number }>("/admin/inquiries/bulk-delete/", {
+    method: "POST",
+    body: { kind, ids },
+  });
+}
+
 export async function adminResendReservationNotifications(id: number) {
   return request<AdminReservationWithNotify>(`/admin/reservations/${id}/resend-notifications/`, {
     method: "POST",
@@ -265,6 +294,8 @@ export type AdminGalleryItem = {
   alt: string;
   image?: string | null;
   image_url: string;
+  /** Root-relative `/media/...` or external URL — prefer for display. */
+  src?: string;
   sort_order: number;
   is_published: boolean;
   created_at: string;

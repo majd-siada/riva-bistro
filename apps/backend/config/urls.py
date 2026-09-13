@@ -1,12 +1,12 @@
 """URL configuration for Riva Bistro."""
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
-from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.permissions import IsAdminUser
+
+from core.media_views import serve_media
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,14 +31,13 @@ urlpatterns = [
     ),
 ]
 
-# django.conf.urls.static.static() is a no-op when DEBUG is false.
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-elif settings.MEDIA_SERVE:
+# DEBUG and production MEDIA_SERVE both use the same cached media view so
+# Cache-Control is consistent. Set MEDIA_SERVE=false when nginx serves files.
+if settings.DEBUG or settings.MEDIA_SERVE:
     urlpatterns += [
         re_path(
             r"^media/(?P<path>.*)$",
-            serve,
-            {"document_root": settings.MEDIA_ROOT},
+            serve_media,
+            name="serve-media",
         ),
     ]

@@ -133,6 +133,7 @@ class AdminNewsItemSerializer(serializers.ModelSerializer):
 
 class AdminGalleryItemSerializer(serializers.ModelSerializer):
     image = serializers.FileField(required=False, allow_null=True)
+    src = serializers.SerializerMethodField()
 
     class Meta:
         model = GalleryItem
@@ -142,11 +143,29 @@ class AdminGalleryItemSerializer(serializers.ModelSerializer):
             "alt",
             "image",
             "image_url",
+            "src",
             "sort_order",
             "is_published",
             "created_at",
         ]
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "src"]
+
+    def get_src(self, obj: GalleryItem) -> str:
+        if obj.image:
+            return obj.image.url
+        return obj.image_url or ""
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # On create, require a file or an external URL so public /galleri has a src.
+        if self.instance is None:
+            uploaded = attrs.get("image")
+            url = (attrs.get("image_url") or "").strip()
+            if not uploaded and not url:
+                raise serializers.ValidationError(
+                    {"image": "Ladda upp en bild eller ange en bild-URL."}
+                )
+        return attrs
 
     def validate_image(self, uploaded):
         if uploaded is None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.db.models import Q
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
@@ -99,12 +99,55 @@ class AdminContactMessageListView(generics.ListAPIView):
         return ContactMessage.objects.all()[:200]
 
 
+class AdminContactMessageDetailView(generics.DestroyAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = ContactMessage.objects.all()
+
+
 class AdminEventInquiryListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = AdminEventInquirySerializer
 
     def get_queryset(self):
         return EventInquiry.objects.all()[:200]
+
+
+class AdminEventInquiryDetailView(generics.DestroyAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = EventInquiry.objects.all()
+
+
+class AdminInquiryBulkDeleteView(APIView):
+    """Delete many contact messages or event inquiries in one request."""
+
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=["admin-content"], request=dict, responses={200: dict})
+    def post(self, request: Request) -> Response:
+        kind = request.data.get("kind")
+        ids = request.data.get("ids")
+        if kind not in {"contact", "event"}:
+            return Response(
+                {"detail": "kind måste vara contact eller event."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(ids, list) or not ids:
+            return Response(
+                {"detail": "ids måste vara en icke-tom lista."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        clean_ids: list[int] = []
+        for value in ids:
+            try:
+                clean_ids.append(int(value))
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "ids måste vara heltal."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        model = ContactMessage if kind == "contact" else EventInquiry
+        deleted, _ = model.objects.filter(pk__in=clean_ids).delete()
+        return Response({"deleted": deleted})
 
 
 class AdminNewsListCreateView(generics.ListCreateAPIView):

@@ -4,6 +4,7 @@ from reservations.admin_views import (
     AdminClosureDetailView,
     AdminClosureListView,
     AdminHoursView,
+    AdminReservationBulkDeleteView,
     AdminReservationDetailView,
     AdminReservationListView,
     AdminReservationOverviewView,
@@ -14,6 +15,11 @@ from reservations.admin_views import (
 urlpatterns = [
     path("overview/", AdminReservationOverviewView.as_view(), name="admin-reservation-overview"),
     path("reservations/", AdminReservationListView.as_view(), name="admin-reservations"),
+    path(
+        "reservations/bulk-delete/",
+        AdminReservationBulkDeleteView.as_view(),
+        name="admin-reservations-bulk-delete",
+    ),
     path(
         "reservations/<int:pk>/",
         AdminReservationDetailView.as_view(),

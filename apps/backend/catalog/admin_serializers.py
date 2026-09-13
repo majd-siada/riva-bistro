@@ -116,3 +116,15 @@ class AdminProductSerializer(serializers.ModelSerializer):
             request = self.context.get("request")
             return request.build_absolute_uri(obj.image.url) if request else obj.image.url
         return ""
+
+    def to_representation(self, instance):
+        """Expose uploaded file as image_url (root-relative /media/...) when present.
+
+        Matches public ProductListSerializer so admin preview and public site
+        agree on which image is live. The model CharField image_url remains
+        writable for external URL fallbacks when no file is uploaded.
+        """
+        data = super().to_representation(instance)
+        if instance.image:
+            data["image_url"] = instance.image.url
+        return data

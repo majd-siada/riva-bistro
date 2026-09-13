@@ -1,10 +1,13 @@
 from django.urls import path
 
 from core.content_views import (
+    AdminContactMessageDetailView,
     AdminContactMessageListView,
+    AdminEventInquiryDetailView,
     AdminEventInquiryListView,
     AdminGalleryDetailView,
     AdminGalleryListCreateView,
+    AdminInquiryBulkDeleteView,
     AdminNewsDetailView,
     AdminNewsListCreateView,
     AdminOfferDetailView,
@@ -20,9 +23,24 @@ urlpatterns = [
         name="admin-contact-messages",
     ),
     path(
+        "inquiries/contact/<int:pk>/",
+        AdminContactMessageDetailView.as_view(),
+        name="admin-contact-message-detail",
+    ),
+    path(
         "inquiries/events/",
         AdminEventInquiryListView.as_view(),
         name="admin-event-inquiries",
+    ),
+    path(
+        "inquiries/events/<int:pk>/",
+        AdminEventInquiryDetailView.as_view(),
+        name="admin-event-inquiry-detail",
+    ),
+    path(
+        "inquiries/bulk-delete/",
+        AdminInquiryBulkDeleteView.as_view(),
+        name="admin-inquiries-bulk-delete",
     ),
     path("news/", AdminNewsListCreateView.as_view(), name="admin-news"),
     path("news/<int:pk>/", AdminNewsDetailView.as_view(), name="admin-news-detail"),

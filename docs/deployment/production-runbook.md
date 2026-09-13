@@ -188,6 +188,13 @@ curl -fsSI https://rivabistro.se/boka | head -n 5
 
 In the browser: home, meny, boka, admin login path. Media under `/media/` should load from the API origin.
 
+Owner photo check (after deploy):
+
+1. Admin → Meny → upload a dish photo → confirm file exists under the API media volume and public `/meny` shows it.
+2. Admin → Galleri → upload → confirm `/galleri` and homepage strip.
+3. API env must include `FRONTEND_REVALIDATE_URL` + `FRONTEND_REVALIDATE_SECRET` (see `.env.example`) so uploads appear without waiting for ISR TTL.
+4. `curl -fsSI https://api.rivabistro.se/media/<path>` should return `200` and `Cache-Control: public, max-age=604800` when `MEDIA_SERVE=true`.
+
 ---
 
 ## Reservation verification (must stay gated)

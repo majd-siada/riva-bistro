@@ -38,6 +38,7 @@ import {
   type AdminCategory,
   type AdminProduct,
 } from "@/lib/admin-api";
+import { resolveImageUrl } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
 import { MENU_SECTION_TABS, type MenuSectionSlug } from "@/lib/menu-sections";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,8 @@ type Draft = {
   is_featured: boolean;
   featured_order: number;
   vat_rate: string;
+  image_url?: string;
+  image_upload_url?: string;
 };
 
 const emptyDraft = (categoryId?: number): Draft => ({
@@ -77,6 +80,8 @@ const emptyDraft = (categoryId?: number): Draft => ({
   is_featured: false,
   featured_order: 0,
   vat_rate: String(VAT),
+  image_url: "",
+  image_upload_url: "",
 });
 
 type Props = {
@@ -282,7 +287,16 @@ export default function AdminMenuManager({
     try {
       const updated = await adminUploadProductImage(id, file);
       setProducts((prev) => prev.map((x) => (x.id === id ? updated : x)));
-      toast.success("Bild uppladdad.");
+      setDraft((prev) =>
+        prev && prev.id === id
+          ? {
+              ...prev,
+              image_url: updated.image_url ?? "",
+              image_upload_url: updated.image_upload_url ?? "",
+            }
+          : prev,
+      );
+      toast.success("Bild uppladdad — syns på /meny och startsidan.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Kunde inte ladda upp bilden.");
     }
@@ -354,6 +368,9 @@ export default function AdminMenuManager({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl text-riva-cream">{title}</h1>
+          <p className="mt-1 text-riva-muted">
+            Hantera rätter. Uppladdade bilder sparas på servern och visas på /meny.
+          </p>
           <p className="mt-1 text-riva-muted">{description}</p>
         </div>
         <Button
@@ -534,6 +551,8 @@ export default function AdminMenuManager({
                             is_featured: p.is_featured ?? false,
                             featured_order: p.featured_order ?? 0,
                             vat_rate: p.vat_rate ?? String(VAT),
+                            image_url: p.image_url ?? "",
+                            image_upload_url: p.image_upload_url ?? "",
                           })
                         }
                       >
@@ -733,7 +752,21 @@ export default function AdminMenuManager({
                 </div>
                 {draft.id && (
                   <div>
-                    <Label htmlFor="d-image">Bild (JPG, PNG, WebP)</Label>
+                    <Label htmlFor="d-image">Bild (JPG, PNG, WebP, max 5 MB)</Label>
+                    <p className="mt-1 text-xs text-riva-muted">
+                      Sparad på servern — syns på webbplatsen direkt efter uppladdning.
+                    </p>
+                    {(draft.image_upload_url || draft.image_url) && (
+                      // eslint-disable-next-line @next/next/no-img-element -- admin preview
+                      <img
+                        src={
+                          draft.image_upload_url ||
+                          resolveImageUrl(draft.image_url || "")
+                        }
+                        alt=""
+                        className="mt-2 h-28 w-40 rounded-md object-cover"
+                      />
+                    )}
                     <input
                       id="d-image"
                       type="file"
