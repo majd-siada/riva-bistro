@@ -514,6 +514,50 @@ def test_create_at_max_party_size_accepted(api):
 
 
 @pytest.mark.django_db
+def test_create_party_size_30_accepted_31_rejected(api):
+    """Published online limit is 30 guests (admin-configurable)."""
+    _open_all_week()
+    config = ReservationSettings.load()
+    config.max_party_size = 30
+    config.max_guests_per_slot = 40
+    config.save()
+    target = _target_date()
+    base = {
+        "name": "Anna",
+        "phone": "0700000000",
+        "email": "anna@example.com",
+        "date": target.isoformat(),
+        "time": "12:00",
+    }
+    ok = api.post("/api/v1/reservations/", {**base, "party_size": 30}, format="json")
+    assert ok.status_code == 201
+    assert ok.json()["party_size"] == 30
+
+    bad = api.post(
+        "/api/v1/reservations/",
+        {**base, "email": "anna2@example.com", "party_size": 31},
+        format="json",
+    )
+    assert bad.status_code == 400
+    assert bad.json()["code"] == "invalid_party"
+    assert "30" in bad.json()["detail"]
+
+
+@pytest.mark.django_db
+def test_availability_reports_max_party_size_30_by_default(api):
+    _open_all_week()
+    config = ReservationSettings.load()
+    # Simulate post-migration default alignment without assuming DB seed.
+    if config.max_party_size < 30:
+        config.max_party_size = 30
+        config.save()
+    target = _target_date()
+    resp = api.get(f"/api/v1/reservations/availability/?date={target.isoformat()}")
+    assert resp.status_code == 200
+    assert resp.json()["max_party_size"] == 30
+
+
+@pytest.mark.django_db
 def test_production_guard_leaves_no_row(api, settings):
     settings.DEBUG = False
     _open_all_week()

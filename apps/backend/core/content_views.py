@@ -222,7 +222,7 @@ class AdminRestaurantProfileView(APIView):
         serializer = RestaurantProfileSerializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        _revalidate("/", "/kontakt", "/om-oss", "/boka")
+        _revalidate("/", "/kontakt", "/om-oss", "/boka", "/meny", "/galleri")
         return Response(serializer.data)
 
 

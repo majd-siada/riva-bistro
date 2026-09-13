@@ -38,7 +38,10 @@ export async function RestaurantJsonLd() {
     loadRestaurantBusiness(),
     loadHours(),
   ]);
-  const socialLinks: string[] = [profile.social.instagram, profile.social.facebook];
+  const socialLinks: string[] = [
+    profile.social.instagram,
+    profile.social.facebook,
+  ].filter(Boolean);
   const sameAs = profile.verified ? socialLinks : [];
 
   const restaurant: Record<string, unknown> = {

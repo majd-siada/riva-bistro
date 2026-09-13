@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StateMessage } from "@/components/ui/state-message";
-import { adminGetSettings, adminUpdateSettings, type AdminSettings } from "@/lib/admin-api";
+import {
+  adminGetRestaurantProfile,
+  adminGetSettings,
+  adminUpdateRestaurantProfile,
+  adminUpdateSettings,
+  type AdminSettings,
+  type RestaurantProfile,
+} from "@/lib/admin-api";
 
 const NUMERIC_FIELDS: { key: keyof AdminSettings; label: string; help: string }[] = [
   { key: "max_guests_per_slot", label: "Max antal gäster per tidslucka", help: "Total kapacitet per bokningstid." },
@@ -21,11 +28,20 @@ const NUMERIC_FIELDS: { key: keyof AdminSettings; label: string; help: string }[
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<AdminSettings | null>(null);
+  const [instagram, setInstagram] = useState("");
+  const [facebook, setFacebook] = useState("");
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingSocial, setSavingSocial] = useState(false);
 
   useEffect(() => {
-    adminGetSettings().then(setSettings).catch(() => setError(true));
+    Promise.all([adminGetSettings(), adminGetRestaurantProfile()])
+      .then(([s, profile]) => {
+        setSettings(s);
+        setInstagram(profile.social_instagram || "");
+        setFacebook(profile.social_facebook || "");
+      })
+      .catch(() => setError(true));
   }, []);
 
   const save = async () => {
@@ -42,70 +58,130 @@ export default function AdminSettingsPage() {
     }
   };
 
+  const saveSocial = async () => {
+    setSavingSocial(true);
+    try {
+      const updated: RestaurantProfile = await adminUpdateRestaurantProfile({
+        social_instagram: instagram.trim(),
+        social_facebook: facebook.trim(),
+      });
+      setInstagram(updated.social_instagram || "");
+      setFacebook(updated.social_facebook || "");
+      toast.success("Sociala länkar sparade — syns i sidfoten när URL:erna är ifyllda.");
+    } catch {
+      toast.error("Kunde inte spara sociala länkar.");
+    } finally {
+      setSavingSocial(false);
+    }
+  };
+
   if (error) return <StateMessage variant="error" title="Kunde inte ladda inställningar" />;
   if (!settings) return <p className="text-riva-muted">Laddar…</p>;
 
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="max-w-2xl space-y-10">
       <div>
-        <h1 className="font-display text-3xl text-riva-cream">Bokningsinställningar</h1>
-        <p className="mt-1 text-riva-muted">Kapacitet och regler för onlinebokning.</p>
+        <h1 className="font-display text-3xl text-riva-cream">Inställningar</h1>
+        <p className="mt-1 text-riva-muted">
+          Bokningsregler och länkar som visas på webbplatsen.
+        </p>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        {NUMERIC_FIELDS.map((f) => (
-          <div key={f.key}>
-            <Label htmlFor={f.key}>{f.label}</Label>
-            <Input
-              id={f.key}
-              type="number"
-              min={0}
-              value={String(settings[f.key] as number)}
-              onChange={(e) =>
-                setSettings({ ...settings, [f.key]: Number(e.target.value) })
-              }
-              className="mt-1.5"
-            />
-            <p className="mt-1 text-xs text-riva-muted">{f.help}</p>
-          </div>
-        ))}
-      </div>
+      <section className="space-y-6">
+        <div>
+          <h2 className="font-display text-2xl text-riva-cream">Bokning</h2>
+          <p className="mt-1 text-sm text-riva-muted">Kapacitet och regler för onlinebokning.</p>
+        </div>
 
-      <div className="rounded-lg border border-riva-gold/40 bg-riva-gold/[0.07] p-5">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
-          <div className="flex-1">
-            <p className="font-medium text-riva-cream">Onlinebokning</p>
-            <p className="mt-1 text-sm text-riva-muted">
-              Denna växel är den enda grinden för onlinebokning — även om DEBUG
-              råkar vara på. Aktivera först när kapaciteten ovan speglar
-              restaurangens verkliga förmåga. När växeln är av kan gäster inte
-              boka online.
-            </p>
-            <p className="mt-2 text-sm text-riva-cream">
-              Status:{" "}
-              <strong className="font-medium">
-                {settings.production_ready ? "Live" : "Avstängd"}
-              </strong>
-            </p>
-            <label className="mt-3 inline-flex items-center gap-2 text-sm text-riva-cream">
-              <input
-                type="checkbox"
-                checked={settings.production_ready}
+        <div className="grid gap-5 sm:grid-cols-2">
+          {NUMERIC_FIELDS.map((f) => (
+            <div key={f.key}>
+              <Label htmlFor={f.key}>{f.label}</Label>
+              <Input
+                id={f.key}
+                type="number"
+                min={0}
+                value={String(settings[f.key] as number)}
                 onChange={(e) =>
-                  setSettings({ ...settings, production_ready: e.target.checked })
+                  setSettings({ ...settings, [f.key]: Number(e.target.value) })
                 }
-                className="h-5 w-5 accent-riva-gold"
+                className="mt-1.5"
               />
-              Aktivera onlinebokning
-            </label>
+              <p className="mt-1 text-xs text-riva-muted">{f.help}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-lg border border-riva-gold/40 bg-riva-gold/[0.07] p-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-riva-gold" aria-hidden="true" />
+            <div className="flex-1">
+              <p className="font-medium text-riva-cream">Onlinebokning</p>
+              <p className="mt-1 text-sm text-riva-muted">
+                Denna växel är den enda grinden för onlinebokning. Aktivera först när
+                kapaciteten ovan speglar restaurangens verkliga förmåga. När växeln är av
+                kan gäster inte boka online.
+              </p>
+              <p className="mt-2 text-sm text-riva-cream">
+                Status:{" "}
+                <strong className="font-medium">
+                  {settings.production_ready ? "Live" : "Avstängd"}
+                </strong>
+              </p>
+              <label className="mt-3 inline-flex items-center gap-2 text-sm text-riva-cream">
+                <input
+                  type="checkbox"
+                  checked={settings.production_ready}
+                  onChange={(e) =>
+                    setSettings({ ...settings, production_ready: e.target.checked })
+                  }
+                  className="h-5 w-5 accent-riva-gold"
+                />
+                Aktivera onlinebokning
+              </label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Button variant="gold" loading={saving} onClick={() => void save()}>
-        Spara inställningar
-      </Button>
+        <Button variant="gold" loading={saving} onClick={() => void save()}>
+          Spara bokningsinställningar
+        </Button>
+      </section>
+
+      <section className="space-y-4 border-t border-riva-cream/10 pt-10">
+        <div>
+          <h2 className="font-display text-2xl text-riva-cream">Sociala medier</h2>
+          <p className="mt-1 text-sm text-riva-muted">
+            Lämna tomt tills kontona finns. Ifyllda länkar visas automatiskt i sidfoten på
+            webbplatsen.
+          </p>
+        </div>
+        <div>
+          <Label htmlFor="social-ig">Instagram-URL</Label>
+          <Input
+            id="social-ig"
+            type="url"
+            placeholder="https://www.instagram.com/…"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            className="mt-1.5"
+          />
+        </div>
+        <div>
+          <Label htmlFor="social-fb">Facebook-URL</Label>
+          <Input
+            id="social-fb"
+            type="url"
+            placeholder="https://www.facebook.com/…"
+            value={facebook}
+            onChange={(e) => setFacebook(e.target.value)}
+            className="mt-1.5"
+          />
+        </div>
+        <Button variant="gold" loading={savingSocial} onClick={() => void saveSocial()}>
+          Spara sociala länkar
+        </Button>
+      </section>
     </div>
   );
 }

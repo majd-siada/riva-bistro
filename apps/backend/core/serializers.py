@@ -202,6 +202,9 @@ def _validate_uploaded_image(uploaded):
 
 
 class RestaurantProfileSerializer(serializers.ModelSerializer):
+    social_instagram = serializers.URLField(required=False, allow_blank=True)
+    social_facebook = serializers.URLField(required=False, allow_blank=True)
+
     class Meta:
         model = RestaurantProfile
         fields = [

@@ -23,8 +23,8 @@ export function CookieNotice() {
     <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg rounded-lg border border-riva-cream/15 bg-riva-surface p-4 shadow-elevated md:left-auto">
       <p className="text-sm text-riva-cream">Vi värdesätter din integritet</p>
       <p className="mt-2 text-xs leading-relaxed text-riva-muted">
-        Vi använder endast nödvändiga kakor för att webbplatsen ska fungera, bland annat
-        för inloggning i administrationen. Ingen reklamspårning. Läs mer i vår{" "}
+        Vi använder bara det som behövs för att webbplatsen ska fungera. Vi använder inte
+        reklam- eller analysverktyg från andra företag. Läs mer i vår{" "}
         <a href="/cookies" className="text-riva-cream underline underline-offset-2">
           cookiepolicy
         </a>

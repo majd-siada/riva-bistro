@@ -6,8 +6,8 @@
  * intentional static fallback and the contact block for legal/policy pages
  * and the client booking form — values MUST stay identical to the live profile.
  *
- * Social URLs may still be placeholders — do not publish them as JSON-LD
- * `sameAs` until `verified` is true.
+ * Social URLs stay empty until the owner pastes real profile links in
+ * Admin → Inställningar. Do not publish placeholder social URLs.
  *
  * Opening hours: prefer Admin → Öppettider / GET /api/v1/hours/ at runtime.
  * `restaurantHoursLabel` is a static fallback from `opening-hours.ts`.
@@ -33,8 +33,8 @@ export const business = {
     city: "Stockholm",
     country: "SE",
   },
-  /** Owner-confirmed public number. */
-  phone: "087042050",
+  /** Owner-confirmed public number (display form). */
+  phone: "08-704 20 50",
   phoneHref: "tel:+4687042050",
   phoneE164: "+4687042050",
   email: "info@rivabistro.se",
@@ -44,8 +44,8 @@ export const business = {
   mapUrl:
     "https://www.google.com/maps/search/?api=1&query=Hornsbergs+Strand+57+112+16+Stockholm",
   social: {
-    instagram: "https://instagram.com/rivabistro",
-    facebook: "https://facebook.com/rivabistro",
+    instagram: "",
+    facebook: "",
   },
 } as const;
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Mail, MapPin, Phone, Share2 } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 import { FAQ } from "@/components/brand/faq";
 import { RestaurantImage } from "@/components/brand/restaurant-image";
@@ -37,7 +37,7 @@ function contactFaqs(business: PublicBusiness) {
     {
       question: "Kan jag boka för större sällskap?",
       answer:
-        "För större sällskap — särskilt över tolv personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
+        "För större sällskap — särskilt över 30 personer — kontakta oss via formuläret eller telefon så vi kan se vad som är möjligt det önskade datumet.",
     },
     {
       question: "Hur når jag er?",
@@ -133,27 +133,6 @@ export default async function ContactPage() {
               {business.kitchenHours ? (
                 <p className="mt-1 text-sm text-riva-muted/80">{business.kitchenHours}</p>
               ) : null}
-            </div>
-            <div>
-              <h2 className="riva-label">Följ oss</h2>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {business.social.instagram && (
-                  <Button asChild variant="outline" size="sm">
-                    <a href={business.social.instagram} target="_blank" rel="noopener noreferrer">
-                      <Share2 className="mr-2 h-4 w-4" strokeWidth={1.25} />
-                      Instagram
-                    </a>
-                  </Button>
-                )}
-                {business.social.facebook && (
-                  <Button asChild variant="outline" size="sm">
-                    <a href={business.social.facebook} target="_blank" rel="noopener noreferrer">
-                      <Share2 className="mr-2 h-4 w-4" strokeWidth={1.25} />
-                      Facebook
-                    </a>
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
           <ContactForm />

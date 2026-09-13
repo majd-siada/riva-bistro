@@ -105,12 +105,8 @@ class RestaurantProfile(models.Model):
             "&query=Hornsbergs+Strand+57+112+16+Stockholm"
         ),
     )
-    social_instagram = models.URLField(
-        blank=True, default="https://instagram.com/rivabistro"
-    )
-    social_facebook = models.URLField(
-        blank=True, default="https://facebook.com/rivabistro"
-    )
+    social_instagram = models.URLField(blank=True, default="")
+    social_facebook = models.URLField(blank=True, default="")
     social_verified = models.BooleanField(default=False)
     kitchen_hours = models.CharField(max_length=200, blank=True, default="")
     updated_at = models.DateTimeField(auto_now=True)

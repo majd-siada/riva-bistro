@@ -6,7 +6,7 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Cookiepolicy",
   description:
-    "Information om vilka kakor Riva Bistro använder. Endast nödvändiga kakor — ingen reklamspårning.",
+    "Hur Riva Bistro använder kakor och liknande teknik på webbplatsen.",
   path: "/cookies",
 });
 
@@ -14,24 +14,24 @@ export default function CookiesPage() {
   return (
     <LegalDocument title="Cookiepolicy" path="/cookies">
       <p>
-        Vi använder endast nödvändiga kakor för att webbplatsen ska fungera, bland annat
-        för att komma ihåg ditt samtycke i cookiemeddelandet och för inloggning i
-        administrationen. Vi använder inte reklam- eller analysverktyg från tredje part på
-        den offentliga webbplatsen.
+        På den offentliga webbplatsen använder vi bara det som behövs för att sidan ska
+        fungera som den ska. Vi använder inte reklam- eller analysverktyg från andra
+        företag, och vi spårar dig inte i marknadsföringssyfte.
       </p>
-      <h2 className="font-display text-2xl text-riva-cream">Nödvändiga kakor</h2>
-      <ul className="list-disc space-y-2 pl-5">
-        <li>
-          <strong className="text-riva-cream">riva-cookie-consent</strong> — sparar att du
-          stängt cookiemeddelandet (localStorage).
-        </li>
-        <li>
-          <strong className="text-riva-cream">Sessionskaka / CSRF</strong> — används endast
-          för inloggad administration mot API:t.
-        </li>
-      </ul>
+
+      <h2 className="font-display text-2xl text-riva-cream">Vad sparas i din webbläsare?</h2>
       <p>
-        Mer om personuppgifter finns i vår{" "}
+        När du stänger vårt korta meddelande om kakor sparar webbläsaren att du har sett
+        det, så att samma meddelande inte visas igen i onödan.
+      </p>
+      <p>
+        Om du loggar in i restaurangens interna adminområde används säkerhetskakor för
+        inloggningen. Det behövs inte för att besöka menyn, boka bord eller läsa om oss.
+      </p>
+
+      <h2 className="font-display text-2xl text-riva-cream">Mer information</h2>
+      <p>
+        Hur vi hanterar personuppgifter när du bokar eller kontaktar oss beskrivs i vår{" "}
         <Link href="/integritetspolicy" className="text-riva-cream underline">
           integritetspolicy
         </Link>

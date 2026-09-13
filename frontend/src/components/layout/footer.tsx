@@ -88,6 +88,37 @@ export async function Footer() {
           {business.kitchenHours ? (
             <p className="mt-4 text-xs text-riva-muted/80">{business.kitchenHours}</p>
           ) : null}
+          {(business.social.instagram || business.social.facebook) && (
+            <div className="mt-6">
+              <h2 className="riva-label">Följ oss</h2>
+              <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-riva-muted">
+                {business.social.instagram ? (
+                  <li>
+                    <a
+                      href={business.social.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-riva hover:text-riva-cream"
+                    >
+                      Instagram
+                    </a>
+                  </li>
+                ) : null}
+                {business.social.facebook ? (
+                  <li>
+                    <a
+                      href={business.social.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-riva hover:text-riva-cream"
+                    >
+                      Facebook
+                    </a>
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

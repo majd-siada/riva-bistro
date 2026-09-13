@@ -30,7 +30,7 @@ While `verified: false` (current):
 **Canonical NAP (keep in sync):**
 
 - Address: Hornsbergs Strand 57, 112 16 Stockholm
-- Phone: 087042050 / +4687042050
+- Phone: 08-704 20 50 / +4687042050
 - Email: info@rivabistro.se
 - Official weekly hours via `official_hours.py` / Admin → Öppettider +
   `restaurantHoursLabel` fallback:

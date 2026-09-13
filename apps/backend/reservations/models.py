@@ -57,7 +57,7 @@ class ReservationSettings(models.Model):
     max_guests_per_slot = models.PositiveIntegerField(default=20)
     slot_interval_minutes = models.PositiveIntegerField(default=30)
     last_seating_buffer_minutes = models.PositiveIntegerField(default=60)
-    max_party_size = models.PositiveIntegerField(default=12)
+    max_party_size = models.PositiveIntegerField(default=30)
     booking_lead_minutes = models.PositiveIntegerField(default=60)
     booking_horizon_days = models.PositiveIntegerField(default=90)
     # Instant online booking is gated by production_ready only.

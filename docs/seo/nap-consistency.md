@@ -19,7 +19,7 @@
 | Postal | 112 16 |
 | City | Stockholm |
 | Area (copy) | Kungsholmen |
-| Phone | 087042050 / +4687042050 |
+| Phone | 08-704 20 50 / +4687042050 |
 | Email | info@rivabistro.se |
 | Site | https://rivabistro.se |
 

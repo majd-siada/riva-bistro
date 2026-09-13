@@ -41,7 +41,7 @@ describe("business NAP helpers", () => {
     expect(business.address.street).toBe("Hornsbergs Strand 57");
     expect(business.address.postalCode).toBe("112 16");
     expect(business.address.city).toBe("Stockholm");
-    expect(business.phone).toBe("087042050");
+    expect(business.phone).toBe("08-704 20 50");
     expect(business.phoneE164).toBe("+4687042050");
     expect(business.email).toBe("info@rivabistro.se");
     expect(fullAddress()).toBe("Hornsbergs Strand 57, 112 16 Stockholm");

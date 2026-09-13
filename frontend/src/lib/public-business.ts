@@ -3,6 +3,22 @@
  */
 import { business as fallback } from "@/config/business";
 
+/** Old seed placeholders — never show until the owner sets a real profile URL. */
+const LEGACY_PLACEHOLDER_SOCIAL = new Set([
+  "https://instagram.com/rivabistro",
+  "https://www.instagram.com/rivabistro",
+  "https://facebook.com/rivabistro",
+  "https://www.facebook.com/rivabistro",
+]);
+
+/** Return a usable public social URL, or empty string if unset/placeholder. */
+export function publicSocialUrl(url: string | undefined | null): string {
+  const u = (url || "").trim().replace(/\/+$/, "");
+  if (!u) return "";
+  if (LEGACY_PLACEHOLDER_SOCIAL.has(u)) return "";
+  return u;
+}
+
 export type PublicBusiness = {
   name: string;
   tagline: string;
@@ -57,7 +73,10 @@ export function businessFromProfile(
       phoneE164: fallback.phoneE164,
       email: fallback.email,
       mapUrl: fallback.mapUrl,
-      social: { ...fallback.social },
+      social: {
+        instagram: publicSocialUrl(fallback.social.instagram),
+        facebook: publicSocialUrl(fallback.social.facebook),
+      },
       verified: fallback.verified,
       kitchenHours: fallback.kitchenHours,
       restaurantHoursLabel: fallback.restaurantHoursLabel,
@@ -79,8 +98,8 @@ export function businessFromProfile(
     email: profile.email || fallback.email,
     mapUrl: profile.map_url || fallback.mapUrl,
     social: {
-      instagram: profile.social_instagram || fallback.social.instagram,
-      facebook: profile.social_facebook || fallback.social.facebook,
+      instagram: publicSocialUrl(profile.social_instagram),
+      facebook: publicSocialUrl(profile.social_facebook),
     },
     verified: profile.social_verified,
     kitchenHours: profile.kitchen_hours || "",

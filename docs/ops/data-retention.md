@@ -1,26 +1,28 @@
-# Data retention (owner decisions required)
+# Data retention — Riva Bistro
 
-This document is a **fill-in template**. Do not treat placeholder periods as policy.
+## Public policy
 
-## Systems that store personal data
+`/integritetspolicy` states booking/contact personal data is retained up to
+**30 days after the reservation date** (bookings) or receipt date (inquiries),
+then removed.
 
-| Data | Where | Suggested review question for owner |
-|------|-------|-------------------------------------|
-| Reservation guest name/phone/email | Postgres `reservations_reservation` | How long after the booking date should rows be kept? |
-| Contact / event inquiries | Postgres inquiry tables | How long should inbox messages be kept? |
-| Staff auth accounts | Django auth | Who may retain admin accounts? |
-| Media uploads | `MEDIA_ROOT` / object storage | When may unused images be deleted? |
-| Application logs | Docker/journald | Max log retention on the VPS? |
-| Backups | `scripts/backup-postgres.sh` output | How many daily dumps to keep? |
+## Automated cleanup
 
-## Technical controls already present
+| Mechanism | Detail |
+|-----------|--------|
+| Command | `python manage.py purge_personal_data` (`--dry-run` supported) |
+| Script | `scripts/purge-personal-data.sh` (Docker Compose on VPS) |
+| Bookings | Personal fields anonymized (`name` / `email` / `phone` / `special_request`); date, time, party size, status, and ref kept |
+| Contact + event inquiries | Entire rows deleted after 30 days from `created_at` |
+| Idempotent | Safe to run daily; already-scrubbed bookings are skipped |
+| Logs | Counts only — never names, emails, phones, or message bodies |
 
-- Online booking create stores only fields required for the reservation.
-- Staff Telegram/email alerts are best-effort and do not invent third-party analytics IDs.
-- Legal scaffolding pages state that final retention must be approved by owner/counsel.
+### Suggested cron (VPS)
 
-## Owner actions
+```cron
+15 3 * * * cd /opt/riva-bistro && ./scripts/purge-personal-data.sh >>/var/log/riva-privacy-purge.log 2>&1
+```
 
-1. Fill retention periods with counsel.
-2. Reflect approved periods in `/integritetspolicy`.
-3. Schedule purge/archive jobs only after periods are decided (not automated in this repo yet).
+## Manual controls
+
+Admin can still delete bookings and inquiries immediately (including bulk delete).
