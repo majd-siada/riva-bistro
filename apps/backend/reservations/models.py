@@ -60,7 +60,6 @@ class ReservationSettings(models.Model):
     max_party_size = models.PositiveIntegerField(default=12)
     booking_lead_minutes = models.PositiveIntegerField(default=60)
     booking_horizon_days = models.PositiveIntegerField(default=90)
-    # Instant confirmation only goes live in production once staff have set a
     # Instant online booking is gated by production_ready only.
     # DEBUG must never bypass — see reservations.availability.instant_booking_enabled.
     production_ready = models.BooleanField(default=False)
