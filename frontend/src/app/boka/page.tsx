@@ -25,7 +25,7 @@ const GOOD_TO_KNOW = [
   },
   {
     title: "Avbokning",
-    body: "Kontakta oss minst 24 timmar innan om du behöver ändra eller avboka.",
+    body: "Hör av dig så snart du kan om du behöver ändra eller avboka — gärna minst en timme före den bokade tiden.",
   },
   {
     title: "Försenad?",

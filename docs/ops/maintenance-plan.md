@@ -32,7 +32,7 @@ Companion: [production-runbook.md](../deployment/production-runbook.md), [bug-tr
 - **Public DNS spot-check:** redo commands in [dns-verification.md](../deployment/dns-verification.md)
 - **Content:** staff confirm featured dishes, hours, closures for holidays
 - **Backup presence:** verify a recent Postgres dump exists on the VPS backup path (script: `scripts/backup-postgres.sh` — schedule is 👤 unless cron was installed by ops)
-- **Privacy purge:** confirm daily `purge_personal_data` cron (or recent log from `scripts/purge-personal-data.sh`) if installed — 👤 until cron is enabled
+- **Privacy purge:** confirm daily cron via `./scripts/install-privacy-purge-cron.sh` (or recent `/var/log/riva-privacy-purge.log`) — 👤 until cron is enabled on the VPS
 
 ### Quarterly (👤)
 

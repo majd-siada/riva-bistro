@@ -5,7 +5,9 @@
 #   ./scripts/purge-personal-data.sh
 #   ./scripts/purge-personal-data.sh --dry-run
 #
-# Suggested cron (daily 03:15 UTC):
+# Suggested cron (daily 03:15): prefer the installer
+#   ./scripts/install-privacy-purge-cron.sh
+# Manual equivalent:
 #   15 3 * * * cd /opt/riva-bistro && ./scripts/purge-personal-data.sh >>/var/log/riva-privacy-purge.log 2>&1
 #
 # Never prints guest names, emails, phones, or message bodies.

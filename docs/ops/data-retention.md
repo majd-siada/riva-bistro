@@ -19,8 +19,22 @@ then removed.
 
 ### Suggested cron (VPS)
 
+Install once on the API host (idempotent):
+
+```bash
+cd /opt/riva-bistro && ./scripts/install-privacy-purge-cron.sh
+```
+
+That installs:
+
 ```cron
 15 3 * * * cd /opt/riva-bistro && ./scripts/purge-personal-data.sh >>/var/log/riva-privacy-purge.log 2>&1
+```
+
+The installer runs a `--dry-run` (counts only). Manual dry-run:
+
+```bash
+./scripts/purge-personal-data.sh --dry-run
 ```
 
 ## Manual controls

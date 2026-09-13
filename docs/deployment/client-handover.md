@@ -38,7 +38,7 @@ Short operational guide for the restaurant owner (Majd). Technical deploy detail
 - [ ] Optional: cancel audit probe reservation if still present
 - [ ] Have counsel review `/integritetspolicy`, `/cookies`, `/villkor`, `/bokningspolicy`
 - [ ] Schedule DB backups: `./scripts/backup-postgres.sh` (cron daily)
-- [ ] Schedule privacy purge: `./scripts/purge-personal-data.sh` (cron daily — see `docs/ops/data-retention.md`)
+- [ ] Schedule privacy purge: `./scripts/install-privacy-purge-cron.sh` (daily — see `docs/ops/data-retention.md`)
 - [ ] Optional: set `SENTRY_DSN` after installing `sentry-sdk`
 - [ ] Google Business Profile + Search Console (external — not done from this repo)
 
