@@ -61,9 +61,8 @@ class ReservationSettings(models.Model):
     booking_lead_minutes = models.PositiveIntegerField(default=60)
     booking_horizon_days = models.PositiveIntegerField(default=90)
     # Instant confirmation only goes live in production once staff have set a
-    # real capacity and flipped this on. In DEBUG we always allow it (dev
-    # placeholder capacity). See reservations.availability.instant_booking_enabled.
-    # Gate is production_ready only — DEBUG never bypasses.
+    # Instant online booking is gated by production_ready only.
+    # DEBUG must never bypass — see reservations.availability.instant_booking_enabled.
     production_ready = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 

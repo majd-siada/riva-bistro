@@ -15,10 +15,11 @@ backend — the frontend availability UI is advisory only. Implementation:
    (`pg_advisory_xact_lock`) serialises concurrent bookings for the same date+time,
    so capacity is enforced at the database layer (no overbooking).
 3. Every reservation receives a **unique booking reference** (`RB-XXXXXX`).
-4. **Production guard**: instant confirmation is only allowed when `settings.DEBUG`
-   (dev placeholder capacity) or `ReservationSettings.production_ready` is true. In
-   production it stays disabled — and returns a clear "not enabled" response rather
-   than a fake confirmation — until staff set a real capacity and enable it.
+4. **Production guard**: instant online booking is allowed **only** when
+   `ReservationSettings.production_ready` is true. `settings.DEBUG` must **never**
+   bypass this gate (a mis-set `DEBUG` on a production host must not enable bookings).
+   When disabled, availability returns `enabled=false` with a clear response — not a
+   fake confirmation — until staff set capacity and turn online booking on.
 5. Confirmation email is **best-effort** and out of band — a mail failure never
    turns a real, committed booking into an error.
 
@@ -59,7 +60,7 @@ Availability response fields (keep distinct):
 | Field | Meaning |
 |-------|---------|
 | `closed` | Restaurant not open that calendar day (hours / closure / out of horizon) |
-| `enabled` | Online booking allowed (`production_ready` when `DEBUG` is off) |
+| `enabled` | Online booking allowed (`production_ready` only; `DEBUG` never enables booking) |
 
 `production_ready=false` must yield `enabled=false` without forcing `closed=true`
 on an open day.
