@@ -46,6 +46,15 @@ import { cn } from "@/lib/utils";
 const VAT = 0.12;
 const DEFAULT_SECTION: MenuSectionSlug = "rivas-meny";
 
+/** Weekday under-categories for Dagens lunch (day = category on /meny). */
+const DAGENS_LUNCH_DAYS: ReadonlyArray<{ name: string; sort_order: number }> = [
+  { name: "Måndag", sort_order: 10 },
+  { name: "Tisdag", sort_order: 20 },
+  { name: "Onsdag", sort_order: 30 },
+  { name: "Torsdag", sort_order: 40 },
+  { name: "Fredag", sort_order: 50 },
+];
+
 const incFromBase = (base: string, rate: string) =>
   Math.round(Number(base) * (1 + Number(rate || VAT)));
 const baseFromInc = (inc: number, rate: number) =>
@@ -174,8 +183,57 @@ export default function AdminMenuManager({
     if (sectionSlug === "rivas-meny") {
       return childCategories.length ? childCategories : sectionCategories;
     }
+    if (sectionSlug === "dagens-lunch") {
+      // Day headings only — dishes should not sit on the section shell.
+      return childCategories;
+    }
     return sectionCategories;
   }, [sectionSlug, childCategories, sectionCategories]);
+
+  const dishCategoryOptions = useMemo(() => {
+    if (
+      draft &&
+      draft.category !== "" &&
+      !productCategories.some((c) => c.id === draft.category)
+    ) {
+      const orphan = categories.find((c) => c.id === draft.category);
+      return orphan ? [...productCategories, orphan] : productCategories;
+    }
+    return productCategories;
+  }, [draft, productCategories, categories]);
+
+  const ensureDagensLunchDays = async (): Promise<AdminCategory[]> => {
+    if (!sectionRoot || sectionSlug !== "dagens-lunch") return childCategories;
+    const existingNames = new Set(
+      childCategories.map((c) => c.name.trim().toLocaleLowerCase("sv")),
+    );
+    const missing = DAGENS_LUNCH_DAYS.filter(
+      (day) => !existingNames.has(day.name.toLocaleLowerCase("sv")),
+    );
+    if (missing.length === 0) return childCategories;
+    const created: AdminCategory[] = [];
+    for (const day of missing) {
+      const row = await adminCreateCategory({
+        name: day.name,
+        sort_order: day.sort_order,
+        parent: sectionRoot.id,
+        is_active: true,
+      });
+      created.push(row);
+    }
+    const next = [...categories, ...created];
+    setCategories(next);
+    return next
+      .filter(
+        (c) =>
+          c.id !== sectionRoot.id &&
+          (c.parent === sectionRoot.id || c.parent_slug === sectionSlug),
+      )
+      .sort(
+        (a, b) =>
+          (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name),
+      );
+  };
 
   const sectionProducts = useMemo(
     () =>
@@ -242,7 +300,11 @@ export default function AdminMenuManager({
 
   const saveDraft = async () => {
     if (!draft || draft.category === "" || !draft.name.trim() || !draft.priceInc) {
-      toast.error("Fyll i namn, kategori och pris.");
+      toast.error(
+        sectionSlug === "dagens-lunch"
+          ? "Fyll i namn, dag och pris."
+          : "Fyll i namn, kategori och pris.",
+      );
       return;
     }
     setSaving(true);
@@ -320,6 +382,29 @@ export default function AdminMenuManager({
     }
   };
 
+  const openNewDish = async () => {
+    if (!sectionRoot) return;
+    try {
+      let categoryId = productCategories[0]?.id ?? sectionRoot.id;
+      if (sectionSlug === "dagens-lunch") {
+        const days = await ensureDagensLunchDays();
+        categoryId = days[0]?.id ?? sectionRoot.id;
+      }
+      setDraft(emptyDraft(categoryId));
+    } catch {
+      toast.error("Kunde inte förbereda dagar för dagens lunch.");
+    }
+  };
+
+  const seedDagensLunchDays = async () => {
+    try {
+      await ensureDagensLunchDays();
+      toast.success("Veckodagarna Måndag–Fredag är klara.");
+    } catch {
+      toast.error("Kunde inte skapa veckodagar.");
+    }
+  };
+
   const saveCategoryField = async (
     c: AdminCategory,
     patch: Partial<Pick<AdminCategory, "name" | "sort_order" | "is_active">>,
@@ -360,9 +445,6 @@ export default function AdminMenuManager({
   if (loading) return <p className="text-riva-muted">Laddar…</p>;
   if (error) return <StateMessage variant="error" title="Kunde inte ladda menyn" />;
 
-  const defaultCategoryId =
-    productCategories[0]?.id ?? sectionRoot?.id ?? categories[0]?.id;
-
   return (
     <div className="space-y-12">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -375,7 +457,7 @@ export default function AdminMenuManager({
         </div>
         <Button
           variant="gold"
-          onClick={() => setDraft(emptyDraft(defaultCategoryId))}
+          onClick={() => void openNewDish()}
           disabled={!sectionRoot}
         >
           Ny rätt
@@ -576,14 +658,23 @@ export default function AdminMenuManager({
       </div>
 
       <section className="border-t border-riva-cream/10 pt-10">
-        <h2 className="font-display text-2xl text-riva-cream">Kategorier</h2>
+        <h2 className="font-display text-2xl text-riva-cream">
+          {sectionSlug === "dagens-lunch" ? "Veckodagar" : "Kategorier"}
+        </h2>
         <p className="mt-1 text-sm text-riva-muted">
-          Underkategorier i den här sektionen
-          {sectionSlug === "rivas-meny" ? " (t.ex. Förrätter under RIVAS MENY)." : "."}
+          {sectionSlug === "dagens-lunch"
+            ? "Varje rätt hör till en dag (Måndag–Fredag). Dagarna visas som rubriker på /meny."
+            : sectionSlug === "rivas-meny"
+              ? "Underkategorier i den här sektionen (t.ex. Förrätter under RIVAS MENY)."
+              : "Underkategorier i den här sektionen."}
         </p>
         <div className="mt-4 max-w-3xl space-y-2">
           {childCategories.length === 0 ? (
-            <p className="text-sm text-riva-muted">Inga underkategorier.</p>
+            <p className="text-sm text-riva-muted">
+              {sectionSlug === "dagens-lunch"
+                ? "Inga veckodagar ännu — skapa Måndag–Fredag nedan."
+                : "Inga underkategorier."}
+            </p>
           ) : (
             childCategories.map((c) => (
               <div
@@ -639,6 +730,14 @@ export default function AdminMenuManager({
               </Button>
             </div>
           )}
+
+          {sectionSlug === "dagens-lunch" && sectionRoot && (
+            <div className="pt-2">
+              <Button variant="outline" onClick={() => void seedDagensLunchDays()}>
+                Skapa Måndag–Fredag
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -661,22 +760,35 @@ export default function AdminMenuManager({
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="d-cat">Kategori</Label>
+                    <Label htmlFor="d-cat">
+                      {sectionSlug === "dagens-lunch" ? "Dag" : "Kategori"}
+                    </Label>
                     <Select
                       value={draft.category === "" ? "" : String(draft.category)}
                       onValueChange={(v) => setDraft({ ...draft, category: Number(v) })}
                     >
                       <SelectTrigger id="d-cat" className="mt-1.5">
-                        <SelectValue placeholder="Välj kategori" />
+                        <SelectValue
+                          placeholder={
+                            sectionSlug === "dagens-lunch"
+                              ? "Välj dag"
+                              : "Välj kategori"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {productCategories.map((c) => (
+                        {dishCategoryOptions.map((c) => (
                           <SelectItem key={c.id} value={String(c.id)}>
                             {c.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {sectionSlug === "dagens-lunch" ? (
+                      <p className="mt-1.5 text-xs text-riva-muted">
+                        Välj vilken veckodag rätten ska visas under på menyn.
+                      </p>
+                    ) : null}
                   </div>
                   <div>
                     <Label htmlFor="d-price">Pris (kr, inkl. moms)</Label>
