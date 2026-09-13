@@ -8,6 +8,7 @@ from core.content_views import (
     SiteContentView,
 )
 from core.inquiry_views import ContactView, EventInquiryView
+from core.revalidate_auth import RevalidateAuthView
 from core.views import HealthView
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path("restaurant/", RestaurantProfileView.as_view(), name="restaurant-profile"),
     path("site-content/", SiteContentView.as_view(), name="site-content"),
     path("offers/", OfferListView.as_view(), name="offers"),
+    path("revalidate-auth/", RevalidateAuthView.as_view(), name="revalidate-auth"),
 ]

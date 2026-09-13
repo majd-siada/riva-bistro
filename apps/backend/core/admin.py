@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from core.models import ContactMessage, EventInquiry, GalleryItem
+from core.revalidate import GALLERY_PATHS, schedule_frontend_revalidation
 
 
 @admin.register(ContactMessage)
@@ -29,3 +30,11 @@ class EventInquiryAdmin(admin.ModelAdmin):
 class GalleryItemAdmin(admin.ModelAdmin):
     list_display = ("alt", "sort_order", "is_published")
     list_editable = ("sort_order", "is_published")
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(GALLERY_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(GALLERY_PATHS)

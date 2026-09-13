@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from core.revalidate import HOURS_PATHS, schedule_frontend_revalidation
 from reservations.models import (
     OpeningHours,
     Reservation,
@@ -12,6 +13,14 @@ from reservations.models import (
 class OpeningHoursAdmin(admin.ModelAdmin):
     list_display = ["weekday", "opens_at", "closes_at", "is_closed"]
     ordering = ["weekday"]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(HOURS_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(HOURS_PATHS)
 
 
 @admin.register(SpecialClosure)

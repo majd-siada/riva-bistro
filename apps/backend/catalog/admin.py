@@ -13,6 +13,7 @@ from catalog.section_proxies import (
     section_category_q,
     section_product_q,
 )
+from core.revalidate import MENU_PATHS, schedule_frontend_revalidation
 
 # ---------------------------------------------------------------------------
 # Shared section helpers
@@ -101,6 +102,15 @@ class SectionCategoryAdmin(admin.ModelAdmin):
             if shell is not None:
                 obj.parent = shell
         super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        schedule_frontend_revalidation(MENU_PATHS)
 
 
 class SectionProductAdmin(admin.ModelAdmin):
@@ -199,6 +209,14 @@ class SectionProductAdmin(admin.ModelAdmin):
             SectionCategoryFilter,
         )
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(MENU_PATHS)
+
 
 def _register_section_admins() -> None:
     for slug, meta in SECTION_ADMIN_MODELS.items():
@@ -257,6 +275,18 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines = [ProductInline]
     fields = ("name", "slug", "description", "parent", "sort_order", "is_active")
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        schedule_frontend_revalidation(MENU_PATHS)
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -306,5 +336,13 @@ class ProductAdmin(admin.ModelAdmin):
                 obj.image.url,
             )
         return "—"
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        schedule_frontend_revalidation(MENU_PATHS)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        schedule_frontend_revalidation(MENU_PATHS)
 
 
