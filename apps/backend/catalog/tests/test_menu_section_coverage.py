@@ -190,3 +190,38 @@ def test_public_products_exclude_inactive_category(seeded_menu):
     featured = client.get("/api/v1/menu/featured/")
     assert featured.status_code == 200
     assert all(row["category_slug"] != "forratter" for row in featured.json())
+
+
+@pytest.mark.django_db
+def test_admin_create_duplicate_product_name_gets_unique_slug(staff_client):
+    """Creating a dish whose slugify(name) already exists must not 500."""
+    category = Category.objects.get(slug="forratter")
+    first = staff_client.post(
+        "/api/v1/admin/menu/products/",
+        _create_payload(category.id, "Torskfilé", sort_order=50),
+        format="json",
+    )
+    assert first.status_code == 201, first.content
+    assert first.json()["slug"] == "torskfile"
+
+    duplicate = staff_client.post(
+        "/api/v1/admin/menu/products/",
+        _create_payload(category.id, "Torskfilé", sort_order=51),
+        format="json",
+    )
+    assert duplicate.status_code == 201, duplicate.content
+    body = duplicate.json()
+    assert body["name"] == "Torskfilé"
+    assert body["slug"] == "torskfile-2"
+
+    update = staff_client.patch(
+        f"/api/v1/admin/menu/products/{body['id']}/",
+        {"description": "Updated after duplicate create", "sort_order": 52},
+        format="json",
+    )
+    assert update.status_code == 200, update.content
+    assert update.json()["slug"] == "torskfile-2"
+    assert update.json()["description"] == "Updated after duplicate create"
+
+    staff_client.delete(f"/api/v1/admin/menu/products/{first.json()['id']}/")
+    staff_client.delete(f"/api/v1/admin/menu/products/{body['id']}/")

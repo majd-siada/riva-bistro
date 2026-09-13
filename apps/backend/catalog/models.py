@@ -75,8 +75,37 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            # Slug is unique globally and read-only in admin; colliding names
+            # (e.g. a second "Torskfilé") must not raise IntegrityError → 500.
+            self.slug = _unique_slug(
+                Product,
+                self.name,
+                exclude_pk=self.pk,
+                max_length=self._meta.get_field("slug").max_length,
+            )
         super().save(*args, **kwargs)
+
+
+def _unique_slug(
+    model_cls: type[models.Model],
+    source: str,
+    *,
+    exclude_pk: int | None = None,
+    max_length: int = 220,
+) -> str:
+    """Return slugify(source), appending -2, -3, … until unused."""
+    base = (slugify(source) or "item")[:max_length]
+    candidate = base
+    n = 2
+    while True:
+        qs = model_cls.objects.filter(slug=candidate)
+        if exclude_pk is not None:
+            qs = qs.exclude(pk=exclude_pk)
+        if not qs.exists():
+            return candidate
+        suffix = f"-{n}"
+        candidate = f"{base[: max_length - len(suffix)]}{suffix}"
+        n += 1
 
 
 class ModifierGroup(models.Model):
